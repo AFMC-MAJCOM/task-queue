@@ -1,6 +1,6 @@
 # This workflow will install Python dependencies, and run tests.
 
-name: Weave CI/CD
+name: Task Queue CI/CD
 
 on:
   push:
