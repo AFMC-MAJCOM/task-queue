@@ -1,9 +1,6 @@
 import subprocess
 from functools import partial
 import shutil
-from .utils import create_logger
-
-logger = create_logger("DATA_PIPELINE_INTERNAL", "log.txt")
 
 S5CMD_EXE = "s5cmd"
 
@@ -23,7 +20,7 @@ def base_command(subcmd, *main_args, concurrency=None, other_arguments=[]):
 
     cmd = ["s5cmd", subcmd] + list(main_args) + args
 
-    logger.info(f"Running s5cmd command {cmd}")
+    print(f"Running s5cmd command {cmd}")
     subprocess.run(cmd, check=True)
     # mock
     # print(cmd)
