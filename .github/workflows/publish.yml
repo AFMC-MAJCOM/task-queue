@@ -13,6 +13,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: build image
         run: |
-          docker build . -t ghcr.io/AFMC-MAJCOM/task-queue/test:latest
-          docker run ghcr.io/AFMC-MAJCOM/task-queue/test:latest controller --help 
-          docker push ghcr.io/AFMC-MAJCOM/task-queue/test:latest
+          docker build . -t ghcr.io/afmc-majcom/task-queue/test:latest
+          docker run ghcr.io/afmc-majcom/task-queue/test:latest controller --help 
+          docker push ghcr.io/afmc-majcom/task-queue/test:latest
