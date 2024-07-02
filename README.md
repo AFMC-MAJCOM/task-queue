@@ -87,7 +87,7 @@ To download the docker image run the following command.
 docker pull ghcr.io/afmc-majcom/task-queue/task-queue:latest
 ```
 
-To verify this worked run. You should now see the task queue image listed out.
+You should see the task queue image listed out by running the following command.
 
 ```
 docker image ls
