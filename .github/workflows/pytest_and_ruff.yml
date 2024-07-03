@@ -23,6 +23,7 @@ jobs:
 
   linting:
     name: Lint Code
+    needs: testing
     runs-on: ubuntu-latest
     steps:
       - name: Ruff
