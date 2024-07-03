@@ -15,6 +15,7 @@ jobs:
   build:
      uses: ./.github/workflows/build.yml
   testing:
+    needs: build
     name: Run Tests
     runs-on: ubuntu-latest
     steps:    
