@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:    
       - name: Pytest
-      - uses: microsoft/action-python@0.7.0
+        uses: microsoft/action-python@0.7.0
         with:          
           testing: true
 
@@ -24,5 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ruff
-      - uses: actions/checkout@v4
-      - uses: chartboost/ruff-action@v1
+        uses: actions/checkout@v4
+      - name: ruff
+        uses: chartboost/ruff-action@v1
