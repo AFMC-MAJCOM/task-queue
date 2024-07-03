@@ -3,9 +3,9 @@ from fastapi import FastAPI
 from dataclasses import dataclass, asdict
 import os
 
-from .queue_base import QueueBase, QueueItemStage
-from .s3_queue import JsonS3Queue
-from .sql_queue import JsonSQLQueue
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.s3_queue import JsonS3Queue
+from data_pipeline.sql_queue import JsonSQLQueue
 
 app = FastAPI()
 
