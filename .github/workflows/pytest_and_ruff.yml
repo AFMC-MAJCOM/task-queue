@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   testing:
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:    
       - name: Pytest
@@ -21,6 +22,7 @@ jobs:
           testing: true
 
   linting:
+    name: Lint Code
     runs-on: ubuntu-latest
     steps:
       - name: Ruff
