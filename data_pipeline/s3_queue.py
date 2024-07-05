@@ -158,7 +158,8 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
             for item, success in zip(items_to_add, queue_write_success)
             if not success
         ]
-        raise BaseException("Error writing at least one queue object to S3:", fail_items)
+        raise BaseException("Error writing at least one queue object to S3:",
+                            fail_items)
 
     return len(added_items)
 
@@ -226,10 +227,14 @@ index_name = "index.txt"
 
 def JsonS3Queue(queue_base_s3_path):
     queue_index_path = os.path.join(queue_base_s3_path, index_name)
-    queue_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.WAITING.name)
-    processing_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.PROCESSING.name)
-    success_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.SUCCESS.name)
-    fail_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.FAIL.name)
+    queue_path = os.path.join(queue_base_s3_path,
+                              queue_base.QueueItemStage.WAITING.name)
+    processing_path = os.path.join(queue_base_s3_path,
+                                   queue_base.QueueItemStage.PROCESSING.name)
+    success_path = os.path.join(queue_base_s3_path,
+                                queue_base.QueueItemStage.SUCCESS.name)
+    fail_path = os.path.join(queue_base_s3_path,
+                             queue_base.QueueItemStage.FAIL.name)
 
     return queue_base.QueueBase(
         partial(add_json_to_s3_queue, queue_path, queue_index_path),
@@ -252,7 +257,8 @@ def JsonS3Queue(queue_base_s3_path):
             )
         ),
 
-        partial(lookup_status, queue_path, success_path, fail_path, processing_path),
+        partial(lookup_status, queue_path, success_path,
+                fail_path, processing_path),
 
         {
             "implementation": "s3",

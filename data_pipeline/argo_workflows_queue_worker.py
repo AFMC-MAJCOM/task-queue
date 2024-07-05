@@ -87,7 +87,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Returns a jsonnable dict to send to the submit URL
         """
 
-        payload : dict = queue_item_body[ArgoWorkflowsQueueWorker.PAYLOAD_FIELD]
+        payload : dict = queue_item_body[
+            ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
+            ]
 
         # merge new labels into submit options for easier query later
         # we have to do this get/set stuff because submitOptions and labels
@@ -95,8 +97,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         submit_options = payload.get('submitOptions', {})
 
         labels = submit_options.get('labels', "")
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}={self._worker_interface_id}"
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL}={item_id}"
+        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
+            ={self._worker_interface_id}"
+        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL} \
+            ={item_id}"
         labels = labels.strip(",")
 
         submit_options['labels'] = labels
@@ -125,7 +129,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     def _construct_poll_query(self):
         # select labels that match this object
         return {
-            "listOptions.labelSelector": f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}={self._worker_interface_id}",
+            "listOptions.labelSelector": f" \
+                {ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
+                ={self._worker_interface_id}",
             "fields": "items.metadata.labels,metadata.resourceVersion"
         }
 
@@ -161,12 +167,14 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         # queue item ID and status are labels in `metadata.labels`
         labels = lambda wf: wf['metadata']['labels']
-        get_workflow_queue_item_id = lambda wf: labels(wf)[ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
+        get_workflow_queue_item_id = lambda wf: labels(wf) \
+            [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
         get_workflow_status = lambda wf: self._get_workflow_status(
-            labels(wf).get(argo_completed_label, "false"), 
+            labels(wf).get(argo_completed_label, "false"),
             labels(wf).get(argo_phase_label, "Pending")
         )
-        get_workflow_create_time = lambda wf: pd.Timestamp(wf['metadata']['creationTimestamp'])
+        get_workflow_create_time = lambda wf: pd.Timestamp(
+            wf['metadata']['creationTimestamp'])
 
         # We may still get older workflows with the same worker ID and queue
         # item ID if we have retried an item that has already been run. We can
@@ -179,7 +187,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         for workflow in workflows:
             timestamp = get_workflow_create_time(workflow)
             item_id = get_workflow_queue_item_id(workflow)
-            if (item_id not in results) or (timestamp > completed_times[item_id]):
+            if (item_id not in results) or \
+                (timestamp > completed_times[item_id]):
                 results[item_id] = get_workflow_status(workflow)
                 completed_times[item_id] = timestamp
 

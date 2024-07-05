@@ -13,7 +13,7 @@ app = FastAPI()
 class QueueSettings():
     def from_env(env_dict:dict):
         return QueueSettings()
-    
+
     def make_queue(self) -> QueueBase:
         pass
 
@@ -45,13 +45,14 @@ class SqlQueueSettings(QueueSettings):
             host = env_dict['SQL_QUEUE_POSTGRES_HOSTNAME']
             database = env_dict['SQL_QUEUE_POSTGRES_DATABASE']
 
-            conn_str = f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
+            conn_str = \
+                f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
 
         return SqlQueueSettings(
             conn_str,
             env_dict['SQL_QUEUE_NAME'],
         )
-    
+
     def make_queue(self):
         from sqlalchemy import create_engine
         return JsonSQLQueue(
@@ -66,7 +67,7 @@ def queue_settings_from_env(env_dict) -> QueueSettings:
         return S3QueueSettings.from_env(env_dict)
     elif impl == "sql-json":
         return SqlQueueSettings.from_env(env_dict)
-    
+
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 

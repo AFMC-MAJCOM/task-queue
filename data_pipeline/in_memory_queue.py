@@ -25,7 +25,8 @@ class InMemoryQueue_():
 
         self.index = set(ids_in_queue)
 
-        assert len(ids_in_queue) == len(self.index), "There are duplicates IDs in the work queue"
+        assert len(ids_in_queue) == len(self.index), \
+            "There are duplicates IDs in the work queue"
 
     def get_for_stage(self, stage:QueueItemStage):
         match stage:
@@ -121,8 +122,12 @@ def InMemoryQueue():
     return QueueBase(
         partial(add_to_memory_queue, in_memory_queue),
         partial(get_from_memory_queue, in_memory_queue),
-        lambda item_id: move_dict_item(in_memory_queue.processing, in_memory_queue.success, item_id),
-        lambda item_id: move_dict_item(in_memory_queue.processing, in_memory_queue.fail, item_id),
+        lambda item_id: move_dict_item(in_memory_queue.processing,
+                                       in_memory_queue.success,
+                                       item_id),
+        lambda item_id: move_dict_item(in_memory_queue.processing,
+                                       in_memory_queue.fail,
+                                       item_id),
         lambda stage: len(in_memory_queue.get_for_stage(stage)),
         partial(lookup_status, in_memory_queue),
         {"implementation": "memory"}

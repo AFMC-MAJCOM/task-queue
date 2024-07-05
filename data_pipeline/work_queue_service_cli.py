@@ -70,7 +70,8 @@ def start_jobs_with_processing_limit(
 
     started_jobs = work_queue.push_next_jobs(to_start)
 
-    logger.info(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
+    logger.info(f"start_jobs_with_processing_limit: Started
+        {len(started_jobs)} jobs")
 
 def main(
     periodic_functions : List[Callable[[], None]],
@@ -164,7 +165,9 @@ if __name__ == "__main__":
     )
 
     periodic_functions = [
-        lambda: start_jobs_with_processing_limit(args.processing_limit, queue, work_queue)
+        lambda: start_jobs_with_processing_limit(args.processing_limit,
+                                                 queue,
+                                                 work_queue)
     ]
 
     main(periodic_functions, work_queue, args.periodic_seconds)

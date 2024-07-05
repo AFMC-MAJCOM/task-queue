@@ -17,12 +17,14 @@ from .utils import test_sql_engine
 
 
 import os
-AWS_UNIT_TEST_QUEUE_BASE = "s3://data-dev-998806663306/unit-test-space/s3_queue_"
+AWS_UNIT_TEST_QUEUE_BASE = \
+    "s3://data-dev-998806663306/unit-test-space/s3_queue_"
 LOCAL_UNIT_TEST_QUEUE_BASE = "s3://unit-tests/queue/queue_"
 UNIT_TEST_QUEUE_BASE = LOCAL_UNIT_TEST_QUEUE_BASE
 
 def new_s3_queue(request):
-    queue_base = os.path.join(UNIT_TEST_QUEUE_BASE, str(random.randint(0, 9999999)))
+    queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
+                              str(random.randint(0, 9999999)))
     yield s3q.JsonS3Queue(queue_base)
 
     #If the test passes

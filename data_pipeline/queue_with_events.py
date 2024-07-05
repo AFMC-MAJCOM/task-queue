@@ -171,11 +171,13 @@ def QueueWithEvents(
         move_event_name = f"{event_base_name}_MOVE"
 
     # validate arguments
-    assert bool(add_event_name) and bool(move_event_name), "No event name supplied for queue"
+    assert bool(add_event_name) and bool(move_event_name), \
+        "No event name supplied for queue"
 
     return QueueBase(
         partial(add_to_queue_with_event, queue, event_store, add_event_name),
-        partial(get_from_queue_with_event, queue, event_store, move_event_name),
+        partial(get_from_queue_with_event, queue,
+                event_store, move_event_name),
         partial(queue_success_with_event, queue, event_store, move_event_name),
         partial(queue_fail_with_event, queue, event_store, move_event_name),
         queue.size,
