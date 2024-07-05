@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 from .queue_base import QueueBase, QueueItemStage
 
 from typing import Optional
@@ -10,6 +12,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Engine
 
 class SqlQueue(SQLModel, table=True):
+    """Docstring
+    """
     # no queue may have duplicate `index_key`s
     __table_args__ = (
         UniqueConstraint("queue_name", "index_key", name="_queue_name_index_key_uc"),
@@ -23,6 +27,17 @@ class SqlQueue(SQLModel, table=True):
 
 
 def add_json_to_sql_queue(engine, queue_name, items:dict):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     success = 0
 
     if len(items) == 0:
@@ -56,6 +71,17 @@ def add_json_to_sql_queue(engine, queue_name, items:dict):
 
 
 def get_json_from_sql_queue(engine, queue_name, n_items=1):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     with Session(engine) as session:
         stmt = select(SqlQueue).where(
             (queue_name == SqlQueue.queue_name)
@@ -72,6 +98,17 @@ def get_json_from_sql_queue(engine, queue_name, n_items=1):
     
 
 def update_stage(engine, queue_name, new_stage, item_key):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     with Session(engine) as session:
         statement = select(SqlQueue).where(
             (SqlQueue.index_key == item_key) & (SqlQueue.queue_name == queue_name)
@@ -87,6 +124,17 @@ def update_stage(engine, queue_name, new_stage, item_key):
 
 
 def queue_size(engine, queue_name, stage):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     with Session(engine) as session:
         statement = select(func.count(SqlQueue.id)).filter(
             SqlQueue.queue_name == queue_name,
@@ -97,6 +145,17 @@ def queue_size(engine, queue_name, stage):
     
 
 def lookup_status(engine, queue_name, item_id):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     with Session(engine) as session:
         statement = (
             select(SqlQueue.queue_item_stage)
@@ -112,6 +171,17 @@ def lookup_status(engine, queue_name, item_id):
 
 
 def JsonSQLQueue(engine:Engine, queue_name):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # table = SQLModel.metadata.tables[SqlQueue.__tablename__]
     # SQLModel.metadata.drop_all(engine, [table], checkfirst=True)
     SQLModel.metadata.create_all(engine)

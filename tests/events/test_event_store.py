@@ -1,3 +1,5 @@
+"""Top file docstring
+"""
 import pytest
 import datetime
 from typing import Iterator, List
@@ -24,6 +26,8 @@ n_event_types = len(test_event_names)
 start_time = datetime.datetime.now()
 
 class TestEventData(BaseModel):
+    """Docstring
+    """
     __test__ = False
 
     some_number : int
@@ -31,6 +35,17 @@ class TestEventData(BaseModel):
     some_dict : dict
 
 def random_event(event_name, time=True, time_offset_sec=0):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     data = TestEventData(
         some_number=random.randint(0, 1000000),
         some_string=chr(random.randint(ord('a'), ord('z'))),
@@ -54,6 +69,17 @@ n_events = n_events_per_type*n_event_types
 # one second after the previous event of that type
 @pytest.fixture
 def random_events() -> List[Event]:
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     return [ 
         random_event(test_event_names[i%n_event_types], (i // n_event_types)) 
         for i in range(0, n_events)
@@ -63,6 +89,17 @@ ALL_EVENT_STORE_TYPES = ["memory", "sql"]
 
 @pytest.fixture
 def new_empty_store(request) -> Iterator[EventStoreInterface]:
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     if request.param == "memory":
         yield InMemoryEventStore()
     if request.param == "sql":
@@ -71,11 +108,33 @@ def new_empty_store(request) -> Iterator[EventStoreInterface]:
 
 @pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
 def test_add_events(new_empty_store, random_events):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     new_empty_store.add(random_events)
 
 
 @pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
 def test_get_events(new_empty_store, random_events):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     event_name = test_event_names[0]
 
     # compare before/after in case tests are run out of order
@@ -91,6 +150,17 @@ def test_get_events(new_empty_store, random_events):
 
 @pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
 def test_get_events_time_since(new_empty_store, random_events):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     new_empty_store.add(random_events)
 
     event_name = test_event_names[0]
@@ -106,6 +176,17 @@ def test_get_events_time_since(new_empty_store, random_events):
 
 @pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
 def test_event_default_time_now(new_empty_store):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     evt = Event(
         name="doesnt_matter",
         version="0.0.1",
@@ -123,4 +204,15 @@ def test_event_default_time_now(new_empty_store):
 
 @pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
 def test_add_empty(new_empty_store):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     new_empty_store.add([])

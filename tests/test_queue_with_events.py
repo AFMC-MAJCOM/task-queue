@@ -1,3 +1,5 @@
+"""Top file docstring
+"""
 import pytest
 
 from data_pipeline.events.in_memory_event_store import InMemoryEventStore
@@ -16,6 +18,8 @@ MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 
 @pytest.fixture
 def queue_with_events():
+    """Docstring
+    """
     q = InMemoryQueue()
     s = InMemoryEventStore()
 
@@ -27,6 +31,8 @@ def queue_with_events():
     )
 
 def test_event_queue_add(queue_with_events):
+    """Docstring
+    """
     _, s, eq = queue_with_events
 
     eq.put(default_items)
@@ -44,6 +50,8 @@ def test_event_queue_add(queue_with_events):
 
 
 def test_event_queue_lifecycle(queue_with_events):
+    """Docstring
+    """
     _, s, eq = queue_with_events
 
     eq.put(default_items)

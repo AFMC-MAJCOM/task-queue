@@ -1,3 +1,5 @@
+"""Top file docstrong
+"""
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from data_pipeline.queue_base import QueueItemStage
 import random
@@ -13,6 +15,8 @@ if not run_argo_tests:
     pytest.skip(allow_module_level=True)
 
 def make_queue_item(fail=False):
+    """Docstring
+    """
     queue_item_id = f"test-item-{random_number()}"
 
     queue_item_body = {
@@ -32,6 +36,8 @@ def make_queue_item(fail=False):
 
 
 def port_forwarded_worker():
+    """Docstring
+    """
     return ArgoWorkflowsQueueWorker(
         f"test-worker-{random_number()}",
         "http://localhost:2746",
@@ -40,6 +46,8 @@ def port_forwarded_worker():
 
 
 def wait_for_finish(worker, queue_item_id):
+    """Docstring
+    """
     while True:
         results = worker.poll_all_status()
         status = results[queue_item_id]
@@ -53,6 +61,8 @@ def wait_for_finish(worker, queue_item_id):
 
 
 def test_argo_worker_end_to_end_success():
+    """Docstring
+    """
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item()
@@ -68,6 +78,8 @@ def test_argo_worker_end_to_end_success():
 
 
 def test_argo_worker_end_to_end_fail():
+    """Docstring
+    """
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item(fail=True)
@@ -83,6 +95,8 @@ def test_argo_worker_end_to_end_fail():
 
 
 def test_argo_worker_end_to_end_concurrent():
+    """Docstring
+    """
     worker = port_forwarded_worker()
 
     n_processes = 10
@@ -115,6 +129,8 @@ def test_argo_worker_end_to_end_concurrent():
 
 
 def test_argo_worker_no_workflows():
+    """Docstring
+    """
     worker = port_forwarded_worker()
 
     statuses = worker.poll_all_status()
@@ -122,6 +138,8 @@ def test_argo_worker_no_workflows():
     assert len(statuses) == 0
 
 def test_argo_worker_rerun_item():
+    """Docstring
+    """
     worker = port_forwarded_worker()
 
     # set up the first job to fail

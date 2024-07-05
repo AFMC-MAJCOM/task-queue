@@ -1,3 +1,5 @@
+"""Top file docstring
+"""
 from .event_store_interface import EventStoreInterface
 from .event import Event
 
@@ -10,6 +12,8 @@ from datetime import datetime
 from sqlalchemy import Engine
 
 class SqlEventStoreModel(SQLModel, table=True):
+    """Docstring
+    """
     __tablename__ = "sqleventstore"
     id : int | None = Field(default=None, primary_key=True)
     name : str
@@ -19,6 +23,17 @@ class SqlEventStoreModel(SQLModel, table=True):
     time : datetime
 
 def to_event(self) -> Event:
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     return Event(
         id = self.id,
         name = self.name,
@@ -29,6 +44,17 @@ def to_event(self) -> Event:
     )
 
 def from_event(event:Event):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # this `if/else` is necessary because if `id` is set to anything (even
     # None) then it will be set when dumped to a dict using `model_dump`, even
     # with `exlude_unset=True`.
@@ -52,12 +78,36 @@ def from_event(event:Event):
 
 
 class SqlEventStore(EventStoreInterface):
+    """Docstring
+    """
     def __init__(self, engine:Engine):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         SQLModel.metadata.create_all(engine)
         self.engine = engine
 
 
     def _add_raw(self, events: List[Event]):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         if not events:
             # empty list causes issues on SQL insert
             return
@@ -78,6 +128,17 @@ class SqlEventStore(EventStoreInterface):
 
     
     def get(self, event_name: str, time_since: datetime = None) -> List[Event]:
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         sql_query = event_name == SqlEventStoreModel.name
 
         if time_since is not None:

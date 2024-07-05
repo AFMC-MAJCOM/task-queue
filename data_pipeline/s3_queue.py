@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 import json
 import s3fs
 import os
@@ -7,18 +9,51 @@ from . import s5fs
 from . import queue_base
 
 def ensure_s3_prefix(path:str):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     if not path.startswith("s3://"):
         return "s3://" + path
     return path
 
 
 def safe_s5fs_move(source, dest):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     s5fs.move(
         ensure_s3_prefix(source), 
         ensure_s3_prefix(dest)
     )
 
 def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     fs.invalidate_cache()
     path = str(path)
     if filesystem.exists(path):
@@ -40,6 +75,17 @@ else:
 
 
 def check_queue_index(index_path, item):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     fs = s3fs.S3FileSystem()
     if (fs.exists(index_path)):
         with fs.open(index_path, 'r') as f:
@@ -53,6 +99,17 @@ def check_queue_index(index_path, item):
     return False
 
 def get_queue_index_items(index_path):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     """
     the queue index file is a text file with one item entry per line
     """
@@ -67,6 +124,17 @@ def get_queue_index_items(index_path):
         ]
     
 def subtract_duplicates(main_list, *other_lists):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     """
     remove duplicate items in `main_list`, and optionally subtract duplicates
     from `other_lists` as well
@@ -80,8 +148,19 @@ def subtract_duplicates(main_list, *other_lists):
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
-     fs = s3fs.S3FileSystem()
-     with fs.open(index_path, 'a') as f:
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
+    fs = s3fs.S3FileSystem()
+    with fs.open(index_path, 'a') as f:
         # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))
         # trailing newline so the next add doesn't append to the end of the 
@@ -90,17 +169,61 @@ def add_items_to_index(index_path, items):
 
 
 def add_item_to_index(index_path, item):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     add_items_to_index(index_path, [item])
 
 
 def id_to_fname(item_id):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     return f"{item_id}.json"
 
 def fname_to_id(item_fname:str):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     return os.path.splitext(os.path.basename(item_fname))[0]
 
 
 def maybe_write_s3_json(s3_path, json_data):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     """
     Fault-tolerant write to S3: if the write fails, simply return False instead
     of raising an exception.
@@ -121,6 +244,17 @@ def maybe_write_s3_json(s3_path, json_data):
 
 
 def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # get a list of item keys that are already in the index, and remove them 
     # from the incoming items list
     in_index = get_queue_index_items(queue_index_path)
@@ -164,6 +298,17 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
 
 
 def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # once bitten, twice shy
     if n_items < 0:
         n_items = 0
@@ -192,6 +337,17 @@ def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
 
 
 def s3_move(item_path, dest_path):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     name = os.path.basename(item_path)
     dest = os.path.join(dest_path, name)
 
@@ -207,6 +363,17 @@ def lookup_status(
     processing_path,
     item_id
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     paths_with_status = [
         (waiting_path, queue_base.QueueItemStage.WAITING),
         (success_path, queue_base.QueueItemStage.SUCCESS),
@@ -225,6 +392,17 @@ def lookup_status(
 index_name = "index.txt"
 
 def JsonS3Queue(queue_base_s3_path):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     queue_index_path = os.path.join(queue_base_s3_path, index_name)
     queue_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.WAITING.name)
     processing_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.PROCESSING.name)

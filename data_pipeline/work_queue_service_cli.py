@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 from .work_queue import WorkQueue
 from .argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from .s3_queue import JsonS3Queue
@@ -25,6 +27,17 @@ NO_EVENT_STORE_CLI_CHOICE = "none"
 SQL_EVENT_STORE_CLI_CHOICE = "sql-json"
 
 def handle_worker_interface_choice(choice:str, args):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     if choice == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
         return ArgoWorkflowsQueueWorker(
             args.worker_interface_id,
@@ -33,6 +46,17 @@ def handle_worker_interface_choice(choice:str, args):
         )
       
 def handle_queue_implementation_choice(choice:str, args):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
         queue = JsonS3Queue(args.s3_base_path)
     elif choice == JSON_SQL_QUEUE_CLI_CHOICE:
@@ -61,6 +85,17 @@ def start_jobs_with_processing_limit(
     queue:QueueBase,
     work_queue:WorkQueue,
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     n_processing = queue.size(QueueItemStage.PROCESSING)
     to_start = max_processing_limit - n_processing
 
@@ -77,6 +112,17 @@ def main(
     work_queue:WorkQueue,
     period_sec:int=10
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     while True:
         logger.info("Updating job statuses")
         work_queue.update_job_status()

@@ -1,9 +1,13 @@
+"""Blank dockstring for file
+"""
 from enum import Enum
 
 from dataclasses import dataclass
 from typing import Callable, Any, List, Tuple, Dict, Optional
 
 class QueueItemStage(Enum):
+    """Docstring
+    """
     WAITING = 0
     PROCESSING = 1
     SUCCESS = 2
@@ -11,6 +15,8 @@ class QueueItemStage(Enum):
 
 @dataclass
 class QueueBase():
+    """Docstring
+    """
     put : Callable[[Dict[str, Any]], None]
     get : Callable[[Optional[int]], List[Tuple[str, Any]]]
     success : Callable[[str], Any]

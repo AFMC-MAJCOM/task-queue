@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 import subprocess
 from functools import partial
 import shutil
@@ -7,6 +9,17 @@ S5CMD_EXE = "s5cmd"
 HAS_S5CMD = shutil.which("s5cmd") is not None
 
 def base_command(subcmd, *main_args, concurrency=None, other_arguments=[]):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     """
     Runs an S5cmd subcommand with some main arguments and some other optional
     configuration or flags.

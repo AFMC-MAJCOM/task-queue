@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 from .queue_base import QueueBase, QueueItemStage
 from queue import Queue
 
@@ -9,6 +11,8 @@ import json
 
 @dataclass
 class InMemoryQueue_():
+    """Doctring
+    """
     waiting : Dict[str, Any] = field(default_factory=dict)
     processing : Dict[str, Any] = field(default_factory=dict)
     success : Dict[str, Any] = field(default_factory=dict)
@@ -16,6 +20,17 @@ class InMemoryQueue_():
     index : set[str] = field(default_factory=set)
 
     def regenerate_index(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         ids_in_queue = (
             list(self.waiting.keys())
             + list(self.processing.keys())
@@ -28,6 +43,17 @@ class InMemoryQueue_():
         assert len(ids_in_queue) == len(self.index), "There are duplicates IDs in the work queue"
 
     def get_for_stage(self, stage:QueueItemStage):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         match stage:
             case QueueItemStage.WAITING:
                 return self.waiting
@@ -40,6 +66,17 @@ class InMemoryQueue_():
 
 
 def is_json_serializable(o):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     try:
         json.dumps(o)
         return True
@@ -52,6 +89,17 @@ def add_to_memory_queue(
     in_memory_queue:InMemoryQueue_, 
     new_items:Dict[str, Any]
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # filter out ids that already exist in the index
     filtered_items = {
         k:v
@@ -72,6 +120,17 @@ def move_dict_item(
     dict_to,
     key
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # pop removes the key from the dictionary and returns the value
     item = dict_from.pop(key)
     dict_to[key] = item
@@ -83,6 +142,17 @@ def get_from_memory_queue(
     in_memory_queue : InMemoryQueue_,
     n_items = 1
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # islice does not support negative values
     # `list` is necessary to freeze this iterator - now it won't break
     # when the dictionary changes size while iterating
@@ -106,6 +176,17 @@ def lookup_status(
     in_memory_queue : InMemoryQueue_,
     item_id : str
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     for item_stage in QueueItemStage:
         dict_for_stage = in_memory_queue.get_for_stage(item_stage)
         if item_id in dict_for_stage:
@@ -115,6 +196,17 @@ def lookup_status(
 
 
 def InMemoryQueue():
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     in_memory_queue = InMemoryQueue_()
     print(in_memory_queue)
 

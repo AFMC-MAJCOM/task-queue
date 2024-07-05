@@ -1,3 +1,5 @@
+"""Top docstring
+"""
 import pytest
 import random
 import data_pipeline.queue_base as qb
@@ -5,6 +7,17 @@ import data_pipeline.queue_base as qb
 pytestmark = pytest.mark.skip()
 
 def random_item():
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     key = chr(random.randint(ord('a'), ord('z')))
     val = [
         random.randint(0, 100)
@@ -17,6 +30,17 @@ n_items = 20
 default_items = dict([random_item() for _ in range(n_items)])
 
 def test_put_get(queue):
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     put = queue.put(default_items)
     get = queue.get(len(default_items))
 
@@ -29,6 +53,8 @@ def test_put_get(queue):
         ])
 
 def test_add_to_queue_no_duplicates(queue):
+    """Docstring
+    """
     queue.put(default_items)
     first_put = queue.size(qb.QueueItemStage.WAITING)
     queue.put(default_items)
@@ -43,6 +69,8 @@ def test_add_to_queue_no_duplicates(queue):
     assert get_count == len(items_from_queue)
 
 def test_multiple_get_empty(queue):
+    """Docstring
+    """
     first_item = list(default_items.keys())[0]
     put = queue.put({first_item:default_items[first_item]})
 
@@ -52,18 +80,24 @@ def test_multiple_get_empty(queue):
     assert len(get_2) == 0
 
 def test_multiple_get(queue):
+    """Docstring
+    """
     queue.put(default_items)
 
     queue.get()
     queue.get()
 
 def test_out_of_order(queue):
+    """Docstring
+    """
     queue.put(default_items)
     get = queue.get()
     queue.put(default_items)
     queue.success(get[0][0])
 
 def test_mixed_duplicates(queue):
+    """Docstring
+    """
     half = len(default_items) // 2
     half_items = dict(list(default_items.items())[half:])
     queue.put(half_items)
@@ -71,11 +105,15 @@ def test_mixed_duplicates(queue):
     assert queue.size(qb.QueueItemStage.WAITING) == len(default_items)
 
 def test_get_empty_queue(queue):
+    """Docstring
+    """
     out = queue.get(10)
 
     assert out == []
 
 def test_get_zero_items(queue):
+    """Docstring
+    """
     queue.put(default_items)
 
     nothing = queue.get(0)
@@ -85,6 +123,8 @@ def test_get_zero_items(queue):
     assert queue.size(qb.QueueItemStage.PROCESSING) == 0
 
 def test_put_exception(queue):
+    """Docstring
+    """
     items = {
         "a": [1, 2, 3],
         "b": random.Random(), # something that is not json serializable
@@ -110,6 +150,8 @@ def test_put_exception(queue):
     assert second_len == len(items) - 1
     
 def test_queue_size(queue):
+    """Docstring
+    """
     queue.put(default_items)
     waiting_size = queue.size(qb.QueueItemStage.WAITING)
     assert len(default_items) == waiting_size
@@ -137,6 +179,8 @@ def test_queue_size(queue):
     assert fail_size == move_amount
 
 def test_lookup(queue: qb.QueueBase):
+    """Docstring
+    """
     queue.put(default_items)
 
     proc, succ, fail = queue.get(3)
@@ -151,5 +195,7 @@ def test_lookup(queue: qb.QueueBase):
     assert queue.lookup_status(fail[0]) == qb.QueueItemStage.FAIL
 
 def test_lookup_fail(queue: qb.QueueBase):
+    """Docstring
+    """
     with pytest.raises(KeyError):
         queue.lookup_status("does-not-exist")

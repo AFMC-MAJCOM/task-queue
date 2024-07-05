@@ -1,9 +1,13 @@
+"""Top file docstring
+"""
 from typing import Generic, TypeVar, Optional, Dict
 
 import pydantic
 import datetime
 
 class Event(pydantic.BaseModel):
+    """Docstring
+    """
     name : str
     version : str
     data : pydantic.JsonValue

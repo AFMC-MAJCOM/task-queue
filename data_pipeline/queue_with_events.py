@@ -1,3 +1,5 @@
+"""Blank dockstring for file
+"""
 from .queue_base import QueueBase, QueueItemStage
 from .events.event_store_interface import EventStoreInterface
 from .events.event import Event
@@ -11,12 +13,16 @@ from functools import partial
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
 
 class QueueAddEventData(pydantic.BaseModel):
+    """Docstring
+    """
     queue_index_key : str
     queue_item_data : pydantic.JsonValue
     queue_info : Dict[str, str]
 
 
 class QueueMoveEventData(pydantic.BaseModel):
+    """Docstring
+    """
     queue_index_key : str
     stage_from : QueueItemStage
     stage_to : QueueItemStage
@@ -25,6 +31,17 @@ class QueueMoveEventData(pydantic.BaseModel):
     # values when dumped with `model_dump`
     @pydantic.field_validator('stage_from', 'stage_to')
     def _internal_validator(cls, v):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         if isinstance(v, QueueItemStage):
             return v
         else:
@@ -32,6 +49,17 @@ class QueueMoveEventData(pydantic.BaseModel):
         
     @pydantic.field_serializer('stage_from', 'stage_to')
     def _internal_serializer(v):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         return v.value
 
 
@@ -41,6 +69,17 @@ def add_to_queue_with_event(
     queue_add_event_name : str,
     new_items
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # the flow control of this function looks really weird to satisfy the 
     # `test_put_with_exception` test.
     queue_event_data = []
@@ -81,6 +120,17 @@ def get_from_queue_with_event(
     queue_move_event_name : str,
     n_items = 1
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     # you can never be too careful
     if n_items < 0:
         n_items = 0
@@ -113,6 +163,17 @@ def record_queue_move_event(
     from_stage : QueueItemStage,
     to_stage : QueueItemStage
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     queue_event_data = Event(
         name = queue_move_event_name,
         version = QUEUE_EVENT_SCHEMA_VERSION,
@@ -132,6 +193,17 @@ def queue_success_with_event(
     queue_move_event_name : str,
     item_id : str
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     record_queue_move_event(
         event_store,
         queue_move_event_name,
@@ -148,6 +220,17 @@ def queue_fail_with_event(
     queue_move_event_name : str,
     item_id : str
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     record_queue_move_event(
         event_store,
         queue_move_event_name,
@@ -166,6 +249,17 @@ def QueueWithEvents(
     add_event_name : str = None,
     move_event_name : str = None
 ):
+    """Docstring
+
+    details
+
+    Parameters:
+    -----------
+
+    Returns:
+    -----------
+
+    """
     if event_base_name:
         add_event_name = f"{event_base_name}_ADD"
         move_event_name = f"{event_base_name}_MOVE"

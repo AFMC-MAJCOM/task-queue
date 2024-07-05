@@ -1,9 +1,10 @@
+"""Blank dockstring for file
+"""
 from .queue_worker_interface import QueueWorkerInterface
 from .queue_base import QueueItemStage
 import requests
 from urllib.parse import urljoin
 
-# for timestamp parsing
 import pandas as pd
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
@@ -39,6 +40,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             "serviceAccount": "string"
         }
     }
+
+    Parameters:
+    -----------
     """
 
     PAYLOAD_FIELD = "submit_body"
@@ -52,15 +56,48 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         argo_workflows_endpoint:str,
         namespace:str
     ):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         self._worker_interface_id = worker_interface_id
         self._argo_workflows_endpoint = argo_workflows_endpoint
         self._namespace = namespace
 
     def urlconcat(*components):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         return "/".join(c.strip("/") for c in components)
 
     @property
     def _argo_workflows_submit_url(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         return ArgoWorkflowsQueueWorker.urlconcat(
             self._argo_workflows_endpoint, 
             "api", 
@@ -72,6 +109,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     @property
     def _argo_workflows_list_url(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         return ArgoWorkflowsQueueWorker.urlconcat(
             self._argo_workflows_endpoint, 
             "api", 
@@ -82,6 +130,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def _construct_submit_body(self, item_id, queue_item_body):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         """
         Returns a jsonnable dict to send to the submit URL
         """
@@ -105,6 +164,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         return payload
 
     def send_job(self, item_id, queue_item_body):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
 
@@ -122,6 +192,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             raise e
 
     def _construct_poll_query(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         # select labels that match this object
         return {
             "listOptions.labelSelector": f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}={self._worker_interface_id}",
@@ -129,6 +210,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         }
 
     def _get_workflow_status(self, completed, phase):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         """
         workflow status can be read from the labels
         - workflows.argoproj.io/completed='false' -> PROCESSING
@@ -146,6 +238,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def _get_response_ids_and_status(self, response_body):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         workflows = response_body['items']
 
         # If there are no workflows to return, `items` will be `null` instead
@@ -184,6 +287,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def poll_all_status(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         print("Getting status from Argo Workflows")
         request_url = self._argo_workflows_list_url
         request_params = self._construct_poll_query()

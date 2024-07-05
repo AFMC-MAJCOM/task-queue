@@ -1,18 +1,44 @@
+"""Blank dockstring for file
+"""
 from .queue_worker_interface import QueueWorkerInterface
 from .queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
+    """Docstring
+    """
     def __init__(
         self, 
         queue:QueueBase, 
         interface:QueueWorkerInterface
     ):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         self._queue = queue
         self._interface = interface
         self._cached_statuses = {}
 
 
     def push_next_jobs(self, n_jobs=None):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         if n_jobs is None:
             n_jobs = 1
 
@@ -29,6 +55,17 @@ class WorkQueue():
 
 
     def update_job_status(self):
+        """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
         statuses = self._interface.poll_all_status()
 
         # new_statuses = {

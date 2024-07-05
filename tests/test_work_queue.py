@@ -1,3 +1,5 @@
+"""Top file docstring
+"""
 import data_pipeline.work_queue as work_queue
 import data_pipeline.in_memory_queue as mq
 from data_pipeline.queue_worker_interface import DummyWorkerInterface
@@ -9,12 +11,25 @@ import pytest
 
 @pytest.fixture
 def default_work_queue() -> work_queue.WorkQueue:
+    """Docstring
+
+        details
+
+        Parameters:
+        -----------
+
+        Returns:
+        -----------
+
+        """
     queue = mq.InMemoryQueue()
     queue.put(default_items)
     interface = DummyWorkerInterface()
     return work_queue.WorkQueue(queue, interface)
 
 def test_push_job(default_work_queue):
+    """Docstring
+    """
     default_work_queue.push_next_jobs()
 
     # make sure we have something in the worker interface that is in processing
@@ -31,6 +46,8 @@ def test_push_job(default_work_queue):
     assert n_processing_second - n_processing_first == n_jobs
 
 def test_job_success(default_work_queue):
+    """Docstring
+    """
     n_jobs = 5
 
     # push something to the worker
@@ -48,6 +65,8 @@ def test_job_success(default_work_queue):
     assert n_processing == n_jobs - n_success
 
 def test_job_fail(default_work_queue):
+    """Docstring
+    """
     n_jobs = 5
 
     # push something to the worker
@@ -65,6 +84,8 @@ def test_job_fail(default_work_queue):
     assert n_processing == n_jobs - n_fail
 
 def test_idempotent_update(default_work_queue):
+    """Docstring
+    """
     n_jobs = 5
 
     pushed_jobs = default_work_queue.push_next_jobs(n_jobs)
@@ -75,6 +96,8 @@ def test_idempotent_update(default_work_queue):
     default_work_queue.update_job_status()
 
 def test_push_multiple(default_work_queue):
+    """Docstring
+    """
     n_jobs = 3
 
     first_pushed_jobs = default_work_queue.push_next_jobs(n_jobs)

@@ -1,3 +1,5 @@
+"""Top file docstring
+"""
 import pytest
 
 import data_pipeline.s3_queue as s3q
@@ -22,6 +24,8 @@ LOCAL_UNIT_TEST_QUEUE_BASE = "s3://unit-tests/queue/queue_"
 UNIT_TEST_QUEUE_BASE = LOCAL_UNIT_TEST_QUEUE_BASE
 
 def new_s3_queue(request):
+    """Docstring
+    """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE, str(random.randint(0, 9999999)))
     yield s3q.JsonS3Queue(queue_base)
 
@@ -35,9 +39,13 @@ def new_s3_queue(request):
         print(f"Failed results at {queue_base}")
 
 def new_in_memory_queue(request):
+    """Docstring
+    """
     return InMemoryQueue()
 
 def new_sql_queue(request):
+    """Docstring
+    """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
     return sqlq.JsonSQLQueue(test_sql_engine, queue_name)
 
@@ -45,6 +53,8 @@ def new_sql_queue(request):
 ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
 @pytest.fixture
 def new_empty_queue(request):
+    """Docstring
+    """
     if request.param == "sql":
         yield new_sql_queue(request)
     elif request.param == "s3":
@@ -59,48 +69,72 @@ def new_empty_queue(request):
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):
+    """Docstring
+    """
     qtest.test_put_get(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_mixed_duplicates(new_empty_queue):
+    """Docstring
+    """
     qtest.test_mixed_duplicates(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_add_to_queue_no_duplicates(new_empty_queue):
+    """Docstring
+    """
     qtest.test_add_to_queue_no_duplicates(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_get_empty_queue(new_empty_queue):
+    """Docstring
+    """
     qtest.test_get_empty_queue(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_exception(new_empty_queue):
+    """Docstring
+    """
     qtest.test_put_exception(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_queue_size(new_empty_queue):
+    """Docstring
+    """
     qtest.test_queue_size(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_out_of_order(new_empty_queue):
+    """Docstring
+    """
     qtest.test_out_of_order(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_get_zero_items(new_empty_queue):
+    """Docstring
+    """
     qtest.test_get_zero_items(new_empty_queue)
     
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_lookup(new_empty_queue):
+    """Docstring
+    """
     qtest.test_lookup(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_multiple_get(new_empty_queue):
+    """Docstring
+    """
     qtest.test_multiple_get(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_multiple_get_empty(new_empty_queue):
+    """Docstring
+    """
     qtest.test_multiple_get_empty(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_empty(new_empty_queue):
+    """Docstring
+    """
     new_empty_queue.put({})
