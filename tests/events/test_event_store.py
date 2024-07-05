@@ -54,8 +54,8 @@ n_events = n_events_per_type*n_event_types
 # one second after the previous event of that type
 @pytest.fixture
 def random_events() -> List[Event]:
-    return [ 
-        random_event(test_event_names[i%n_event_types], (i // n_event_types)) 
+    return [
+        random_event(test_event_names[i%n_event_types], (i // n_event_types))
         for i in range(0, n_events)
     ]
 

@@ -42,7 +42,7 @@ def add_json_to_sql_queue(engine, queue_name, items:dict):
             )
         except BaseException as e:
             print(e)
-    
+
     with Session(engine) as session:
         statement = insert(SqlQueue).values(db_items).on_conflict_do_nothing()
         session.exec(statement)
@@ -62,14 +62,14 @@ def get_json_from_sql_queue(engine, queue_name, n_items=1):
             & (SqlQueue.queue_item_stage == QueueItemStage.WAITING.value)
         ).limit(n_items)
         results = session.exec(stmt)
-        
+
         outputs = []
         for queue_item in results:
             outputs.append((queue_item.index_key, json.loads(queue_item.json_data)))
             update_stage(engine, queue_name, QueueItemStage.PROCESSING, queue_item.index_key)
 
         return outputs
-    
+
 
 def update_stage(engine, queue_name, new_stage, item_key):
     with Session(engine) as session:
@@ -94,7 +94,7 @@ def queue_size(engine, queue_name, stage):
         )
 
         return session.exec(statement).first()
-    
+
 
 def lookup_status(engine, queue_name, item_id):
     with Session(engine) as session:

@@ -19,7 +19,7 @@ class InMemoryQueue_():
         ids_in_queue = (
             list(self.waiting.keys())
             + list(self.processing.keys())
-            + list(self.success.keys()) 
+            + list(self.success.keys())
             + list(self.fail.keys())
         )
 
@@ -49,7 +49,7 @@ def is_json_serializable(o):
 
 
 def add_to_memory_queue(
-    in_memory_queue:InMemoryQueue_, 
+    in_memory_queue:InMemoryQueue_,
     new_items:Dict[str, Any]
 ):
     # filter out ids that already exist in the index
@@ -92,8 +92,8 @@ def get_from_memory_queue(
 
     for id in next_ids:
         queue_item = move_dict_item(
-            in_memory_queue.waiting, 
-            in_memory_queue.processing, 
+            in_memory_queue.waiting,
+            in_memory_queue.processing,
             id
         )
 
@@ -110,7 +110,7 @@ def lookup_status(
         dict_for_stage = in_memory_queue.get_for_stage(item_stage)
         if item_id in dict_for_stage:
             return item_stage
-        
+
     raise KeyError(item_id)
 
 

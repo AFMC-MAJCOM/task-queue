@@ -31,7 +31,7 @@ def handle_worker_interface_choice(choice:str, args):
             args.endpoint,
             args.namespace
         )
-      
+
 def handle_queue_implementation_choice(choice:str, args):
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
         queue = JsonS3Queue(args.s3_base_path)
@@ -48,8 +48,8 @@ def handle_queue_implementation_choice(choice:str, args):
             )
 
         queue = QueueWithEvents(
-            queue, 
-            store, 
+            queue,
+            store,
             add_event_name=args.add_to_queue_event_name,
             move_event_name=args.move_queue_event_name
         )
@@ -91,7 +91,7 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "worker_interface", 
+        "worker_interface",
         choices=[
             ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE
         ]
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     worker_interface = handle_worker_interface_choice(
-        args.worker_interface, 
+        args.worker_interface,
         args
     )
 

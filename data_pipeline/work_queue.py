@@ -3,8 +3,8 @@ from .queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
     def __init__(
-        self, 
-        queue:QueueBase, 
+        self,
+        queue:QueueBase,
         interface:QueueWorkerInterface
     ):
         self._queue = queue

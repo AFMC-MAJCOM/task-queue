@@ -8,7 +8,8 @@ import pandas as pd
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     """
-    Pushes `queue_item_body.submit_body` directly to the argo workflows rest API.
+    Pushes `queue_item_body.submit_body` directly to the argo workflows rest
+    API.
 
     submit_body schema:
     {
@@ -47,8 +48,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def __init__(
-        self, 
-        worker_interface_id:str, 
+        self,
+        worker_interface_id:str,
         argo_workflows_endpoint:str,
         namespace:str
     ):
@@ -62,21 +63,21 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     @property
     def _argo_workflows_submit_url(self):
         return ArgoWorkflowsQueueWorker.urlconcat(
-            self._argo_workflows_endpoint, 
-            "api", 
-            "v1", 
-            "workflows", 
-            self._namespace, 
+            self._argo_workflows_endpoint,
+            "api",
+            "v1",
+            "workflows",
+            self._namespace,
             "submit"
         )
 
     @property
     def _argo_workflows_list_url(self):
         return ArgoWorkflowsQueueWorker.urlconcat(
-            self._argo_workflows_endpoint, 
-            "api", 
-            "v1", 
-            "workflows", 
+            self._argo_workflows_endpoint,
+            "api",
+            "v1",
+            "workflows",
             self._namespace
         )
 
@@ -87,7 +88,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
 
         payload : dict = queue_item_body[ArgoWorkflowsQueueWorker.PAYLOAD_FIELD]
-        
+
         # merge new labels into submit options for easier query later
         # we have to do this get/set stuff because submitOptions and labels
         # may not existin the queue item body payload
@@ -132,8 +133,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         workflow status can be read from the labels
         - workflows.argoproj.io/completed='false' -> PROCESSING
-        - workflows.argoproj.io/completed='true' and workflows.argoproj.io/phase='Succeeded' -> SUCCESS
-        - workflows.argoproj.io/completed='true' and not workflows.argoproj.io/phase='Succeeded' -> FAIL
+        - workflows.argoproj.io/completed='true' and workflows.argoproj.io/
+            phase='Succeeded' -> SUCCESS
+        - workflows.argoproj.io/completed='true' and not workflows.argoproj.io/
+            phase='Succeeded' -> FAIL
         """
 
         if completed == 'true':
@@ -166,8 +169,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         get_workflow_create_time = lambda wf: pd.Timestamp(wf['metadata']['creationTimestamp'])
 
         # We may still get older workflows with the same worker ID and queue
-        # item ID if we have retried an item that has already been run. We can 
-        # handle this case by only taking the most recent one. 
+        # item ID if we have retried an item that has already been run. We can
+        # handle this case by only taking the most recent one.
 
         print("Filtering results")
         results = {}

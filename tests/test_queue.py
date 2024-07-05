@@ -88,7 +88,7 @@ def test_out_of_order(new_empty_queue):
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_get_zero_items(new_empty_queue):
     qtest.test_get_zero_items(new_empty_queue)
-    
+
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_lookup(new_empty_queue):
     qtest.test_lookup(new_empty_queue)

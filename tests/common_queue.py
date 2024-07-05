@@ -108,7 +108,7 @@ def test_put_exception(queue):
 
     second_len = queue.size(qb.QueueItemStage.WAITING)
     assert second_len == len(items) - 1
-    
+
 def test_queue_size(queue):
     queue.put(default_items)
     waiting_size = queue.size(qb.QueueItemStage.WAITING)
