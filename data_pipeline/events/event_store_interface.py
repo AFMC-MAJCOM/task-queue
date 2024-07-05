@@ -23,4 +23,3 @@ class EventStoreInterface(ABC):
     def get(self, event_name : str,
             time_since : datetime = None) -> List[Event]:
         pass
-

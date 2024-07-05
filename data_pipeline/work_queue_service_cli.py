@@ -70,7 +70,7 @@ def start_jobs_with_processing_limit(
 
     started_jobs = work_queue.push_next_jobs(to_start)
 
-    logger.info(f"start_jobs_with_processing_limit: Started
+    logger.info(f"start_jobs_with_processing_limit: Started \
         {len(started_jobs)} jobs")
 
 def main(

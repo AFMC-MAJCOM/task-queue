@@ -34,7 +34,8 @@ class WorkQueue():
         # new_statuses = {
         #     k : v
         #     for k,v in statuses.items()
-        #     if k not in self._cached_statuses or self._cached_statuses[k] != v
+        #     if k not in self._cached_statuses or self._cached_statuses[k] \
+        # != v
         # }
 
         print("Processing new statuses from worker interface")
