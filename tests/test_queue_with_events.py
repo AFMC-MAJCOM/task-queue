@@ -1,4 +1,4 @@
-"""Top file docstring
+"""Pytests for the queue_with_events.py functionality.
 """
 import pytest
 
@@ -18,7 +18,7 @@ MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 
 @pytest.fixture
 def queue_with_events():
-    """Docstring
+    """Fixture to create queue with events for testing.
     """
     q = InMemoryQueue()
     s = InMemoryEventStore()
@@ -31,7 +31,8 @@ def queue_with_events():
     )
 
 def test_event_queue_add(queue_with_events):
-    """Docstring
+    """Tests that every event was added to the queue and every item has an
+    event.
     """
     _, s, eq = queue_with_events
 
@@ -42,15 +43,15 @@ def test_event_queue_add(queue_with_events):
     for e in add_events:
         queue_add_event = QueueAddEventData(**e.data)
         
-        # make sure every item has an event
+        # Make sure every item has an event
         assert queue_add_event.queue_index_key in default_items
 
-    # make sure every item has an event
+    # Make sure every item has an event
     assert len(add_events) == len(default_items)
 
 
 def test_event_queue_lifecycle(queue_with_events):
-    """Docstring
+    """Test event queue lifestyle works as expected.
     """
     _, s, eq = queue_with_events
 
@@ -88,12 +89,12 @@ def test_event_queue_lifecycle(queue_with_events):
         e for e in move_events if e.stage_to == QueueItemStage.FAIL
     ]
 
-    # make sure the right number of events happened for each stage
+    # Make sure the right number of events happened for each stage
     assert len(process_events) == len(success_items) + len(fail_items)
     assert len(success_events) == eq.size(QueueItemStage.SUCCESS)
     assert len(fail_events) == eq.size(QueueItemStage.FAIL)
 
     for e in move_events:
         if e.stage_to != QueueItemStage.PROCESSING:
-            # if this item was moved, make sure it is in the proper spot now
+            # If this item was moved, make sure it is in the proper spot now
             assert e.stage_to == eq.lookup_status(e.queue_index_key)
