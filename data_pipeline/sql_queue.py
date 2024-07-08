@@ -4,7 +4,8 @@ from typing import Optional
 import json
 from functools import partial
 
-from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint, Column
+from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
+from sqlmodel import Column
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Engine
@@ -12,7 +13,8 @@ from sqlalchemy import Engine
 class SqlQueue(SQLModel, table=True):
     # no queue may have duplicate `index_key`s
     __table_args__ = (
-        UniqueConstraint("queue_name", "index_key", name="_queue_name_index_key_uc"),
+        UniqueConstraint("queue_name", "index_key",
+                         name="_queue_name_index_key_uc"),
     )
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -42,7 +44,7 @@ def add_json_to_sql_queue(engine, queue_name, items:dict):
             )
         except BaseException as e:
             print(e)
-    
+
     with Session(engine) as session:
         statement = insert(SqlQueue).values(db_items).on_conflict_do_nothing()
         session.exec(statement)
@@ -50,7 +52,8 @@ def add_json_to_sql_queue(engine, queue_name, items:dict):
         session.commit()
 
     if len(db_items) != len(items):
-        raise BaseException("Error writing at least one queue object to S3:", fail_items)
+        raise BaseException("Error writing at least one queue object to S3:",
+                            fail_items)
 
     return success
 
@@ -62,19 +65,24 @@ def get_json_from_sql_queue(engine, queue_name, n_items=1):
             & (SqlQueue.queue_item_stage == QueueItemStage.WAITING.value)
         ).limit(n_items)
         results = session.exec(stmt)
-        
+
         outputs = []
         for queue_item in results:
-            outputs.append((queue_item.index_key, json.loads(queue_item.json_data)))
-            update_stage(engine, queue_name, QueueItemStage.PROCESSING, queue_item.index_key)
+            outputs.append((queue_item.index_key,
+                            json.loads(queue_item.json_data)))
+            update_stage(engine,
+                         queue_name,
+                         QueueItemStage.PROCESSING,
+                         queue_item.index_key)
 
         return outputs
-    
+
 
 def update_stage(engine, queue_name, new_stage, item_key):
     with Session(engine) as session:
         statement = select(SqlQueue).where(
-            (SqlQueue.index_key == item_key) & (SqlQueue.queue_name == queue_name)
+            (SqlQueue.index_key == item_key) & \
+                (SqlQueue.queue_name == queue_name)
         )
         results = session.exec(statement)
 
@@ -94,13 +102,14 @@ def queue_size(engine, queue_name, stage):
         )
 
         return session.exec(statement).first()
-    
+
 
 def lookup_status(engine, queue_name, item_id):
     with Session(engine) as session:
         statement = (
             select(SqlQueue.queue_item_stage)
-            .where((queue_name == SqlQueue.queue_name) & (str(item_id) == SqlQueue.index_key))
+            .where((queue_name == SqlQueue.queue_name) & \
+                   (str(item_id) == SqlQueue.index_key))
         )
 
         item = session.exec(statement).first()

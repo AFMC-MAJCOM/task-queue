@@ -20,6 +20,6 @@ class EventStoreInterface(ABC):
 
 
     @abstractmethod
-    def get(self, event_name : str, time_since : datetime = None) -> List[Event]:
+    def get(self, event_name : str,
+            time_since : datetime = None) -> List[Event]:
         pass
-

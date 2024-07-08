@@ -29,19 +29,19 @@ class QueueMoveEventData(pydantic.BaseModel):
             return v
         else:
             return QueueItemStage(v)
-        
+
     @pydantic.field_serializer('stage_from', 'stage_to')
     def _internal_serializer(v):
         return v.value
 
 
 def add_to_queue_with_event(
-    queue : QueueBase, 
-    event_store : EventStoreInterface, 
+    queue : QueueBase,
+    event_store : EventStoreInterface,
     queue_add_event_name : str,
     new_items
 ):
-    # the flow control of this function looks really weird to satisfy the 
+    # the flow control of this function looks really weird to satisfy the
     # `test_put_with_exception` test.
     queue_event_data = []
     filtered_items = {}
@@ -102,7 +102,7 @@ def get_from_queue_with_event(
     ]
 
     event_store.add(queue_event_data)
-    
+
     return items
 
 
@@ -160,8 +160,8 @@ def queue_fail_with_event(
 
 
 def QueueWithEvents(
-    queue : QueueBase, 
-    event_store : EventStoreInterface, 
+    queue : QueueBase,
+    event_store : EventStoreInterface,
     event_base_name : str = None,
     add_event_name : str = None,
     move_event_name : str = None
@@ -171,18 +171,20 @@ def QueueWithEvents(
         move_event_name = f"{event_base_name}_MOVE"
 
     # validate arguments
-    assert bool(add_event_name) and bool(move_event_name), "No event name supplied for queue"
+    assert bool(add_event_name) and bool(move_event_name), \
+        "No event name supplied for queue"
 
     return QueueBase(
         partial(add_to_queue_with_event, queue, event_store, add_event_name),
-        partial(get_from_queue_with_event, queue, event_store, move_event_name),
+        partial(get_from_queue_with_event, queue,
+                event_store, move_event_name),
         partial(queue_success_with_event, queue, event_store, move_event_name),
         partial(queue_fail_with_event, queue, event_store, move_event_name),
         queue.size,
         queue.lookup_status,
 
-        { 
-            "implementation": "event", 
+        {
+            "implementation": "event",
             "event_base_name": event_base_name,
             "base_queue_description": queue._description
         }

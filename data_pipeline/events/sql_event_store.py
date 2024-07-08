@@ -76,7 +76,7 @@ class SqlEventStore(EventStoreInterface):
             session.exec(statement)
             session.commit()
 
-    
+
     def get(self, event_name: str, time_since: datetime = None) -> List[Event]:
         sql_query = event_name == SqlEventStoreModel.name
 
