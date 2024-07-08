@@ -40,9 +40,6 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             "serviceAccount": "string"
         }
     }
-
-    Parameters:
-    -----------
     """
 
     PAYLOAD_FIELD = "submit_body"

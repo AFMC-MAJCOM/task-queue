@@ -1,4 +1,4 @@
-"""Blank dockstring for file
+"""Contains functions and classes concering Queue with Event.
 """
 from .queue_base import QueueBase, QueueItemStage
 from .events.event_store_interface import EventStoreInterface
@@ -13,7 +13,7 @@ from functools import partial
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
 
 class QueueAddEventData(pydantic.BaseModel):
-    """Docstring
+    """Adds data to Event for adding Event to Event Store.
     """
     queue_index_key : str
     queue_item_data : pydantic.JsonValue
@@ -21,7 +21,7 @@ class QueueAddEventData(pydantic.BaseModel):
 
 
 class QueueMoveEventData(pydantic.BaseModel):
-    """Docstring
+    """Class concerning staging Event data.
     """
     queue_index_key : str
     stage_from : QueueItemStage
@@ -31,16 +31,15 @@ class QueueMoveEventData(pydantic.BaseModel):
     # values when dumped with `model_dump`
     @pydantic.field_validator('stage_from', 'stage_to')
     def _internal_validator(cls, v):
-        """Docstring
-
-        details
+        """Validates that the input is a QueueItemStage object.
 
         Parameters:
         -----------
+        v: QueueItemStage object or int.
 
         Returns:
         -----------
-
+        QueueItemStage object.
         """
         if isinstance(v, QueueItemStage):
             return v
@@ -49,39 +48,40 @@ class QueueMoveEventData(pydantic.BaseModel):
         
     @pydantic.field_serializer('stage_from', 'stage_to')
     def _internal_serializer(v):
-        """Docstring
-
-        details
+        """Serializes QueueItemStage by returning the int representation.
 
         Parameters:
         -----------
+        v: QueueItemStage object.
 
         Returns:
         -----------
-
+        Integer representing stage.
         """
         return v.value
 
 
-def add_to_queue_with_event(
-    queue : QueueBase, 
-    event_store : EventStoreInterface, 
-    queue_add_event_name : str,
-    new_items
-):
-    """Docstring
-
-    details
+def add_to_queue_with_event(queue,
+                            event_store,
+                            queue_add_event_name,
+                            new_items
+                           ):
+    """Adds Events to Queue to add to Event Store.
 
     Parameters:
     -----------
-
+    queue: QueueBase
+        Queue to add Items to.
+    event_store: EventStoreInterface
+        Event Store to add Events to.
+    queue_add_event_name: str
+        Name of Event.
+    new_items: Dict
+        New Items to add to queue.
     Returns:
     -----------
-
+    Results of putting filtered_items in queue in the WAITING stage.
     """
-    # the flow control of this function looks really weird to satisfy the 
-    # `test_put_with_exception` test.
     queue_event_data = []
     filtered_items = {}
     exc = None
@@ -114,24 +114,27 @@ def add_to_queue_with_event(
     return out
 
 
-def get_from_queue_with_event(
-    queue : QueueBase,
-    event_store : EventStoreInterface,
-    queue_move_event_name : str,
-    n_items = 1
-):
-    """Docstring
-
-    details
+def get_from_queue_with_event(queue,
+                              event_store,
+                              queue_move_event_name,
+                              n_items = 1
+                             ):
+    """Grabs Items in WAITING stage, creates Event, then adds to the Store.
 
     Parameters:
     -----------
-
+    queue: QueueBase
+        Queue to get Items from.
+    event_store: EventStoreInterface
+        Event Store to add Events to.
+    queue_move_event_name: str
+        Name of Event.
+    n_items: int (default=1)
+        Number of Items to get from Queue.
     Returns:
     -----------
-
+    List of Items grabbed from the Queue and moved to PROCESSING stage.
     """
-    # you can never be too careful
     if n_items < 0:
         n_items = 0
 
@@ -156,23 +159,25 @@ def get_from_queue_with_event(
     return items
 
 
-def record_queue_move_event(
-    event_store : EventStoreInterface,
-    queue_move_event_name : str,
-    item_id : str,
-    from_stage : QueueItemStage,
-    to_stage : QueueItemStage
-):
-    """Docstring
-
-    details
+def record_queue_move_event(event_store,
+                            queue_move_event_name,
+                            item_id,
+                            from_stage,
+                            to_stage
+                           ):
+    """Tracks the movement of Events.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    event_store: EventStoreInterface
+    queue_move_event_name: str
+        name of Event
+    item_id: str
+        ID of Item
+    from_stage: QueueItemStage
+        Stage Item is being moved from.
+    to_stage: QueueItemStage
+        Stage Item is being moved to.
     """
     queue_event_data = Event(
         name = queue_move_event_name,
@@ -187,22 +192,22 @@ def record_queue_move_event(
     event_store.add(queue_event_data)
 
 
-def queue_success_with_event(
-    queue : QueueBase,
-    event_store : EventStoreInterface,
-    queue_move_event_name : str,
-    item_id : str
-):
-    """Docstring
-
-    details
+def queue_success_with_event(queue,
+                             event_store,
+                             queue_move_event_name,
+                             item_id
+                            ):
+    """Moves Event Item from PROCESSING to SUCCESS stage.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    queue: QueueBase
+        Queue to add Event to SUCCESS stage.
+    event_store: EventStoreInterface
+    queue_move_event_name: str
+        Name of Event.
+    item_id: str
+        ID of Item.
     """
     record_queue_move_event(
         event_store,
@@ -214,22 +219,22 @@ def queue_success_with_event(
 
     queue.success(item_id)
 
-def queue_fail_with_event(
-    queue : QueueBase,
-    event_store : EventStoreInterface,
-    queue_move_event_name : str,
-    item_id : str
-):
-    """Docstring
-
-    details
+def queue_fail_with_event(queue,
+                          event_store,
+                          queue_move_event_name,
+                          item_id
+                         ):
+    """Moves Event Item from PROCESSING to FAIL stage.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    queue: QueueBase
+        Queue to add Event to Fail stage.
+    event_store: EventStoreInterface
+    queue_move_event_name: str
+        Name of Event.
+    item_id: str
+        ID of Item.
     """
     record_queue_move_event(
         event_store,
@@ -242,23 +247,28 @@ def queue_fail_with_event(
     queue.fail(item_id)
 
 
-def QueueWithEvents(
-    queue : QueueBase, 
-    event_store : EventStoreInterface, 
-    event_base_name : str = None,
-    add_event_name : str = None,
-    move_event_name : str = None
-):
-    """Docstring
-
-    details
+def QueueWithEvents(queue,
+                    event_store,
+                    event_base_name = None,
+                    add_event_name = None,
+                    move_event_name = None
+                   ):
+    """Creates Queue with Events.
 
     Parameters:
     -----------
+    queue: QueueBase
+    event_store: EventStoreInterface
+    event_base_name: str (default=None)
+        Name of Base Event.
+    add_event_name: str (default=None)
+        Add Event name.
+    move_event_name: str (default=None)
+        Move Event name.
 
     Returns:
     -----------
-
+    QueueBase object with Events.
     """
     if event_base_name:
         add_event_name = f"{event_base_name}_ADD"

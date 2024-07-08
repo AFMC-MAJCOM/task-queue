@@ -1,4 +1,4 @@
-"""Blank dockstring for file
+"""Wherein is contained the Base Classes for Queue.
 """
 from enum import Enum
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Callable, Any, List, Tuple, Dict, Optional
 
 class QueueItemStage(Enum):
-    """Docstring
+    """Item Stage Class for Queue.
     """
     WAITING = 0
     PROCESSING = 1
@@ -15,7 +15,7 @@ class QueueItemStage(Enum):
 
 @dataclass
 class QueueBase():
-    """Docstring
+    """Base Class for Queue.
     """
     put : Callable[[Dict[str, Any]], None]
     get : Callable[[Optional[int]], List[Tuple[str, Any]]]
