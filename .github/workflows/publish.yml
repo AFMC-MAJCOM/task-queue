@@ -3,19 +3,26 @@ on:
   workflow_dispatch:
   push:
 jobs:
-  publish-docker-image:
+  deploy-docker-image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      - name: build image
+        run: |
+          docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue
+
+      - name: test image
+        run: |
+          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
+          docker ps
+          
       - name: Login to ghcr.Io
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: build image
-        run: |
-          docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
-          docker ps
+      #- name: publish image
+        #run: |
           #docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
