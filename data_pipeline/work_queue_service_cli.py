@@ -1,20 +1,16 @@
-from .work_queue import WorkQueue
-from .argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from .s3_queue import JsonS3Queue
-from .sql_queue import JsonSQLQueue
-from .queue_base import QueueBase, QueueItemStage
-from .queue_worker_interface import QueueWorkerInterface
-from .events.sql_event_store import SqlEventStore
-from .queue_with_events import QueueWithEvents
+from data_pipeline.work_queue import WorkQueue
+from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from data_pipeline.s3_queue import JsonS3Queue
+from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.events.sql_event_store import SqlEventStore
+from data_pipeline.queue_with_events import QueueWithEvents
 
 from typing import Callable, List
 import argparse
 import time
 from sqlalchemy import create_engine
-
-from .utils import create_logger
-
-logger = create_logger("work_queue_service", "log.txt")
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
 
@@ -79,10 +75,10 @@ def main(
     period_sec:int=10
 ):
     while True:
-        logger.info("Updating job statuses")
+        print("Updating job statuses")
         work_queue.update_job_status()
 
-        logger.info("Running periodic functions")
+        print("Running periodic functions")
         for fn in periodic_functions:
             fn()
 
