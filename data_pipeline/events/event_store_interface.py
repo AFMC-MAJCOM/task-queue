@@ -52,4 +52,3 @@ class EventStoreInterface(ABC):
         Retuns a List of Events.
         """
         pass
-

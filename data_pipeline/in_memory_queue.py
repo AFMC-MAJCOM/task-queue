@@ -1,6 +1,6 @@
 """Wherein is conatained the class and functions for the In Memroy Queue.
 """
-from .queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueBase, QueueItemStage
 from queue import Queue
 
 from dataclasses import dataclass, field
@@ -25,13 +25,14 @@ class InMemoryQueue_():
         ids_in_queue = (
             list(self.waiting.keys())
             + list(self.processing.keys())
-            + list(self.success.keys()) 
+            + list(self.success.keys())
             + list(self.fail.keys())
         )
 
         self.index = set(ids_in_queue)
 
-        assert len(ids_in_queue) == len(self.index), "There are duplicates IDs in the work queue"
+        assert len(ids_in_queue) == len(self.index), \
+            "There are duplicates IDs in the work queue"
 
     def get_for_stage(self, stage):
         """Gets the stage of the QueueItemStage passed in.
@@ -144,8 +145,8 @@ def get_from_memory_queue(in_memory_queue, n_items = 1):
 
     for id in next_ids:
         queue_item = move_dict_item(
-            in_memory_queue.waiting, 
-            in_memory_queue.processing, 
+            in_memory_queue.waiting,
+            in_memory_queue.processing,
             id
         )
 
@@ -171,7 +172,7 @@ def lookup_status(in_memory_queue, item_id):
         dict_for_stage = in_memory_queue.get_for_stage(item_stage)
         if item_id in dict_for_stage:
             return item_stage
-        
+
     raise KeyError(item_id)
 
 
@@ -184,8 +185,12 @@ def InMemoryQueue():
     return QueueBase(
         partial(add_to_memory_queue, in_memory_queue),
         partial(get_from_memory_queue, in_memory_queue),
-        lambda item_id: move_dict_item(in_memory_queue.processing, in_memory_queue.success, item_id),
-        lambda item_id: move_dict_item(in_memory_queue.processing, in_memory_queue.fail, item_id),
+        lambda item_id: move_dict_item(in_memory_queue.processing,
+                                       in_memory_queue.success,
+                                       item_id),
+        lambda item_id: move_dict_item(in_memory_queue.processing,
+                                       in_memory_queue.fail,
+                                       item_id),
         lambda stage: len(in_memory_queue.get_for_stage(stage)),
         partial(lookup_status, in_memory_queue),
         {"implementation": "memory"}

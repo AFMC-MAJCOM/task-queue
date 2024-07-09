@@ -1,22 +1,18 @@
 """Wherein is contained the functions concerning the Work Queue Service CLI.
 """
-from .work_queue import WorkQueue
-from .argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from .s3_queue import JsonS3Queue
-from .sql_queue import JsonSQLQueue
-from .queue_base import QueueBase, QueueItemStage
-from .queue_worker_interface import QueueWorkerInterface
-from .events.sql_event_store import SqlEventStore
-from .queue_with_events import QueueWithEvents
+from data_pipeline.work_queue import WorkQueue
+from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from data_pipeline.s3_queue import JsonS3Queue
+from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.events.sql_event_store import SqlEventStore
+from data_pipeline.queue_with_events import QueueWithEvents
 
 from typing import Callable, List
 import argparse
 import time
 from sqlalchemy import create_engine
-
-from .utils import create_logger
-
-logger = create_logger("work_queue_service", "log.txt")
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
 
@@ -73,8 +69,8 @@ def handle_queue_implementation_choice(choice, args):
             )
 
         queue = QueueWithEvents(
-            queue, 
-            store, 
+            queue,
+            store,
             add_event_name=args.add_to_queue_event_name,
             move_event_name=args.move_queue_event_name
         )
@@ -104,7 +100,8 @@ def start_jobs_with_processing_limit(max_processing_limit,
 
     started_jobs = work_queue.push_next_jobs(to_start)
 
-    logger.info(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
+    logger.info(f"start_jobs_with_processing_limit: Started \
+        {len(started_jobs)} jobs")
 
 def main(periodic_functions, work_queue, period_sec=10):
     """Main function, runs functions periodically with a set time to wait.
@@ -119,10 +116,10 @@ def main(periodic_functions, work_queue, period_sec=10):
         Number of seconds to wait between running periodic functions.
     """
     while True:
-        logger.info("Updating job statuses")
+        print("Updating job statuses")
         work_queue.update_job_status()
 
-        logger.info("Running periodic functions")
+        print("Running periodic functions")
         for fn in periodic_functions:
             fn()
 
@@ -132,7 +129,7 @@ def main(periodic_functions, work_queue, period_sec=10):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "worker_interface", 
+        "worker_interface",
         choices=[
             ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE
         ]
@@ -190,7 +187,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     worker_interface = handle_worker_interface_choice(
-        args.worker_interface, 
+        args.worker_interface,
         args
     )
 
@@ -205,7 +202,9 @@ if __name__ == "__main__":
     )
 
     periodic_functions = [
-        lambda: start_jobs_with_processing_limit(args.processing_limit, queue, work_queue)
+        lambda: start_jobs_with_processing_limit(args.processing_limit,
+                                                 queue,
+                                                 work_queue)
     ]
 
     main(periodic_functions, work_queue, args.periodic_seconds)

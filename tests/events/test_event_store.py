@@ -79,9 +79,9 @@ def random_events():
     Returns:
     -----------
     List of events.
-    """
-    return [ 
-        random_event(test_event_names[i%n_event_types], (i // n_event_types)) 
+    """ 
+    return [
+        random_event(test_event_names[i%n_event_types], (i // n_event_types))
         for i in range(0, n_events)
     ]
 
@@ -97,14 +97,18 @@ def new_empty_store(request):
         yield SqlEventStore(test_sql_engine)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_add_events(new_empty_store, random_events):
     """Tests that adding events to empty store does not throw error.
     """
     new_empty_store.add(random_events)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_get_events(new_empty_store, random_events):
     """Tests get_events functions as expected.
     """
@@ -121,7 +125,9 @@ def test_get_events(new_empty_store, random_events):
     assert all( e.name == event_name for e in events_after )
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_get_events_time_since(new_empty_store, random_events):
     """Tests get_events with time_since param functions as expected.
     """
@@ -138,7 +144,9 @@ def test_get_events_time_since(new_empty_store, random_events):
     assert all( e.name == event_name for e in events )
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_event_default_time_now(new_empty_store):
     """Tests that the time assigned is accurate and does not throw errors when
     added to empty store.
@@ -158,7 +166,9 @@ def test_event_default_time_now(new_empty_store):
     new_empty_store.add(evt)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_add_empty(new_empty_store):
     """Tests adding empty list to store does not throw errors.
     """

@@ -1,0 +1,4 @@
+# Ignore all hidden git files
+.git
+.gitignore
+.github

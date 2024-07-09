@@ -95,7 +95,6 @@ class SqlEventStore(EventStoreInterface):
             session.exec(statement)
             session.commit()
 
-    
     def get(self, event_name, time_since=None):
         """Returns list of events that have happened since a specific time.
 

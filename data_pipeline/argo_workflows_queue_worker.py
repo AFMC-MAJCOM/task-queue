@@ -1,7 +1,7 @@
 """Wherein is contained the class for the Argo Workflow Queue Worker.
 """
-from .queue_worker_interface import QueueWorkerInterface
-from .queue_base import QueueItemStage
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.queue_base import QueueItemStage
 import requests
 from urllib.parse import urljoin
 
@@ -9,7 +9,8 @@ import pandas as pd
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     """
-    Pushes `queue_item_body.submit_body` directly to the argo workflows rest API.
+    Pushes `queue_item_body.submit_body` directly to the argo workflows rest
+    API.
 
     submit_body schema:
     {
@@ -86,11 +87,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns a submit URL.
         """
         return ArgoWorkflowsQueueWorker.urlconcat(
-            self._argo_workflows_endpoint, 
-            "api", 
-            "v1", 
-            "workflows", 
-            self._namespace, 
+            self._argo_workflows_endpoint,
+            "api",
+            "v1",
+            "workflows",
+            self._namespace,
             "submit"
         )
 
@@ -99,10 +100,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns the Argo Workflows URL
         """
         return ArgoWorkflowsQueueWorker.urlconcat(
-            self._argo_workflows_endpoint, 
-            "api", 
-            "v1", 
-            "workflows", 
+            self._argo_workflows_endpoint,
+            "api",
+            "v1",
+            "workflows",
             self._namespace
         )
 
@@ -121,14 +122,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Returns a jsonnable dict to send to the submit URL
         """
-        payload : dict = queue_item_body[ArgoWorkflowsQueueWorker.PAYLOAD_FIELD]
-        
         # Merge new labels into submit options for easier query later
+        payload : dict = queue_item_body[
+            ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
+            ]
         submit_options = payload.get('submitOptions', {})
 
         labels = submit_options.get('labels', "")
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}={self._worker_interface_id}"
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL}={item_id}"
+        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
+            ={self._worker_interface_id}"
+        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL} \
+            ={item_id}"
         labels = labels.strip(",")
 
         submit_options['labels'] = labels
@@ -172,7 +176,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         # Select labels that match this object
         return {
-            "listOptions.labelSelector": f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}={self._worker_interface_id}",
+            "listOptions.labelSelector": f" \
+                {ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
+                ={self._worker_interface_id}",
             "fields": "items.metadata.labels,metadata.resourceVersion"
         }
 
@@ -231,12 +237,14 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         # Queue item ID and status are labels in `metadata.labels`
         labels = lambda wf: wf['metadata']['labels']
-        get_workflow_queue_item_id = lambda wf: labels(wf)[ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
+        get_workflow_queue_item_id = lambda wf: labels(wf) \
+            [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
         get_workflow_status = lambda wf: self._get_workflow_status(
-            labels(wf).get(argo_completed_label, "false"), 
+            labels(wf).get(argo_completed_label, "false"),
             labels(wf).get(argo_phase_label, "Pending")
         )
-        get_workflow_create_time = lambda wf: pd.Timestamp(wf['metadata']['creationTimestamp'])
+        get_workflow_create_time = lambda wf: pd.Timestamp(
+            wf['metadata']['creationTimestamp'])
 
         # We may still get older workflows with the same worker ID and queue
         # Item ID if we have retried an item that has already been run. We can 
@@ -249,7 +257,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         for workflow in workflows:
             timestamp = get_workflow_create_time(workflow)
             item_id = get_workflow_queue_item_id(workflow)
-            if (item_id not in results) or (timestamp > completed_times[item_id]):
+            if (item_id not in results) or \
+                (timestamp > completed_times[item_id]):
                 results[item_id] = get_workflow_status(workflow)
                 completed_times[item_id] = timestamp
 

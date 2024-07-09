@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from dataclasses import dataclass, asdict
 import os
 
-from .queue_base import QueueBase, QueueItemStage
-from .s3_queue import JsonS3Queue
-from .sql_queue import JsonSQLQueue
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.s3_queue import JsonS3Queue
+from data_pipeline.sql_queue import JsonSQLQueue
 
 app = FastAPI()
 
@@ -65,13 +65,14 @@ class SqlQueueSettings(QueueSettings):
             host = env_dict['SQL_QUEUE_POSTGRES_HOSTNAME']
             database = env_dict['SQL_QUEUE_POSTGRES_DATABASE']
 
-            conn_str = f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
+            conn_str = \
+                f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
 
         return SqlQueueSettings(
             conn_str,
             env_dict['SQL_QUEUE_NAME'],
         )
-    
+
     def make_queue(self):
         """Creates and returns a JSONSQLQueue.
         """
@@ -99,7 +100,7 @@ def queue_settings_from_env(env_dict):
         return S3QueueSettings.from_env(env_dict)
     elif impl == "sql-json":
         return SqlQueueSettings.from_env(env_dict)
-    
+
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 

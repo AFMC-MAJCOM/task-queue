@@ -1,7 +1,7 @@
 """Wherein is contained the Abstract Class for QueueWorkerInterface.
 """
 from abc import ABC, abstractmethod
-from .queue_base import QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 from typing import Dict, Any
 
 class QueueWorkerInterface(ABC):
@@ -20,7 +20,7 @@ class QueueWorkerInterface(ABC):
             Contents of Queue Item body.
         """
         pass
-   
+
     @abstractmethod
     def poll_all_status(self):
         """Requests status from workflows.
@@ -64,7 +64,7 @@ class DummyWorkerInterface(QueueWorkerInterface):
         Returns Dict[Any, QueueItemStage] of job statuses.
         """
         return self._job_status
-    
+
     def mock_success(self, item_id):
         """Forces Item to SUCCESS stage.
 

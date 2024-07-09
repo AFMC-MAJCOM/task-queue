@@ -1,7 +1,7 @@
 """Wherein is contained the WorkQueue class.
 """
-from .queue_worker_interface import QueueWorkerInterface
-from .queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
@@ -58,7 +58,8 @@ class WorkQueue():
         print("Processing new statuses from worker interface")
         for queue_item_id, status in statuses.items():
             # Not in processing -> don't care
-            if self._queue.lookup_status(queue_item_id) != QueueItemStage.PROCESSING:
+            if self._queue.lookup_status(queue_item_id) != \
+                QueueItemStage.PROCESSING:
                 continue
 
             if status == QueueItemStage.SUCCESS:
