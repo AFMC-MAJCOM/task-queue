@@ -1,7 +1,7 @@
 from enum import Enum
-
 from dataclasses import dataclass
 from typing import Callable, Any, List, Tuple, Dict, Optional
+
 
 class QueueItemStage(Enum):
     WAITING = 0

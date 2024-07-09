@@ -1,18 +1,18 @@
+from typing import Callable, List
+import argparse
+import time
+
+from sqlalchemy import create_engine
+
 from .work_queue import WorkQueue
 from .argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from .s3_queue import JsonS3Queue
 from .sql_queue import JsonSQLQueue
 from .queue_base import QueueBase, QueueItemStage
-from .queue_worker_interface import QueueWorkerInterface
 from .events.sql_event_store import SqlEventStore
 from .queue_with_events import QueueWithEvents
-
-from typing import Callable, List
-import argparse
-import time
-from sqlalchemy import create_engine
-
 from .utils import create_logger
+
 
 logger = create_logger("work_queue_service", "log.txt")
 

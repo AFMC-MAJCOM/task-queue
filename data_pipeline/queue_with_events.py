@@ -1,12 +1,12 @@
+from typing import Dict
+from functools import partial
+
+import pydantic
+
 from .queue_base import QueueBase, QueueItemStage
 from .events.event_store_interface import EventStoreInterface
 from .events.event import Event
 
-from typing import Dict
-from typing_extensions import Annotated
-import pydantic
-from pydantic import BeforeValidator
-from functools import partial
 
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
 

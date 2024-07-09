@@ -1,13 +1,14 @@
+from typing import List
+from datetime import datetime
+import json
+
+from sqlmodel import Field, Session, SQLModel, select
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import Engine
+
 from .event_store_interface import EventStoreInterface
 from .event import Event
 
-import json
-
-from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert
-from typing import List, Optional
-from datetime import datetime
-from sqlalchemy import Engine
 
 class SqlEventStoreModel(SQLModel, table=True):
     __tablename__ = "sqleventstore"

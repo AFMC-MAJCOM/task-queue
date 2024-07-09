@@ -1,10 +1,10 @@
+import requests
+
+import pandas as pd
+
 from .queue_worker_interface import QueueWorkerInterface
 from .queue_base import QueueItemStage
-import requests
-from urllib.parse import urljoin
 
-# for timestamp parsing
-import pandas as pd
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     """

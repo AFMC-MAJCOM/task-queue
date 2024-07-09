@@ -1,14 +1,13 @@
-from .queue_base import QueueBase, QueueItemStage
-
 from typing import Optional
-import json
 from functools import partial
+import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlmodel import Column
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Engine
+
+from .queue_base import QueueBase, QueueItemStage
+
 
 class SqlQueue(SQLModel, table=True):
     # no queue may have duplicate `index_key`s
