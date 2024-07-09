@@ -112,11 +112,13 @@ Before you can do this step you need to have a postgres server running and acces
 
 ```
 QUEUE_IMPLEMENTATION=sql-json
-SQL_QUEUE_CONNECTION_STRING=<postgresql://postgres:your_password@hostname:5432/database_name>
+SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:<your_password>@<hostname>:5432/<database_name>
 SQL_QUEUE_NAME=<the_name_of_your_queue>
 ```
 
-Now you can run the server using the following command. Note, if you started your own local postgres server your hostname should be _host.docker.internal_
+If you started your own local postgres server your hostname should be _host.docker.internal_. The password should match the password passed in place of `<your_password>` when running the above command `docker run --name my-postgres -e POSTGRES_PASSWORD=<your_password> -d -p 5432:5432 postgres`. An example for the SQL_QUEUE_CONNECTION_STRING is `postgresql://postgres:password@host.docker.internal:5432/database_name`.
+
+The container can then be spun up using the below command.
 
 ```
 docker run --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 
