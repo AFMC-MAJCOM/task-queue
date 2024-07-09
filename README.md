@@ -119,13 +119,13 @@ SQL_QUEUE_NAME=<the_name_of_your_queue>
 Now you can run the server using the following command. Note, if you started your own local postgres server your hostname should be _host.docker.internal_
 
 ```
-docker run --rm -p 8001:80 --env-file ./env.list task-queue server 
+docker run --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 
 ```
 
 (Optional) If you started your own local postgres server and are using a linux machine run this command instead.
 
 ```
-docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:80 --env-file ./env.list task-queue server 
+docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 
 ```
 
 ### Running the CLI
@@ -133,6 +133,6 @@ docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:80 --env-fi
 Run the following command to output help from CLI
 
 ```
-docker run --rm task-queue controller --help
+docker run --rm ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
 ```
 
