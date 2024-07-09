@@ -1,4 +1,4 @@
-"""Blank dockstring for file
+"""Wherein is contained the functions for implementing the SQL Queue.
 """
 from .queue_base import QueueBase, QueueItemStage
 
@@ -12,9 +12,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Engine
 
 class SqlQueue(SQLModel, table=True):
-    """Docstring
+    """Creates the SQL Queue.
     """
-    # no queue may have duplicate `index_key`s
+    # No queue may have duplicate `index_key`s
     __table_args__ = (
         UniqueConstraint("queue_name", "index_key", name="_queue_name_index_key_uc"),
     )
@@ -26,17 +26,20 @@ class SqlQueue(SQLModel, table=True):
     queue_name: str
 
 
-def add_json_to_sql_queue(engine, queue_name, items:dict):
-    """Docstring
-
-    details
+def add_json_to_sql_queue(engine, queue_name, items):
+    """Adds Items to the SQL Queue.
 
     Parameters:
     -----------
+    engine: Engine
+    queue_name: str
+        Name of Queue.
+    items: dict
+        Dictionary of Items to add to Queue.
 
     Returns:
     -----------
-
+    Returns 0 if it was successful or else raises exception.
     """
     success = 0
 
@@ -71,16 +74,19 @@ def add_json_to_sql_queue(engine, queue_name, items:dict):
 
 
 def get_json_from_sql_queue(engine, queue_name, n_items=1):
-    """Docstring
-
-    details
+    """Grabs Items from SQL Queue.
 
     Parameters:
     -----------
+    engine: Engine
+    queue_name: str
+        Name of Queue.
+    n_items: int (default=1)
+        Number of Items to get from Queue.
 
     Returns:
     -----------
-
+    Returns list of item keys and data from the Queue.
     """
     with Session(engine) as session:
         stmt = select(SqlQueue).where(
@@ -98,16 +104,17 @@ def get_json_from_sql_queue(engine, queue_name, n_items=1):
     
 
 def update_stage(engine, queue_name, new_stage, item_key):
-    """Docstring
-
-    details
+    """Updates the stage of an Item.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    engine: Engine
+    queue_name: str
+        Name of Queue.
+    new_stage: QueueItemStage.[STAGE]
+        New stage for the Item to get moved to.
+    item_key: str
+        Key of the Item to be staged.
     """
     with Session(engine) as session:
         statement = select(SqlQueue).where(
@@ -124,16 +131,18 @@ def update_stage(engine, queue_name, new_stage, item_key):
 
 
 def queue_size(engine, queue_name, stage):
-    """Docstring
-
-    details
+    """Gets the number of items in a certain stage.
 
     Parameters:
     -----------
-
+    engine: Engine
+    queue_name: str
+        Name of Queue.
+    stage: QueueItemStage.[STAGE]
+        Desired Stage to return size of.
     Returns:
     -----------
-
+    Returns the numbre of items in the Queue at that current stage.
     """
     with Session(engine) as session:
         statement = select(func.count(SqlQueue.id)).filter(
@@ -145,16 +154,19 @@ def queue_size(engine, queue_name, stage):
     
 
 def lookup_status(engine, queue_name, item_id):
-    """Docstring
-
-    details
+    """Looks up what the current stage of a certain item is.
 
     Parameters:
     -----------
+    engine: Engine
+    queue_name: str
+        Name of Queue.
+    item_id: str
+        ID of item to return current stage.
 
     Returns:
     -----------
-
+    Returns a QueueItemStage object for the Item.
     """
     with Session(engine) as session:
         statement = (
@@ -171,19 +183,8 @@ def lookup_status(engine, queue_name, item_id):
 
 
 def JsonSQLQueue(engine:Engine, queue_name):
-    """Docstring
-
-    details
-
-    Parameters:
-    -----------
-
-    Returns:
-    -----------
-
+    """Creates and returns the SQL Queue.
     """
-    # table = SQLModel.metadata.tables[SqlQueue.__tablename__]
-    # SQLModel.metadata.drop_all(engine, [table], checkfirst=True)
     SQLModel.metadata.create_all(engine)
 
     return QueueBase(

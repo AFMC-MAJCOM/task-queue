@@ -21,7 +21,7 @@ class QueueAddEventData(pydantic.BaseModel):
 
 
 class QueueMoveEventData(pydantic.BaseModel):
-    """Class concerning staging Event data.
+    """Class concerning tracking movment of Items on Queue.
     """
     queue_index_key : str
     stage_from : QueueItemStage
@@ -66,7 +66,7 @@ def add_to_queue_with_event(queue,
                             queue_add_event_name,
                             new_items
                            ):
-    """Adds Events to Queue to add to Event Store.
+    """Adds Events from Items in Queue to Event Store.
 
     Parameters:
     -----------
@@ -88,6 +88,7 @@ def add_to_queue_with_event(queue,
 
     for k, v in new_items.items():
         try:
+            
             queue_event_data.append(
                 Event(
                     name=queue_add_event_name,
@@ -165,7 +166,7 @@ def record_queue_move_event(event_store,
                             from_stage,
                             to_stage
                            ):
-    """Tracks the movement of Events.
+    """Tracks the movement of Items in Queue via Event Store.
 
     Parameters:
     -----------
@@ -268,7 +269,7 @@ def QueueWithEvents(queue,
 
     Returns:
     -----------
-    QueueBase object with Events.
+    QueueBase object.
     """
     if event_base_name:
         add_event_name = f"{event_base_name}_ADD"

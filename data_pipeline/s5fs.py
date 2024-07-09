@@ -1,4 +1,4 @@
-"""Blank dockstring for file
+"""Module for running s5cmd subcommands.
 """
 import subprocess
 from functools import partial
@@ -9,20 +9,19 @@ S5CMD_EXE = "s5cmd"
 HAS_S5CMD = shutil.which("s5cmd") is not None
 
 def base_command(subcmd, *main_args, concurrency=None, other_arguments=[]):
-    """Docstring
-
-    details
+    """Runs an S5cmd subcommand with some main arguments and some other
+    optional configuration or flags.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
-    """
-    """
-    Runs an S5cmd subcommand with some main arguments and some other optional
-    configuration or flags.
+    subcmd: str
+        subcommand
+    *main_args: string(s)
+        main arguments
+    concurrency: string(s) (default=None)
+        concurrency arguments
+    other_arguments: List of strings (default=[])
+        other arguements to include
     """
     if concurrency:
         concurrency_args = ["--concurrency", str(concurrency)]
@@ -35,8 +34,6 @@ def base_command(subcmd, *main_args, concurrency=None, other_arguments=[]):
 
     print(f"Running s5cmd command {cmd}")
     subprocess.run(cmd, check=True)
-    # mock
-    # print(cmd)
 
 cp = partial(base_command, "cp")
 mv = partial(base_command, "mv")
