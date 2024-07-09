@@ -112,7 +112,7 @@ Before you can do this step you need to have a postgres server running and acces
 
 ```
 QUEUE_IMPLEMENTATION=sql-json
-SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.internal:5432/database_name
+SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.internal:5432/postgres
 SQL_QUEUE_NAME=queue_name
 ```
 
