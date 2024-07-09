@@ -112,7 +112,7 @@ Before you can do this step you need to have a postgres server running and acces
 
 ```
 QUEUE_IMPLEMENTATION=sql-json
-SQL_QUEUE_CONNECTION_STRING=<postgresql://postgres:your_password@hostname:port/database_name>
+SQL_QUEUE_CONNECTION_STRING=<postgresql://postgres:your_password@hostname:5432/database_name>
 SQL_QUEUE_NAME=<the_name_of_your_queue>
 ```
 
