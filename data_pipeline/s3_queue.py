@@ -398,7 +398,7 @@ def lookup_status(waiting_path,
 index_name = "index.txt"
 
 def JsonS3Queue(queue_base_s3_path):
-    """Returns the query for the s3 Queue.
+    """Returns the s3 Queue.
     """
     queue_index_path = os.path.join(queue_base_s3_path, index_name)
     queue_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.WAITING.name)

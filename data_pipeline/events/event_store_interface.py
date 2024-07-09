@@ -1,4 +1,4 @@
-"""Top file docstring
+"""Wherein is contained the functionality for the EventStoreInterface.
 """
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -8,36 +8,27 @@ from .event import Event
 
 
 class EventStoreInterface(ABC):
-    """Docstring
+    """The Abstract Class to create an Event Store Interface.
     """
 
     @abstractmethod
-    def _add_raw(self, events : List[Event]):
-        """Docstring
-
-        details
+    def _add_raw(self, events):
+        """Add events to Event Store.
 
         Parameters:
         -----------
-
-        Returns:
-        -----------
-
+        events: List[Event]
+            List of Events
         """
         pass
 
 
-    def add(self, event : Union[Event, List[Event]]):
-        """Docstring
-
-        details
+    def add(self, event):
+        """Adds Events to Event Store.
 
         Parameters:
         -----------
-
-        Returns:
-        -----------
-
+        event: Union[Event, List[Event]]
         """
         if not isinstance(event, list):
             event = [event]
@@ -46,17 +37,19 @@ class EventStoreInterface(ABC):
 
 
     @abstractmethod
-    def get(self, event_name : str, time_since : datetime = None) -> List[Event]:
-        """Docstring
-
-        details
+    def get(self, event_name, time_since=None):
+        """Returns list of events that have happened since a specific time.
 
         Parameters:
         -----------
+        event_name: str
+            Name of Event Store
+        time_since: datatime (default=None)
+            Desired time since.
 
         Returns:
         -----------
-
+        Retuns a List of Events.
         """
         pass
 

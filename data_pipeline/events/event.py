@@ -1,4 +1,4 @@
-"""Top file docstring
+"""Class to create and Event.
 """
 from typing import Generic, TypeVar, Optional, Dict
 
@@ -6,7 +6,7 @@ import pydantic
 import datetime
 
 class Event(pydantic.BaseModel):
-    """Docstring
+    """Initializes an Event.
     """
     name : str
     version : str

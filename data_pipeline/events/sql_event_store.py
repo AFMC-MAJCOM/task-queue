@@ -1,4 +1,4 @@
-"""Top file docstring
+"""Wherein is contained the implementation of the SQL Event Store.
 """
 from .event_store_interface import EventStoreInterface
 from .event import Event
@@ -12,27 +12,18 @@ from datetime import datetime
 from sqlalchemy import Engine
 
 class SqlEventStoreModel(SQLModel, table=True):
-    """Docstring
+    """Initializes the SQLEventStoreModel.
     """
     __tablename__ = "sqleventstore"
     id : int | None = Field(default=None, primary_key=True)
     name : str
     version : str
-    json_data : str # json blob
-    event_metadata : str # json blob
+    json_data : str # JSON blob
+    event_metadata : str # JSON blob
     time : datetime
 
-def to_event(self) -> Event:
-    """Docstring
-
-    details
-
-    Parameters:
-    -----------
-
-    Returns:
-    -----------
-
+def to_event(self):
+    """Creates and returns an Event.
     """
     return Event(
         id = self.id,
@@ -43,19 +34,10 @@ def to_event(self) -> Event:
         time = self.time
     )
 
-def from_event(event:Event):
-    """Docstring
-
-    details
-
-    Parameters:
-    -----------
-
-    Returns:
-    -----------
-
+def from_event(event):
+    """Takes an event and creates an SQLEventStoreModel and returns it.
     """
-    # this `if/else` is necessary because if `id` is set to anything (even
+    # This `if/else` is necessary because if `id` is set to anything (even
     # None) then it will be set when dumped to a dict using `model_dump`, even
     # with `exlude_unset=True`.
     if event.id is None:
@@ -78,35 +60,22 @@ def from_event(event:Event):
 
 
 class SqlEventStore(EventStoreInterface):
-    """Docstring
+    """Creates the SQL Event Store.
     """
-    def __init__(self, engine:Engine):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+    def __init__(self, engine):
+        """Initializes the SQL Event Store.
         """
         SQLModel.metadata.create_all(engine)
         self.engine = engine
 
 
-    def _add_raw(self, events: List[Event]):
-        """Docstring
-
-        details
+    def _add_raw(self, events):
+        """Add events to Event Store.
 
         Parameters:
         -----------
-
-        Returns:
-        -----------
-
+        events: List[Event]
+            List ov Events
         """
         if not events:
             # empty list causes issues on SQL insert
@@ -127,17 +96,19 @@ class SqlEventStore(EventStoreInterface):
             session.commit()
 
     
-    def get(self, event_name: str, time_since: datetime = None) -> List[Event]:
-        """Docstring
-
-        details
+    def get(self, event_name, time_since=None):
+        """Returns list of events that have happened since a specific time.
 
         Parameters:
         -----------
+        event_name: str
+            Name of Event Store
+        time_since: datatime (default=None)
+            Desired time since.
 
         Returns:
         -----------
-
+        Retuns a List of Events.
         """
         sql_query = event_name == SqlEventStoreModel.name
 

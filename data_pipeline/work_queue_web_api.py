@@ -1,4 +1,5 @@
-"""Blank dockstring for file
+"""Wherein is contained the functions and classes concering the Work Queue Web
+API.
 """
 from fastapi import FastAPI
 
@@ -13,92 +14,48 @@ app = FastAPI()
 
 @dataclass
 class QueueSettings():
-    """Docstring
+    """Class concerning the Queue Settings.
     """
     def from_env(env_dict:dict):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+        """Returns instance of QueueSettings
         """
         return QueueSettings()
     
-    def make_queue(self) -> QueueBase:
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+    def make_queue(self):
+        """Returns QueueBase object.
         """
         pass
 
 
 @dataclass
 class S3QueueSettings(QueueSettings):
-    """Docstring
+    """Class concerning the s3 Queue settings.
     """
     s3_base_path : str
 
     def from_env(env_dict:dict):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+        """Returns an S3QueueSettings object given an s3 Queue Base path.
         """
         return S3QueueSettings(
             env_dict['S3_QUEUE_BASE_PATH']
         )
 
     def make_queue(self):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+        """Creates and returns a JsonS3Queue.
         """
         return JsonS3Queue(self.s3_base_path)
 
 
 @dataclass
 class SqlQueueSettings(QueueSettings):
-    """Docstring
+    """Class concerning the SQL queue settings.
     """
     connection_string : str
     queue_name : str
 
     def from_env(env_dict:dict):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+        """Creates and returns an instance of SqlQueueSettings based on the
+        given env_dict.
         """
         if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
             conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
@@ -116,16 +73,7 @@ class SqlQueueSettings(QueueSettings):
         )
     
     def make_queue(self):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
+        """Creates and returns a JSONSQLQueue.
         """
         from sqlalchemy import create_engine
         return JsonSQLQueue(
@@ -134,18 +82,18 @@ class SqlQueueSettings(QueueSettings):
         )
 
 
-def queue_settings_from_env(env_dict) -> QueueSettings:
-    """Docstring
+def queue_settings_from_env(env_dict):
+    """Creates an instance of QueueSettings from an environment dictionary.
 
-        details
+    Parameters:
+    -----------
+    env_dict: dict
+        Dictionary of environment variables.
 
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
-        """
+    Returns:
+    -----------
+    Returns QueueSettings.
+    """
     impl = env_dict['QUEUE_IMPLEMENTATION']
     if impl == "s3-json":
         return S3QueueSettings.from_env(env_dict)
@@ -157,17 +105,8 @@ queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes():
-    """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
-        """
+    """API endpoint to get the number of jobs in each stage.
+    """
     return {
         s.name : queue.size(s)
         for s in QueueItemStage
@@ -175,32 +114,14 @@ async def get_queue_sizes():
 
 @app.get("/api/v1/queue/status/{item_id}")
 async def lookup_queue_item_status(item_id:str):
-    """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
-        """
+    """API endpoint to look up the status of a specific item in queue.
+    """
     return queue.lookup_status(item_id)
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue():
-    """Docstring
-
-        details
-
-        Parameters:
-        -----------
-
-        Returns:
-        -----------
-
-        """
+    """API endpoint to descibe the Queue.
+    """
     return {
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)

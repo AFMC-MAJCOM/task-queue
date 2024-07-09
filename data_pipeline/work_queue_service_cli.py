@@ -1,4 +1,4 @@
-"""Blank dockstring for file
+"""Wherein is contained the functions concerning the Work Queue Service CLI.
 """
 from .work_queue import WorkQueue
 from .argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
@@ -26,17 +26,18 @@ JSON_SQL_QUEUE_CLI_CHOICE = "sql-json"
 NO_EVENT_STORE_CLI_CHOICE = "none"
 SQL_EVENT_STORE_CLI_CHOICE = "sql-json"
 
-def handle_worker_interface_choice(choice:str, args):
-    """Docstring
-
-    details
+def handle_worker_interface_choice(choice, args):
+    """Handles the worker interface choice.
 
     Parameters:
     -----------
+    choice: str
+        Desired choice.
 
     Returns:
     -----------
-
+    Returns an instance of the ArgoWorkflowsQueueWorker if the choice matches
+    the ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE env variable.
     """
     if choice == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
         return ArgoWorkflowsQueueWorker(
@@ -45,17 +46,17 @@ def handle_worker_interface_choice(choice:str, args):
             args.namespace
         )
       
-def handle_queue_implementation_choice(choice:str, args):
-    """Docstring
-
-    details
+def handle_queue_implementation_choice(choice, args):
+    """Handles the queue implementation choice.
 
     Parameters:
     -----------
+    choice: str
+        Desired choice.
 
     Returns:
     -----------
-
+    Returns a Queue with Events based on the desired Queue Base choice.
     """
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
         queue = JsonS3Queue(args.s3_base_path)
@@ -80,26 +81,24 @@ def handle_queue_implementation_choice(choice:str, args):
 
     return queue
 
-def start_jobs_with_processing_limit(
-    max_processing_limit:int,
-    queue:QueueBase,
-    work_queue:WorkQueue,
-):
-    """Docstring
-
-    details
+def start_jobs_with_processing_limit(max_processing_limit,
+                                     queue,
+                                     work_queue
+                                    ):
+    """Pushes jobs to Work Queue without exceed the processing limit.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    max_processing_limit: str
+        Max processing limit.
+    queue: Queue Base
+        Queue to get items in PROCESSING items from.
+    work_queue: WorkQueue
+        Work Queue to push jobs to.
     """
     n_processing = queue.size(QueueItemStage.PROCESSING)
     to_start = max_processing_limit - n_processing
 
-    # this case should never happen but I've been wrong before
     if to_start < 0:
         to_start = 0
 
@@ -107,21 +106,17 @@ def start_jobs_with_processing_limit(
 
     logger.info(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
 
-def main(
-    periodic_functions : List[Callable[[], None]],
-    work_queue:WorkQueue,
-    period_sec:int=10
-):
-    """Docstring
-
-    details
+def main(periodic_functions, work_queue, period_sec=10):
+    """Main function, runs functions periodically with a set time to wait.
 
     Parameters:
     -----------
-
-    Returns:
-    -----------
-
+    periodic_functions: List[Callable[[], None]]
+        Functions to run periodically.
+    work_queue: WorkQueue
+        Work Queue
+    period_sec: int (default=10)
+        Number of seconds to wait between running periodic functions.
     """
     while True:
         logger.info("Updating job statuses")
@@ -163,7 +158,7 @@ if __name__ == "__main__":
         default=False
     )
 
-    # extra stuff
+    # Extra stuff
     parser.add_argument(
         "--processing-limit",
         default=10,
@@ -176,7 +171,7 @@ if __name__ == "__main__":
 
     known_args, _ = parser.parse_known_args()
 
-    # dynamically add extra arguments based on worker/queue choice
+    # Dynamically add extra arguments based on worker/queue choice
     if known_args.worker_interface == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
         parser.add_argument("--worker-interface-id", required=True)
         parser.add_argument("--endpoint", required=True)

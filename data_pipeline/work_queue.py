@@ -1,26 +1,18 @@
-"""Blank dockstring for file
+"""Wherein is contained the WorkQueue class.
 """
 from .queue_worker_interface import QueueWorkerInterface
 from .queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
-    """Docstring
+    """Class for the WorkQueue initialization and supporting functions.
     """
-    def __init__(
-        self, 
-        queue:QueueBase, 
-        interface:QueueWorkerInterface
-    ):
-        """Docstring
-
-        details
+    def __init__(self, queue, interface):
+        """Initializes Work Queue.
 
         Parameters:
         -----------
-
-        Returns:
-        -----------
-
+        queue: QueueBase
+        interface: QueueWorkerInterface
         """
         self._queue = queue
         self._interface = interface
@@ -28,16 +20,16 @@ class WorkQueue():
 
 
     def push_next_jobs(self, n_jobs=None):
-        """Docstring
-
-        details
+        """Sends jobs from Queue.
 
         Parameters:
         -----------
+        n_jobs: int (default=None)
+            Number of jobs to send.
 
         Returns:
         -----------
-
+        Returns the jobs selected from Queue.
         """
         if n_jobs is None:
             n_jobs = 1
@@ -55,24 +47,13 @@ class WorkQueue():
 
 
     def update_job_status(self):
-        """Docstring
-
-        details
-
-        Parameters:
-        -----------
+        """Updates job statuses in Queue.
 
         Returns:
         -----------
-
+        Returns dictionary of all statuses as Dict[Any, QueueItemStage]
         """
         statuses = self._interface.poll_all_status()
-
-        # new_statuses = {
-        #     k : v
-        #     for k,v in statuses.items()
-        #     if k not in self._cached_statuses or self._cached_statuses[k] != v
-        # }
 
         print("Processing new statuses from worker interface")
         for queue_item_id, status in statuses.items():
@@ -84,7 +65,5 @@ class WorkQueue():
                 self._queue.success(queue_item_id)
             elif status == QueueItemStage.FAIL:
                 self._queue.fail(queue_item_id)
-
-        # self._cached_statuses = new_statuses
 
         return statuses
