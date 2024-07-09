@@ -18,14 +18,16 @@ def test_push_job(default_work_queue):
     default_work_queue.push_next_jobs()
 
     # make sure we have something in the worker interface that is in processing
-    n_processing_first = default_work_queue._queue.size(QueueItemStage.PROCESSING)
+    n_processing_first = \
+        default_work_queue._queue.size(QueueItemStage.PROCESSING)
 
     assert n_processing_first == 1
 
     # push more jobs
     n_jobs = 3
     default_work_queue.push_next_jobs(3)
-    n_processing_second = default_work_queue._queue.size(QueueItemStage.PROCESSING)
+    n_processing_second = \
+        default_work_queue._queue.size(QueueItemStage.PROCESSING)
 
     # assert there are `n_jobs` more items in `processing`
     assert n_processing_second - n_processing_first == n_jobs

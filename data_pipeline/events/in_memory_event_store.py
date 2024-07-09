@@ -14,7 +14,7 @@ class InMemoryEventStore(EventStoreInterface):
 
             event._id = len(self.events[event.name])
             self.events[event.name].append(event)
-    
+
     def get(self, event_name:str, time_since: datetime = None) -> List[Event]:
         return [
             e for e in self.events[event_name]

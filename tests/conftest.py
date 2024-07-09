@@ -1,4 +1,5 @@
-# Source: https://stackoverflow.com/questions/69281822/how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
+# Source: https://stackoverflow.com/questions/69281822
+# /how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
 
 import pytest
 import os
@@ -21,4 +22,3 @@ def pytest_runtest_makereport(item, call):
     # be "setup", "call", "teardown"
 
     setattr(item, "rep_" + rep.when, rep)
-    

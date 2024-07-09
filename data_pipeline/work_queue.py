@@ -3,8 +3,8 @@ from data_pipeline.queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
     def __init__(
-        self, 
-        queue:QueueBase, 
+        self,
+        queue:QueueBase,
         interface:QueueWorkerInterface
     ):
         self._queue = queue
@@ -34,13 +34,15 @@ class WorkQueue():
         # new_statuses = {
         #     k : v
         #     for k,v in statuses.items()
-        #     if k not in self._cached_statuses or self._cached_statuses[k] != v
+        #     if k not in self._cached_statuses or self._cached_statuses[k] \
+        # != v
         # }
 
         print("Processing new statuses from worker interface")
         for queue_item_id, status in statuses.items():
             # Not in processing -> don't care
-            if self._queue.lookup_status(queue_item_id) != QueueItemStage.PROCESSING:
+            if self._queue.lookup_status(queue_item_id) != \
+                QueueItemStage.PROCESSING:
                 continue
 
             if status == QueueItemStage.SUCCESS:
