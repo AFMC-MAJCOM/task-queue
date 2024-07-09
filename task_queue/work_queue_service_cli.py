@@ -1,11 +1,11 @@
-from data_pipeline.work_queue import WorkQueue
-from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
-from data_pipeline.queue_base import QueueBase, QueueItemStage
-from data_pipeline.queue_worker_interface import QueueWorkerInterface
-from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.queue_with_events import QueueWithEvents
+from task_queue.work_queue import WorkQueue
+from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from task_queue.s3_queue import JsonS3Queue
+from task_queue.sql_queue import JsonSQLQueue
+from task_queue.queue_base import QueueBase, QueueItemStage
+from task_queue.queue_worker_interface import QueueWorkerInterface
+from task_queue.events.sql_event_store import SqlEventStore
+from task_queue.queue_with_events import QueueWithEvents
 
 from typing import Callable, List
 import argparse

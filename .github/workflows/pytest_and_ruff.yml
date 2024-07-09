@@ -70,5 +70,5 @@ jobs:
         python3.10 -m pip install pytest
     # If you do not install dependencies then it will fail PyLint due to import-errors
     - name: Run pylint
-      run: pylint data_pipeline
+      run: pylint task_queue
 

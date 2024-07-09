@@ -1,5 +1,5 @@
-from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from task_queue.queue_base import QueueItemStage
 import random
 import time
 import os

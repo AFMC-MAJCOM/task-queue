@@ -1,4 +1,4 @@
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from task_queue.queue_base import QueueBase, QueueItemStage
 
 from typing import Optional
 import json

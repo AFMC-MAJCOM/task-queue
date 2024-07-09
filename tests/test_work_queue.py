@@ -1,7 +1,7 @@
-import data_pipeline.work_queue as work_queue
-import data_pipeline.in_memory_queue as mq
-from data_pipeline.queue_worker_interface import DummyWorkerInterface
-from data_pipeline.queue_base import QueueItemStage
+import task_queue.work_queue as work_queue
+import task_queue.in_memory_queue as mq
+from task_queue.queue_worker_interface import DummyWorkerInterface
+from task_queue.queue_base import QueueItemStage
 
 from tests.common_queue import default_items
 

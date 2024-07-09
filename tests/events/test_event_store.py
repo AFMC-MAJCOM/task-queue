@@ -2,10 +2,10 @@ import pytest
 import datetime
 from typing import Iterator, List
 
-from data_pipeline.events.in_memory_event_store import InMemoryEventStore
-from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.events.event_store_interface import EventStoreInterface
-from data_pipeline.events.event import Event
+from task_queue.events.in_memory_event_store import InMemoryEventStore
+from task_queue.events.sql_event_store import SqlEventStore
+from task_queue.events.event_store_interface import EventStoreInterface
+from task_queue.events.event import Event
 
 from pydantic import BaseModel
 

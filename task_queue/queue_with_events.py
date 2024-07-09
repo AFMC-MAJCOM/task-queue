@@ -1,6 +1,6 @@
-from data_pipeline.queue_base import QueueBase, QueueItemStage
-from data_pipeline.events.event_store_interface import EventStoreInterface
-from data_pipeline.events.event import Event
+from task_queue.queue_base import QueueBase, QueueItemStage
+from task_queue.events.event_store_interface import EventStoreInterface
+from task_queue.events.event import Event
 
 from typing import Dict
 from typing_extensions import Annotated

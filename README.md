@@ -71,9 +71,9 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 3. Port-forward the argo workflows server pod
     - `shift+f` on K9s or `kubectl port-forward -n pivot <pod-name> <port>:<port>`
 4. Start the local postgresql and minio server
-    - `docker compose -f data_pipelines/resources/docker-compose.test.yaml up`
-5. pip install the `data_pipeline` package
-6. `python -m pytest data_pipeline`
+    - `docker compose -f task_queue/resources/docker-compose.test.yaml up`
+5. pip install the `task_queue` package
+6. `python -m pytest task_queue`
 
 # Starting Work Queue Server and CLI
 

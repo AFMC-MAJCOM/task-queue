@@ -1,10 +1,10 @@
 import pytest
 
-from data_pipeline.events.in_memory_event_store import InMemoryEventStore
-from data_pipeline.in_memory_queue import InMemoryQueue
-from data_pipeline.queue_with_events import QueueWithEvents, QueueAddEventData
-from data_pipeline.queue_with_events import QueueMoveEventData
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.events.in_memory_event_store import InMemoryEventStore
+from task_queue.in_memory_queue import InMemoryQueue
+from task_queue.queue_with_events import QueueWithEvents, QueueAddEventData
+from task_queue.queue_with_events import QueueMoveEventData
+from task_queue.queue_base import QueueItemStage
 
 from .common_queue import default_items
 
