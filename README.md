@@ -101,22 +101,22 @@ This step is necessary for testing or if you want a local postgres server runnin
 
 ```
 docker pull postgres 
-docker run --name my-postgres -e POSTGRES_PASSWORD=<your_password> -d -p 5432:5432 postgres
+docker run --name my-postgres -e POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
 ```
 
 You can modify the ports, passwords, and name to what you would like them to be but make sure the next steps reflect those changes.
 
 ### Running the Server
 
-Before you can do this step you need to have a postgres server running and access to the server. Once you have that you can create the env.list file. The env.list file requires the following values.
+Before you can do this step you need to have a postgres server running and access to the server. Once you have that you can create the env.list file. The env.list file requires the following values. These values are based on running postgres from a docker container with the docker run command above.
 
 ```
 QUEUE_IMPLEMENTATION=sql-json
-SQL_QUEUE_CONNECTION_STRING=<postgresql://postgres:your_password@hostname:5432/database_name>
-SQL_QUEUE_NAME=<the_name_of_your_queue>
+SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.internal:5432/postgres
+SQL_QUEUE_NAME=queue_name
 ```
 
-Now you can run the server using the following command. Note, if you started your own local postgres server your hostname should be _host.docker.internal_
+The container can then be spun up using the below command.
 
 ```
 docker run --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 

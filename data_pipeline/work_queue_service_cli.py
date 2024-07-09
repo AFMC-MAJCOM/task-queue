@@ -65,9 +65,7 @@ def start_jobs_with_processing_limit(
         to_start = 0
 
     started_jobs = work_queue.push_next_jobs(to_start)
-
-    logger.info(f"start_jobs_with_processing_limit: Started \
-        {len(started_jobs)} jobs")
+    print(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
 
 def main(
     periodic_functions : List[Callable[[], None]],
