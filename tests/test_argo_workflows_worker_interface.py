@@ -43,7 +43,7 @@ def wait_for_finish(worker, queue_item_id):
     while True:
         results = worker.poll_all_status()
         status = results[queue_item_id]
-        
+
         if status != QueueItemStage.PROCESSING:
             break
 
@@ -102,7 +102,7 @@ def test_argo_worker_end_to_end_concurrent():
 
     while True:
         results = worker.poll_all_status()
-        
+
         statuses = list(results.values())
 
         if all(s != QueueItemStage.PROCESSING for s in statuses):
@@ -110,7 +110,8 @@ def test_argo_worker_end_to_end_concurrent():
 
         time.sleep(1)
 
-    assert sum(s == QueueItemStage.SUCCESS for s in statuses) == n_processes - n_fail
+    assert sum(s == QueueItemStage.SUCCESS for s in statuses) == \
+        n_processes - n_fail
     assert sum(s == QueueItemStage.FAIL for s in statuses) == n_fail
 
 
@@ -135,4 +136,3 @@ def test_argo_worker_rerun_item():
     status = wait_for_finish(worker, queue_item_id)
 
     assert status == QueueItemStage.SUCCESS
-    

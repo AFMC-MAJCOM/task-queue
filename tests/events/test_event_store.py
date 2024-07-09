@@ -54,8 +54,8 @@ n_events = n_events_per_type*n_event_types
 # one second after the previous event of that type
 @pytest.fixture
 def random_events() -> List[Event]:
-    return [ 
-        random_event(test_event_names[i%n_event_types], (i // n_event_types)) 
+    return [
+        random_event(test_event_names[i%n_event_types], (i // n_event_types))
         for i in range(0, n_events)
     ]
 
@@ -69,12 +69,16 @@ def new_empty_store(request) -> Iterator[EventStoreInterface]:
         yield SqlEventStore(test_sql_engine)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_add_events(new_empty_store, random_events):
     new_empty_store.add(random_events)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_get_events(new_empty_store, random_events):
     event_name = test_event_names[0]
 
@@ -89,7 +93,9 @@ def test_get_events(new_empty_store, random_events):
     assert all( e.name == event_name for e in events_after )
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_get_events_time_since(new_empty_store, random_events):
     new_empty_store.add(random_events)
 
@@ -104,7 +110,9 @@ def test_get_events_time_since(new_empty_store, random_events):
     assert all( e.name == event_name for e in events )
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_event_default_time_now(new_empty_store):
     evt = Event(
         name="doesnt_matter",
@@ -121,6 +129,8 @@ def test_event_default_time_now(new_empty_store):
     new_empty_store.add(evt)
 
 
-@pytest.mark.parametrize("new_empty_store", ALL_EVENT_STORE_TYPES, indirect=True)
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
 def test_add_empty(new_empty_store):
     new_empty_store.add([])

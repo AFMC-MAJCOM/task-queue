@@ -7,7 +7,7 @@ class QueueWorkerInterface(ABC):
     @abstractmethod
     def send_job(self, item_id, queue_item_body):
         pass
-   
+
     @abstractmethod
     def poll_all_status(self) -> Dict[Any, QueueItemStage]:
         pass
@@ -23,7 +23,7 @@ class DummyWorkerInterface(QueueWorkerInterface):
 
     def poll_all_status(self) -> Dict[Any, QueueItemStage]:
         return self._job_status
-    
+
     def mock_success(self, item_id):
         self._job_status[item_id] = QueueItemStage.SUCCESS
 
