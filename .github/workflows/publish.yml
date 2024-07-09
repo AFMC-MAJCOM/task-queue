@@ -1,5 +1,7 @@
 name: publish
-on: [push]
+on: 
+  workflow_dispatch:
+  push:
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
@@ -15,4 +17,4 @@ jobs:
         run: |
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
           docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
-          docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
+          #docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
