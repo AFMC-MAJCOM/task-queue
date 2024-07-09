@@ -5,6 +5,7 @@ import datetime
 from functools import partial, reduce
 from . import s5fs
 from . import queue_base
+from . import config
 
 def ensure_s3_prefix(path:str):
     if not path.startswith("s3://"):
@@ -28,8 +29,7 @@ def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
             pass
     return []
 
-
-fs = s3fs.S3FileSystem(default_cache_type="none")
+fs = config.get_s3fs_connection(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move
@@ -40,7 +40,7 @@ else:
 
 
 def check_queue_index(index_path, item):
-    fs = s3fs.S3FileSystem()
+    fs = config.get_s3fs_connection()
     if (fs.exists(index_path)):
         with fs.open(index_path, 'r') as f:
             line = f.readline()
@@ -56,7 +56,7 @@ def get_queue_index_items(index_path):
     """
     the queue index file is a text file with one item entry per line
     """
-    fs = s3fs.S3FileSystem()
+    fs = config.get_s3fs_connection()
     if not fs.exists(index_path):
         return []
     with fs.open(index_path, "r") as f:
@@ -80,7 +80,7 @@ def subtract_duplicates(main_list, *other_lists):
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
-    fs = s3fs.S3FileSystem()
+    fs = config.get_s3fs_connection()
     with fs.open(index_path, 'a') as f:
         # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))

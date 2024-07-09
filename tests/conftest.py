@@ -4,6 +4,7 @@
 import s3fs
 import pytest
 import os
+from data_pipeline import config
 
 # make sure environment variables are all good
 # kind of a hack
@@ -18,29 +19,43 @@ import os
 #             client_kwargs={"endpoint_url": os.environ["S3_ENDPOINT"]}
 # )
 
-if os.environ["S3_ENDPOINT"] and os.environ["AWS_ACCESS_KEY_ID"] and os.environ["AWS_SECRET_ACCESS_KEY"]:
-    print('we made it here')
-    os.environ['AWS_ACCESS_KEY_ID'] = os.environ['AWS_ACCESS_KEY_ID']
-    os.environ['AWS_SECRET_ACCESS_KEY'] = os.environ['AWS_SECRET_ACCESS_KEY']
-    os.environ['FSSPEC_S3_ENDPOINT_URL'] = os.environ["S3_ENDPOINT"]
-    os.environ['S3_ENDPOINT_URL'] = os.environ["S3_ENDPOINT"]
-else:
-    print('the environ vars dont exist')
-    os.environ['AWS_ACCESS_KEY_ID'] = 'minioadmin'
-    os.environ['AWS_SECRET_ACCESS_KEY'] = 'minioadmin'
-    os.environ['FSSPEC_S3_ENDPOINT_URL'] = 'http://localhost:9000'
-    os.environ['S3_ENDPOINT_URL'] = 'http://localhost:9000'
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_s3_bucket():
-    fs = s3fs.S3FileSystem()
-    print(fs.ls('/'))
-    test_bucket_name = 'wall-e-testing-queue'
+    """
+    """
+    # if os.environ["S3_ENDPOINT"] and os.environ["AWS_ACCESS_KEY_ID"] and os.environ["AWS_SECRET_ACCESS_KEY"]:
+    #     print('we made it heregfdgsdfgdsFDSFDS')
+    #     os.environ['AWS_ACCESS_KEY_ID'] = os.environ['AWS_ACCESS_KEY_ID']
+    #     os.environ['AWS_SECRET_ACCESS_KEY'] = os.environ['AWS_SECRET_ACCESS_KEY']
+    #     os.environ['FSSPEC_S3_ENDPOINT_URL'] = os.environ["S3_ENDPOINT"]
+    #     os.environ['S3_ENDPOINT_URL'] = os.environ["S3_ENDPOINT"]
+    # else:
+    #     print('the environ vars dont exist')
+    #     os.environ['AWS_ACCESS_KEY_ID'] = 'minioadmin'
+    #     os.environ['AWS_SECRET_ACCESS_KEY'] = 'minioadmin'
+    #     os.environ['FSSPEC_S3_ENDPOINT_URL'] = 'http://localhost:9000'
+    #     os.environ['S3_ENDPOINT_URL'] = 'http://localhost:9000'
+    # fs = s3fs.S3FileSystem(
+    #     client_kwargs={'endpoint_url': os.environ['S3_ENDPOINT']}
+    # )
+    fs = config.get_s3fs_connection()
+
+    test_bucket_name = 'unit-tests'
     if fs.exists(test_bucket_name):
-        print('it exists')
         fs.rm(test_bucket_name, recursive=True)
     fs.mkdir(test_bucket_name)
-    print(fs.ls('/'))
+
+    yield
+    cleanup_bucket(test_bucket_name, fs)
+
+
+def cleanup_bucket(test_bucket_name, fs):
+    """
+    """
+    if fs.exists(test_bucket_name):
+        fs.rm(test_bucket_name)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)

@@ -51,7 +51,7 @@ def new_empty_queue(request):
         yield new_sql_queue(request)
     elif request.param == "s3":
         yield from new_s3_queue(request)
-    elif request.param == "memory": 
+    elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
         store = InMemoryEventStore()
@@ -61,7 +61,6 @@ def new_empty_queue(request):
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):
-    # breakpoint()
     qtest.test_put_get(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
