@@ -1,9 +1,8 @@
 name: publish
-on: [push]on:
+on:
   push:
     branches:
       - main
-      - 'releases/**'
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
