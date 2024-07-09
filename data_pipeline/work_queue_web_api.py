@@ -20,7 +20,7 @@ class QueueSettings():
         """Returns instance of QueueSettings
         """
         return QueueSettings()
-    
+
     def make_queue(self):
         """Returns QueueBase object.
         """

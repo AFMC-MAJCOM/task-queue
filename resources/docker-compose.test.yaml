@@ -8,13 +8,13 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
-    volumes: 
+    volumes:
       - db:/var/lib/postgresql/data
 
-  minio: 
+  minio:
     image: quay.io/minio/minio:RELEASE.2024-04-28T17-53-50Z
 
-    # to create a default `unit-tests` bucket 
+    # to create a default `unit-tests` bucket
     entrypoint: sh
     command: -c 'mkdir -p /data1/unit-tests && /usr/bin/minio server --console-address ":9001" /data1'
     ports:

@@ -43,7 +43,7 @@ def test_event_queue_add(queue_with_events):
 
     for e in add_events:
         queue_add_event = QueueAddEventData(**e.data)
-        
+
         # Make sure every item has an event
         assert queue_add_event.queue_index_key in default_items
 

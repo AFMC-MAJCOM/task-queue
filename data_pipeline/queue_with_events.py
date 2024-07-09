@@ -88,7 +88,6 @@ def add_to_queue_with_event(queue,
 
     for k, v in new_items.items():
         try:
-            
             queue_event_data.append(
                 Event(
                     name=queue_add_event_name,

@@ -41,7 +41,7 @@ def handle_worker_interface_choice(choice, args):
             args.endpoint,
             args.namespace
         )
-      
+
 def handle_queue_implementation_choice(choice, args):
     """Handles the queue implementation choice.
 

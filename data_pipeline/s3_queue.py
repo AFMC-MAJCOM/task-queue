@@ -156,7 +156,7 @@ def add_items_to_index(index_path, items):
     fs = s3fs.S3FileSystem()
     with fs.open(index_path, 'a') as f:
         f.write("\n".join(items))
-        # Trailing newline so the next add doesn't append to the end of the 
+        # Trailing newline so the next add doesn't append to the end of the
         # Last item line we put there
         f.write("\n")
 
@@ -249,7 +249,7 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items):
     -----------
     Returns the length of the list of added items.
     """
-    # Get a list of item keys that are already in the index, and remove them 
+    # Get a list of item keys that are already in the index, and remove them
     # From the incoming items list
     in_index = get_queue_index_items(queue_index_path)
     item_keys_to_add = subtract_duplicates(items.keys(), in_index)

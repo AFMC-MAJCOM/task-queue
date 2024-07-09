@@ -247,8 +247,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             wf['metadata']['creationTimestamp'])
 
         # We may still get older workflows with the same worker ID and queue
-        # Item ID if we have retried an item that has already been run. We can 
-        # Handle this case by only taking the most recent one. 
+        # Item ID if we have retried an item that has already been run. We can
+        # Handle this case by only taking the most recent one.
 
         print("Filtering results")
         results = {}

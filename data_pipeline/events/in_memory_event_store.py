@@ -27,7 +27,7 @@ class InMemoryEventStore(EventStoreInterface):
 
             event._id = len(self.events[event.name])
             self.events[event.name].append(event)
-    
+
     def get(self, event_name, time_since=None):
         """Returns list of events that have happened since a specific time.
 

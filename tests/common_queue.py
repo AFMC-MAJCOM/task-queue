@@ -126,7 +126,7 @@ def test_put_exception(queue):
         pass
 
     first_len = queue.size(qb.QueueItemStage.WAITING)
-    assert first_len == len(items) - 1 
+    assert first_len == len(items) - 1
 
     # Make sure the good items are not duplicated
     try:
