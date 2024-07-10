@@ -1,5 +1,8 @@
-import s3fs
+"""Provides configuration settings and functions used by task-queue."""
+
 import os
+
+import s3fs
 
 
 def get_s3fs_connection(**kwargs):
@@ -16,7 +19,7 @@ def get_s3fs_connection(**kwargs):
     -------
     s3fs.S3FileSystem object
     """
-    if (os.environ.get('S3_ENDPOINT', False)):
+    if os.environ.get('S3_ENDPOINT', False):
         return s3fs.S3FileSystem(
             client_kwargs={'endpoint_url': os.environ['S3_ENDPOINT']},
             **kwargs
