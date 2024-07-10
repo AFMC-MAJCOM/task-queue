@@ -1,16 +1,16 @@
-import pytest
+import random
 import datetime
 from typing import Iterator, List
+
+import pytest
+from pydantic import BaseModel
 
 from data_pipeline.events.in_memory_event_store import InMemoryEventStore
 from data_pipeline.events.sql_event_store import SqlEventStore
 from data_pipeline.events.event_store_interface import EventStoreInterface
 from data_pipeline.events.event import Event
-
-from pydantic import BaseModel
-
-import random
 from ..utils import test_sql_engine
+
 
 random_number = random.randint(0, 999999999)
 
