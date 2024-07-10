@@ -2,6 +2,7 @@ import subprocess
 from functools import partial
 import shutil
 
+
 S5CMD_EXE = "s5cmd"
 
 HAS_S5CMD = shutil.which("s5cmd") is not None

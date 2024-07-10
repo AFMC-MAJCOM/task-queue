@@ -1,11 +1,13 @@
-from fastapi import FastAPI
-
 from dataclasses import dataclass, asdict
 import os
+
+from fastapi import FastAPI
+from sqlalchemy import create_engine
 
 from data_pipeline.queue_base import QueueBase, QueueItemStage
 from data_pipeline.s3_queue import JsonS3Queue
 from data_pipeline.sql_queue import JsonSQLQueue
+
 
 app = FastAPI()
 
@@ -54,7 +56,6 @@ class SqlQueueSettings(QueueSettings):
         )
 
     def make_queue(self):
-        from sqlalchemy import create_engine
         return JsonSQLQueue(
             create_engine(self.connection_string),
             self.queue_name
