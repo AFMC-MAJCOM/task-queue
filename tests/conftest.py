@@ -1,8 +1,10 @@
 # Source: https://stackoverflow.com/questions/69281822
 # /how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
 
-import pytest
 import os
+
+import pytest
+
 
 # make sure environment variables are all good
 # kind of a hack

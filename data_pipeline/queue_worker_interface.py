@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
-from .queue_base import QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 
 
 class QueueWorkerInterface(ABC):

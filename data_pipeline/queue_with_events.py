@@ -3,9 +3,10 @@ from functools import partial
 
 import pydantic
 
-from .queue_base import QueueBase, QueueItemStage
-from .events.event_store_interface import EventStoreInterface
-from .events.event import Event
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.events.event_store_interface import EventStoreInterface
+from data_pipeline.events.event import Event
+
 
 
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"

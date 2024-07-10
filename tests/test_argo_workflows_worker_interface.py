@@ -1,9 +1,12 @@
-from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.queue_base import QueueItemStage
 import random
 import time
 import os
+
 import pytest
+
+from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from data_pipeline.queue_base import QueueItemStage
+
 
 random_number = lambda: random.randint(0, 9999999)
 
