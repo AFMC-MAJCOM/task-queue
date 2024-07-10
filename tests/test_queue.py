@@ -1,5 +1,8 @@
 """Pytests for queue functionality.
 """
+import random
+import os
+
 import pytest
 
 import data_pipeline.s3_queue as s3q
@@ -7,18 +10,10 @@ from data_pipeline.in_memory_queue import InMemoryQueue
 import data_pipeline.sql_queue as sqlq
 import data_pipeline.queue_with_events as eq
 from data_pipeline.events.in_memory_event_store import InMemoryEventStore
-
-
-import data_pipeline.queue_base as qb
-import random
-import os
-import pytest
 import tests.common_queue as qtest
-from sqlalchemy import create_engine
 from .utils import test_sql_engine
 
 
-import os
 AWS_UNIT_TEST_QUEUE_BASE = \
     "s3://data-dev-998806663306/unit-test-space/s3_queue_"
 LOCAL_UNIT_TEST_QUEUE_BASE = "s3://unit-tests/queue/queue_"

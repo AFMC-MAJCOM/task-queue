@@ -1,13 +1,13 @@
 """Wherein is contained the class and functions for the In Memory Queue.
 """
-from data_pipeline.queue_base import QueueBase, QueueItemStage
-from queue import Queue
-
 from dataclasses import dataclass, field
 from typing import Dict, Any
-import itertools
 from functools import partial
+import itertools
 import json
+
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+
 
 @dataclass
 class InMemoryQueue_():

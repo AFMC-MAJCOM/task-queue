@@ -1,8 +1,11 @@
 """Pytests for the common queue functionalities.
 """
-import pytest
 import random
+
+import pytest
+
 import data_pipeline.queue_base as qb
+
 
 pytestmark = pytest.mark.skip()
 

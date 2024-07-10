@@ -1,16 +1,15 @@
 """Wherein is contained the functions for implementing the SQL Queue.
 """
-from data_pipeline.queue_base import QueueBase, QueueItemStage
-
 from typing import Optional
-import json
 from functools import partial
+import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlmodel import Column
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Engine
+
+from data_pipeline.queue_base import QueueBase, QueueItemStage
+
 
 class SqlQueue(SQLModel, table=True):
     """Creates the SQL Queue.

@@ -1,12 +1,14 @@
 """Wherein is contained the functionality for the s3 Queue.
 """
 import json
-import s3fs
 import os
-import datetime
 from functools import partial, reduce
+
+import s3fs
+
 from . import s5fs
 from . import queue_base
+
 
 def ensure_s3_prefix(path:str):
     """Returns a valid s3 path.

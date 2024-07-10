@@ -1,8 +1,10 @@
 """Wherein is contained the Abstract Class for QueueWorkerInterface.
 """
 from abc import ABC, abstractmethod
-from data_pipeline.queue_base import QueueItemStage
 from typing import Dict, Any
+
+from data_pipeline.queue_base import QueueItemStage
+
 
 class QueueWorkerInterface(ABC):
     """Abstract Queue Worker Interface Class.

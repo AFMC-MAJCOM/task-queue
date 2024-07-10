@@ -1,11 +1,12 @@
 """Wherein is contained the class for the Argo Workflow Queue Worker.
 """
-from data_pipeline.queue_worker_interface import QueueWorkerInterface
-from data_pipeline.queue_base import QueueItemStage
 import requests
-from urllib.parse import urljoin
 
 import pandas as pd
+
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.queue_base import QueueItemStage
+
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     """

@@ -1,13 +1,13 @@
 """Pytests for the work_queue functionality.
 """
-import data_pipeline.work_queue as work_queue
+import pytest
+
+from data_pipeline import work_queue
 import data_pipeline.in_memory_queue as mq
 from data_pipeline.queue_worker_interface import DummyWorkerInterface
 from data_pipeline.queue_base import QueueItemStage
-
 from tests.common_queue import default_items
 
-import pytest
 
 @pytest.fixture
 def default_work_queue() -> work_queue.WorkQueue:

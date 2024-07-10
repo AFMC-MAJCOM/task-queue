@@ -1,9 +1,10 @@
 """Class to create and Event.
 """
-from typing import Generic, TypeVar, Optional, Dict
+from typing import Optional, Dict
+import datetime
 
 import pydantic
-import datetime
+
 
 class Event(pydantic.BaseModel):
     """Initializes an Event.

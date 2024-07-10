@@ -1,7 +1,9 @@
 """Configurations for pytests.
 """
-import pytest
 import os
+
+import pytest
+
 
 os.environ['AWS_ACCESS_KEY_ID'] = 'minioadmin'
 os.environ['AWS_SECRET_ACCESS_KEY'] = 'minioadmin'
