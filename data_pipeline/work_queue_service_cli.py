@@ -99,7 +99,8 @@ def start_jobs_with_processing_limit(max_processing_limit,
         to_start = 0
 
     started_jobs = work_queue.push_next_jobs(to_start)
-    print(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
+    print(f"start_jobs_with_processing_limit: Started \
+        {len(started_jobs)} jobs")
 
 def main(periodic_functions, work_queue, period_sec=10):
     """Main function, runs functions periodically with a set time to wait.
