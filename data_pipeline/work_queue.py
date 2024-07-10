@@ -1,5 +1,5 @@
-from .queue_worker_interface import QueueWorkerInterface
-from .queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_worker_interface import QueueWorkerInterface
+from data_pipeline.queue_base import QueueBase, QueueItemStage
 
 class WorkQueue():
     def __init__(

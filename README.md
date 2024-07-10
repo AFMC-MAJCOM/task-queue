@@ -74,3 +74,65 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
     - `docker compose -f data_pipelines/resources/docker-compose.test.yaml up`
 5. pip install the `data_pipeline` package
 6. `python -m pytest data_pipeline`
+
+# Starting Work Queue Server and CLI
+
+You will need docker installed on you machine to use the Task Queue.
+
+## Downloading Docker Image
+
+To download the docker image run the following command.
+
+```
+docker pull ghcr.io/afmc-majcom/task-queue/task-queue:latest
+```
+
+You should see the task queue image listed out by running the following command.
+
+```
+docker image ls
+```
+
+## Running the Docker Image
+
+### (Optional) Starting a Local Postgres Server
+
+This step is necessary for testing or if you want a local postgres server running. To run a postgres server locally run the following command.
+
+```
+docker pull postgres 
+docker run --name my-postgres -e POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
+```
+
+You can modify the ports, passwords, and name to what you would like them to be but make sure the next steps reflect those changes.
+
+### Running the Server
+
+Before you can do this step you need to have a postgres server running and access to the server. Once you have that you can create the env.list file. The env.list file requires the following values. These values are based on running postgres from a docker container with the docker run command above.
+
+```
+QUEUE_IMPLEMENTATION=sql-json
+SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.internal:5432/postgres
+SQL_QUEUE_NAME=queue_name
+```
+
+The container can then be spun up using the below command.
+
+```
+docker run --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 
+```
+
+(Optional) If you started your own local postgres server and are using a linux machine run this command instead.
+
+```
+docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server 
+```
+
+### Running the CLI
+
+Run the following command to output help from CLI
+
+```
+docker run --rm ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
+```
+

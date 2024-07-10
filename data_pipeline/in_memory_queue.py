@@ -1,4 +1,4 @@
-from .queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueBase, QueueItemStage
 from queue import Queue
 
 from dataclasses import dataclass, field
