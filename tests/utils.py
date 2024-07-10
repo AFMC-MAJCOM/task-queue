@@ -1,4 +1,5 @@
 import sqlalchemy as sqla
+import os
 
 test_sql_engine = sqla.create_engine(sqla.engine.url.URL(
             drivername="postgresql",
