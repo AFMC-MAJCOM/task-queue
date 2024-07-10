@@ -1,4 +1,4 @@
-"""Pytets for event store functionality.
+"""Pytest for event store functionality.
 """
 import pytest
 import datetime

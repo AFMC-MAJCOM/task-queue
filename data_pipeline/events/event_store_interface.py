@@ -44,7 +44,7 @@ class EventStoreInterface(ABC):
         -----------
         event_name: str
             Name of Event Store
-        time_since: datatime (default=None)
+        time_since: datetime (default=None)
             Desired time since.
 
         Returns:

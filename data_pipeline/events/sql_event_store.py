@@ -75,7 +75,7 @@ class SqlEventStore(EventStoreInterface):
         Parameters:
         -----------
         events: List[Event]
-            List ov Events
+            List of Events
         """
         if not events:
             # empty list causes issues on SQL insert
@@ -102,12 +102,12 @@ class SqlEventStore(EventStoreInterface):
         -----------
         event_name: str
             Name of Event Store
-        time_since: datatime (default=None)
+        time_since: datetime (default=None)
             Desired time since.
 
         Returns:
         -----------
-        Retuns a List of Events.
+        Returns a List of Events.
         """
         sql_query = event_name == SqlEventStoreModel.name
 

@@ -35,12 +35,12 @@ class InMemoryEventStore(EventStoreInterface):
         -----------
         event_name: str
             Name of Event Store
-        time_since: datatime (default=None)
+        time_since: datetime (default=None)
             Desired time since.
 
         Returns:
         -----------
-        Retuns a List of Events.
+        Returns a List of Events.
         """
         return [
             e for e in self.events[event_name]

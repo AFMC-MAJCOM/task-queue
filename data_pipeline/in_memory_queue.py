@@ -1,4 +1,4 @@
-"""Wherein is conatained the class and functions for the In Memroy Queue.
+"""Wherein is contained the class and functions for the In Memory Queue.
 """
 from data_pipeline.queue_base import QueueBase, QueueItemStage
 from queue import Queue
@@ -20,7 +20,7 @@ class InMemoryQueue_():
     index : set[str] = field(default_factory=set)
 
     def regenerate_index(self):
-        """Regernerates the Index of the InMemoryQueue.
+        """Regenerates the Index of the InMemoryQueue.
         """
         ids_in_queue = (
             list(self.waiting.keys())
@@ -82,7 +82,7 @@ def add_to_memory_queue(in_memory_queue,new_items):
 
     Parameters:
     -----------
-    in_memeory_queue: InMemoryQueue_
+    in_memory_queue: InMemoryQueue_
         InMemoryQueue object
     new_items: Dict[str, Any]
         Dictionary of new Items to add to Queue.
@@ -111,6 +111,8 @@ def move_dict_item(dict_from, dict_to, key):
         Dictionary that Item is being moved from.
     dict_to: Dict
         Dictionary that Item is being moved to.
+    key: str
+        Key for the Item moving from dictionary.
 
     Returns:
     -----------

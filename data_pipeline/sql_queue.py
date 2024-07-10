@@ -150,7 +150,7 @@ def queue_size(engine, queue_name, stage):
         Desired Stage to return size of.
     Returns:
     -----------
-    Returns the numbre of items in the Queue at that current stage.
+    Returns the number of items in the Queue at that current stage.
     """
     with Session(engine) as session:
         statement = select(func.count(SqlQueue.id)).filter(
