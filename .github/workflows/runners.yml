@@ -27,7 +27,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        pytest -vv 
+        pytest -vv
   pytest-windows:
     runs-on: windows-latest
     steps:
@@ -72,3 +72,17 @@ jobs:
     - name: Run pylint
       run: pylint data_pipeline
 
+  version_check:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: 'main'
+    - name: Main Version
+      run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+    - uses: actions/checkout@v3
+    - name: Merge Version
+      run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+    - name: Version Comparison
+      run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
