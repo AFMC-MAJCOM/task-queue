@@ -41,7 +41,7 @@ else:
 
 
 def check_queue_index(index_path, item):
-    fs = config.get_s3fs_connection()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     if (fs.exists(index_path)):
         with fs.open(index_path, 'r') as f:
             line = f.readline()
@@ -57,7 +57,7 @@ def get_queue_index_items(index_path):
     """
     the queue index file is a text file with one item entry per line
     """
-    fs = config.get_s3fs_connection()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     if not fs.exists(index_path):
         return []
     with fs.open(index_path, "r") as f:
@@ -81,7 +81,7 @@ def subtract_duplicates(main_list, *other_lists):
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
-    fs = config.get_s3fs_connection()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     with fs.open(index_path, 'a') as f:
         # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))
