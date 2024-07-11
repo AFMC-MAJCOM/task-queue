@@ -7,8 +7,6 @@ import pytest
 
 import s3fs
 
-from data_pipeline import config
-
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_s3_bucket():

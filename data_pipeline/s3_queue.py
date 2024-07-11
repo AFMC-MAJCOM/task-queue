@@ -6,7 +6,6 @@ import s3fs
 
 from . import s5fs
 from . import queue_base
-from . import config
 
 
 def ensure_s3_prefix(path:str):
