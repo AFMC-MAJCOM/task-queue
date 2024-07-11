@@ -7,6 +7,8 @@ from .event_store_interface import EventStoreInterface
 
 class InMemoryEventStore(EventStoreInterface):
     """Class for the InMemoryEventStore.
+
+    Primarily used for prototyping and testing.
     """
     def __init__(self):
         """Initializes the InMemoryEventStore.

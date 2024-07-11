@@ -50,13 +50,17 @@ def new_sql_queue(request):
 ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
 @pytest.fixture
 def new_empty_queue(request):
-    """Fixture to create empty queues of all type.
+    """Fixture to create an empty queue of one given type.
+
+    This is then broadcasted across ALL_QUEUE_TYPES for each test by way of the
+    pytest.mark.parametrize decorators, so each test is run four times, one for
+    each queue type in the list.
     """
     if request.param == "sql":
         yield new_sql_queue(request)
     elif request.param == "s3":
         yield from new_s3_queue(request)
-    elif request.param == "memory": 
+    elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
         store = InMemoryEventStore()
@@ -78,7 +82,7 @@ def test_mixed_duplicates(new_empty_queue):
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_add_to_queue_no_duplicates(new_empty_queue):
-    """Tests that no duplicated are added to the queue.
+    """Tests that no duplicates are added to the queue.
     """
     qtest.test_add_to_queue_no_duplicates(new_empty_queue)
 

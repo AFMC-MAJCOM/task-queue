@@ -49,11 +49,12 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     WORK_QUEUE_ITEM_ID_LABEL = "work-queue.queue-item-id"
 
 
-    def __init__(self,
-                 worker_interface_id,
-                 argo_workflows_endpoint,
-                 namespace
-                ):
+    def __init__(
+        self,
+        worker_interface_id,
+        argo_workflows_endpoint,
+        namespace
+    ):
         """Initializes ArgoWorkflowQueueInterface
 
         Parameters:
@@ -61,20 +62,20 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         worker_interface_id: str
             ID of worker interface
         argo_workflows_endpoint: str
-            Argo Workflows enpoint
+            Argo Workflows endpoint
         namespace: str
-            namespace for ArgoWorkflowQueueInterface.
+            Kubernetes namespace for ArgoWorkflowQueueInterface.
         """
         self._worker_interface_id = worker_interface_id
         self._argo_workflows_endpoint = argo_workflows_endpoint
         self._namespace = namespace
 
     def urlconcat(*components):
-        """Concatinates URL components into one URL.
+        """Concatenates URL components into one URL.
 
         Parameters:
         -----------
-        *components: string(s)
+        *components: tuple (str)
             Parts of URL.
 
         Returns:
@@ -85,7 +86,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     @property
     def _argo_workflows_submit_url(self):
-        """Returns a submit URL.
+        """Returns the URL to the argo workflows server which new workflows can
+        be submitted to.
         """
         return ArgoWorkflowsQueueWorker.urlconcat(
             self._argo_workflows_endpoint,
@@ -98,7 +100,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     @property
     def _argo_workflows_list_url(self):
-        """Returns the Argo Workflows URL
+        """Returns the URL to the argo workflows server that lists the
+        workflows.
         """
         return ArgoWorkflowsQueueWorker.urlconcat(
             self._argo_workflows_endpoint,
@@ -115,18 +118,22 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         item_id: str
-            ID of Item.
-        queue_item_body: List
-            Contents of Queue Item body.
+            Queue Item ID.
+        queue_item_body: dict
+            Dictionary that must contain a key:value pair where the key is
+            'submit_body' and the value is a dictionary with the format
+            matching the submit_body schema.
 
         Returns:
         -----------
         Returns a jsonnable dict to send to the submit URL
         """
-        # Merge new labels into submit options for easier query later
         payload : dict = queue_item_body[
             ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
             ]
+        # Merge new labels into submit options for easier query later.
+        # We have to do this get/set because submitOptions and labels
+        # may not exist in the queue item body payload
         submit_options = payload.get('submitOptions', {})
 
         labels = submit_options.get('labels', "")
@@ -150,7 +157,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         item_id: str
             Item ID
         queue_item_body: List
-            Contents of Queue Item body.
+            Dictionary that must contain a key:value pair where the key is
+            'submit_body' and the value is a dictionary with the format
+            matching the submit_body schema.
         """
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
@@ -184,7 +193,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         }
 
     def _get_workflow_status(self, completed, phase):
-        """Gets the status of Items in Argo Workflow.
+        """Converts information from the workflow labels into a QueueItemStage.
 
         workflow status can be read from the labels
         - workflows.argoproj.io/completed='false' -> PROCESSING
@@ -202,7 +211,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         Returns:
         -----------
-        Status of Item.
+        Status of Item as QueueItemStage object.
         """
         if completed == 'true':
             if phase == "Succeeded":
@@ -214,8 +223,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def _get_response_ids_and_status(self, response_body):
-        """Creates and returns a dictionary of each Items ID and status in the
-        workflow.
+        """"Converts the response body of the argo workflows server list
+        endpoint into a dictionary of { item_id : queue_item_status }.
 
         Parameters:
         -----------
@@ -229,7 +238,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         workflows = response_body['items']
 
         # If there are no workflows to return, `items` will be `null` instead
-        # Of an empty list.
+        # of an empty list.
         if not workflows:
             workflows = []
 
@@ -248,8 +257,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             wf['metadata']['creationTimestamp'])
 
         # We may still get older workflows with the same worker ID and queue
-        # Item ID if we have retried an item that has already been run. We can
-        # Handle this case by only taking the most recent one.
+        # item ID if we have retried an item that has already been run. We can
+        # handle this case by only taking the most recent one.
 
         print("Filtering results")
         results = {}
@@ -267,7 +276,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
 
     def poll_all_status(self):
-        """Requests status from workflows.
+        """Gets the status of each workflow that was submitted by this worker
+        from the argo workflows server.
 
         Returns:
         -----------

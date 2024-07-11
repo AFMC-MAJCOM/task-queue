@@ -12,6 +12,8 @@ from data_pipeline.queue_base import QueueBase, QueueItemStage
 @dataclass
 class InMemoryQueue_():
     """Queue items are objects in a python dictionary.
+
+    Primarily used for prototyping and testing.
     """
     waiting : Dict[str, Any] = field(default_factory=dict)
     processing : Dict[str, Any] = field(default_factory=dict)

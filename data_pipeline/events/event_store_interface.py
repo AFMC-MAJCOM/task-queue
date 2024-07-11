@@ -24,7 +24,7 @@ class EventStoreInterface(ABC):
 
 
     def add(self, event):
-        """Adds Events to Event Store.
+        """Convenience method to add one or many events to the event store.
 
         Parameters:
         -----------

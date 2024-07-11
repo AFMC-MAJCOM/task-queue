@@ -29,12 +29,12 @@ def handle_worker_interface_choice(choice, args):
     Parameters:
     -----------
     choice: str
-        Desired choice.
+        Choice provided by the worker_interface argument passed to the CLI.
 
     Returns:
     -----------
-    Returns an instance of the ArgoWorkflowsQueueWorker if the choice matches
-    the ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE env variable.
+    Selects the worker interface from the arguments. Currently only the
+    ArgoWorkflowsQueueWorker is implemented.
     """
     if choice == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
         return ArgoWorkflowsQueueWorker(
@@ -49,11 +49,11 @@ def handle_queue_implementation_choice(choice, args):
     Parameters:
     -----------
     choice: str
-        Desired choice.
+        Choice provided by the queue_implementation argument passed to the CLI.
 
     Returns:
     -----------
-    Returns a Queue with Events based on the desired Queue Base choice.
+    Constructs the queue implementation from the arguments.
     """
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
         queue = JsonS3Queue(args.s3_base_path)
@@ -82,16 +82,16 @@ def start_jobs_with_processing_limit(max_processing_limit,
                                      queue,
                                      work_queue
                                     ):
-    """Pushes jobs to Work Queue without exceed the processing limit.
+    """Pushes jobs without exceed the processing limit.
 
     Parameters:
     -----------
     max_processing_limit: str
         Max processing limit.
-    queue: Queue Base
-        Queue to get items in PROCESSING items from.
+    queue: QueueBase
+        Used to get add, use, and get the status of items in the queue.
     work_queue: WorkQueue
-        Work Queue to push jobs to.
+        Work Queue to orchestrate jobs.
     """
     n_processing = queue.size(QueueItemStage.PROCESSING)
     to_start = max_processing_limit - n_processing

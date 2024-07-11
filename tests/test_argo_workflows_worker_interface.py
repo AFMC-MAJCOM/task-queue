@@ -48,7 +48,8 @@ def make_queue_item(fail=False):
 
 
 def port_forwarded_worker():
-    """Creates test worker.
+    """Creates a test worker that connects to an argo workflows instance that
+    is port forwarded to this host on port 2746 (the default port).
 
     Returns:
     -----------
@@ -115,7 +116,8 @@ def test_argo_worker_end_to_end_fail():
 
 
 def test_argo_worker_end_to_end_concurrent():
-    """Test some items fail and some succeed.
+    """Test multiple items running concurrently, with some succeeding and some
+    failing.
     """
     worker = port_forwarded_worker()
 

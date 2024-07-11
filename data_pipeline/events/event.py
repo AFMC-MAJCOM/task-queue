@@ -1,4 +1,4 @@
-"""Class to create and Event.
+"""Class to create an Event.
 """
 from typing import Optional, Dict
 import datetime

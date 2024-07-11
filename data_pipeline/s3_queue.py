@@ -49,7 +49,8 @@ def safe_s3fs_ls(filesystem, path, *args, **kwargs):
 
     Returns:
     -----------
-    Returns list of contents in directory.
+    Returns a list of the contents in the directory if the directory exists,
+    otherwise returns an empty list instead of throwing an exception
     """
     fs.invalidate_cache()
     path = str(path)

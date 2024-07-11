@@ -12,7 +12,7 @@ from data_pipeline.queue_base import QueueBase, QueueItemStage
 
 
 class SqlQueue(SQLModel, table=True):
-    """Creates the SQL Queue.
+    """Class to define the SQL queue table.
     """
     # No queue may have duplicate `index_key`s
     __table_args__ = (

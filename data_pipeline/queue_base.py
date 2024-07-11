@@ -6,7 +6,7 @@ from typing import Callable, Any, List, Tuple, Dict, Optional
 
 
 class QueueItemStage(Enum):
-    """Item Stage Class for Queue.
+    """The different stages that a queue item can be in.
     """
     WAITING = 0
     PROCESSING = 1

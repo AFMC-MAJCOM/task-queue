@@ -94,7 +94,7 @@ def test_idempotent_update(default_work_queue):
     default_work_queue.update_job_status()
 
 def test_push_multiple(default_work_queue):
-    """Test that no is added to the work queue twice.
+    """Test that no job is added to the work queue twice.
     """
     n_jobs = 3
 
