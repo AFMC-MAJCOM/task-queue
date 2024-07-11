@@ -6,7 +6,6 @@ import s3fs
 
 from . import s5fs
 from . import queue_base
-from . import config
 
 
 def ensure_s3_prefix(path:str):
@@ -31,7 +30,7 @@ def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
             pass
     return []
 
-fs = config.get_s3fs_connection(default_cache_type="none")
+fs = s3fs.S3FileSystem(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move

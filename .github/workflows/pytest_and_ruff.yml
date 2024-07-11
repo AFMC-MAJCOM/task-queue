@@ -53,10 +53,12 @@ jobs:
         export SQL_USERNAME=postgres
         export SQL_PASSWORD=postgres
         export SQL_DB_NAME=postgres
-        export WEAVE_SQL_PORT=5432
+        export SQL_PORT=5432
         export AWS_ACCESS_KEY_ID=minioadmin
         export AWS_SECRET_ACCESS_KEY=minioadmin
-        export S3_ENDPOINT=http://172.17.0.1:9000/
+        export AWS_ACCESS_KEY_ID=minioadmin
+        export AWS_SECRET_ACCESS_KEY=minioadmin
+        export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
         pytest -vv
 
   ruff:

@@ -3,15 +3,14 @@
 # /how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
 
 import pytest
-
-from data_pipeline import config
+import s3fs
 
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_s3_bucket():
     """Create a 'unit-tests' S3 bucket for testing purposes.
     """
-    fs = config.get_s3fs_connection()
+    fs = s3fs.S3FileSystem()
 
     test_bucket_name = 'unit-tests'
     if fs.exists(test_bucket_name):
