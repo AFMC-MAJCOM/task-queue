@@ -75,6 +75,11 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 5. pip install the `data_pipeline` package
 6. `python -m pytest data_pipeline`
 
+
+### S3 Connection
+An external MinIO or S3 service is required for the tests to run and `AWS_ACCESS_KEY_ID`
+`AWS_SECRET_ACCESS_KEY` and `FSSPEC_S3_ENDPOINT_URL` environment variables must be set.
+
 # Starting Work Queue Server and CLI
 
 You will need docker installed on you machine to use the Task Queue.
