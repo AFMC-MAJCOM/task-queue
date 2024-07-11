@@ -6,12 +6,11 @@ from functools import partial
 import pydantic
 
 from data_pipeline.queue_base import QueueBase, QueueItemStage
-from data_pipeline.events.event_store_interface import EventStoreInterface
 from data_pipeline.events.event import Event
 
 
-
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
+
 
 class QueueAddEventData(pydantic.BaseModel):
     """Adds data to Event for adding Event to Event Store.

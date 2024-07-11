@@ -1,7 +1,6 @@
 """Wherein is contained the WorkQueue class.
 """
-from data_pipeline.queue_worker_interface import QueueWorkerInterface
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.

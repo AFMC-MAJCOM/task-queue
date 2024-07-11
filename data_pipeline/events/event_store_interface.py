@@ -1,10 +1,6 @@
 """Wherein is contained the functionality for the EventStoreInterface.
 """
 from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import List, Union
-
-from .event import Event
 
 
 class EventStoreInterface(ABC):

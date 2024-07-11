@@ -1,6 +1,5 @@
 """Wherein is contained the functions concerning the Work Queue Service CLI.
 """
-from typing import Callable, List
 import argparse
 import time
 
@@ -10,7 +9,7 @@ from data_pipeline.work_queue import WorkQueue
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from data_pipeline.s3_queue import JsonS3Queue
 from data_pipeline.sql_queue import JsonSQLQueue
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.events.sql_event_store import SqlEventStore
 from data_pipeline.queue_with_events import QueueWithEvents
 

@@ -7,7 +7,7 @@ import os
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.s3_queue import JsonS3Queue
 from data_pipeline.sql_queue import JsonSQLQueue
 

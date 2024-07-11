@@ -1,6 +1,5 @@
 """Wherein is contained the implementation of the In Memory Event Store.
 """
-from datetime import datetime
 from typing import List, Dict
 from .event import Event
 from .event_store_interface import EventStoreInterface
