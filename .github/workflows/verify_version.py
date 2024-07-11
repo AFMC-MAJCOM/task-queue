@@ -32,7 +32,6 @@ def verify_version(old_vers: str, new_vers: str) -> bool:
 
 
 if __name__=="__main__":
-    print(sys.argv)
     assert len(sys.argv) == 3
     old_version = sys.argv[1]
     new_version = sys.argv[2]
