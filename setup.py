@@ -1,5 +1,12 @@
 from setuptools import setup
 
+def get_version(rel_path: str) -> str:
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    raise RuntimeError("Unable to find version string.")
+
 setup(
     name="data_pipeline",
     version=get_version("data_pipeline/__init__.py"),
