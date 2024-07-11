@@ -19,15 +19,10 @@ def get_s3fs_connection(**kwargs):
     -------
     s3fs.S3FileSystem object
     """
-    if os.environ.get('S3_ENDPOINT', False):
-        return s3fs.S3FileSystem(
-            client_kwargs={'endpoint_url': os.environ['S3_ENDPOINT']},
-            **kwargs
-        )
-
     return s3fs.S3FileSystem(
-        endpoint_url='http://localhost:9000',
-        key='minioadmin',
-        secret='minioadmin',
-        **kwargs
+        endpoint_url=os.environ.get("S3_ENDPOINT", None),
+        key=os.environ.get("AWS_ACCESS_KEY_ID", None),
+        secret=os.environ.get("AWS_SECRET_ACCESS_KEY", None),
+        token=os.environ.get("AWS_SESSION_TOKEN", None),
+        **kwargs,
     )
