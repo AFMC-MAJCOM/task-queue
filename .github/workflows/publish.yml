@@ -1,11 +1,14 @@
 name: publish
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
+    needs: [pytest-linux, ruff, pylint, version_check]
     steps:
       - uses: actions/checkout@v2
       - name: Login to ghcr.Io
