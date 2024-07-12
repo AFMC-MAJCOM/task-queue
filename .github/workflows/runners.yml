@@ -82,16 +82,13 @@ jobs:
       run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
-
-name: publish
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
+      
   publish-docker-image:
+    on:
+      push:
+        branches: [ "main" ]
+      pull_request:
+        branches: [ "main" ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
