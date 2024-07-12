@@ -9,5 +9,5 @@ elif [ $1 == "server" ]; then
 elif [ $1 == "version" ]; then
     python3 -c "import data_pipeline; print(data_pipeline.__version__)"
 else
-    echo "First argument must be 'controller', 'server', 'version"
+    echo "First argument must be 'controller', 'server', or 'version"
 fi
