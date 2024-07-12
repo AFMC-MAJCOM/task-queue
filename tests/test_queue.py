@@ -46,7 +46,7 @@ def new_empty_queue(request):
         yield new_sql_queue(request)
     elif request.param == "s3":
         yield from new_s3_queue(request)
-    elif request.param == "memory": 
+    elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
         store = InMemoryEventStore()
