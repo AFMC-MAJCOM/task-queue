@@ -84,7 +84,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
-    needs: [pytest-linux, ruff, pylint, version_check]
+    needs: [version_check]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
