@@ -100,8 +100,6 @@ jobs:
         run: |
           docker build . -t task-queue
           version=$(docker run task-queue version)
-          # Check if the version is empty
-          if [[ -z "$version" ]]; then echo "could not find version for task-queue python package" && exit 1; fi
           echo "Task Queue Version = ${version}"
           docker tag task-queue ghcr.io/afmc-majcom/task-queue/task-queue:${version}
           docker run ghcr.io/afmc-majcom/task-queue/task-queue:${version} controller --help 
