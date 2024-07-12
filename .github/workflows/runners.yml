@@ -101,5 +101,6 @@ jobs:
           version=$(docker run task-queue version)
           echo "Task Queue Version = ${version}"
           docker tag task-queue ghcr.io/afmc-majcom/task-queue/task-queue:${version}
+          docker rmi task-queue
           docker run ghcr.io/afmc-majcom/task-queue/task-queue:${version} controller --help 
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
