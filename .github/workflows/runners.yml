@@ -85,11 +85,7 @@ jobs:
       
   publish-docker-image:
     needs: [pytest-linux, ruff, pylint, version_check]
-    on:
-      push:
-        branches: [ "main" ]
-      pull_request:
-        branches: [ "main" ]
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
