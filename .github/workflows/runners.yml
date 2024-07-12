@@ -84,6 +84,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
+    needs: [pytest-linux, ruff, pylint, version_check]
     on:
       push:
         branches: [ "main" ]
@@ -92,7 +93,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - needs: [pytest-linux, ruff, pylint, version_check]
       - name: Login to ghcr.Io
         uses: docker/login-action@v1
         with:
