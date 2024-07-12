@@ -82,3 +82,30 @@ jobs:
       run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
+
+name: publish
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - needs: [pytest-linux, ruff, pylint, version_check]
+      - name: Login to ghcr.Io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build image
+        run: |
+          docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
+          version=$(docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest version)
+          docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
+          docker run ghcr.io/afmc-majcom/task-queue/task-queue:${version} controller --help 
+          docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
