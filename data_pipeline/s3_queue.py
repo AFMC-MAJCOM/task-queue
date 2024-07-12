@@ -30,7 +30,6 @@ def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
             pass
     return []
 
-
 fs = s3fs.S3FileSystem(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
