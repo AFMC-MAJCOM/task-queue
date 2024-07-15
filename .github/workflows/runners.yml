@@ -119,5 +119,7 @@ jobs:
         run: |
           version=$(python setup.py --version)
           echo "Task Queue Version = ${version}"
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
           git tag ${version}
           git push origin ${version}
