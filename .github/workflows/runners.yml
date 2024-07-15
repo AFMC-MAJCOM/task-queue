@@ -84,7 +84,7 @@ jobs:
       
   publish-docker-image:
     needs: [version_check] # ADD THESE WHEN THEY PASS!!!, pylint, ruff, pytest-linux]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       packages: write
