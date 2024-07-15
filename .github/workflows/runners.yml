@@ -126,7 +126,7 @@ jobs:
 
   create-git-tag:
     needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
-    #if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions: 
       contents: write
