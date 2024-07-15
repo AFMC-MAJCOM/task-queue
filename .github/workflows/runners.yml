@@ -110,14 +110,12 @@ jobs:
     needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
     #if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Create and push tag
-        with:
-          github_token: ${{ secrets.PAT }}
-          branch: refs/pull/42/merge
-          directory: .
         run: |
           version=$(python setup.py --version)
           echo "Task Queue Version = ${version}"
