@@ -1,14 +1,33 @@
-"""Configurations for pytests.
+"""Configurations to setup and help testing.
 """
+# Source: https://stackoverflow.com/questions/69281822
+# /how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
 import os
-
 import pytest
 
+import s3fs
 
-os.environ['AWS_ACCESS_KEY_ID'] = 'minioadmin'
-os.environ['AWS_SECRET_ACCESS_KEY'] = 'minioadmin'
-os.environ['FSSPEC_S3_ENDPOINT_URL'] = 'http://localhost:9000'
-os.environ['S3_ENDPOINT_URL'] = 'http://localhost:9000'
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_s3_bucket():
+    """Create a 'unit-tests' S3 bucket for testing purposes.
+    """
+    fs = s3fs.S3FileSystem()
+
+    test_bucket_name = 'unit-tests'
+    if fs.exists(test_bucket_name):
+        fs.rm(test_bucket_name, recursive=True)
+    fs.mkdir(test_bucket_name)
+
+    yield
+    cleanup_bucket(test_bucket_name, fs)
+
+
+def cleanup_bucket(test_bucket_name, fs):
+    """Delete the created bucket that was used for testing.
+    """
+    if fs.exists(test_bucket_name):
+        fs.rm(test_bucket_name)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
