@@ -99,7 +99,7 @@ jobs:
       - name: build image
         run: |
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-          echo "version=$(python setup.py --version)" >> $GITHUB_ENV
+          version=$(python setup.py --version)
           echo "Task Queue Version = ${version}"
           docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
