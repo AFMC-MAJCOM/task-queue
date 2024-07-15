@@ -37,7 +37,7 @@ class InMemoryQueue_():
             "There are duplicates IDs in the work queue"
 
     def get_for_stage(self, stage):
-        """Gets the stage of the QueueItemStage passed in.
+        """Get the InMemoryQueue stage given a QueueItemStage.
 
         Parameters:
         -----------
@@ -87,7 +87,8 @@ def add_to_memory_queue(in_memory_queue,new_items):
     in_memory_queue: InMemoryQueue_
         InMemoryQueue object
     new_items: Dict[str, Any]
-        Dictionary of new Items to add to Queue.
+        Dictionary of new Items to add to Queue, where the key is the item_id
+        and the value is the Queue Item Body.
     """
     # Filter out IDs that already exist in the index
     filtered_items = {
@@ -138,7 +139,7 @@ def get_from_memory_queue(in_memory_queue, n_items = 1):
 
     Returns:
     -----------
-    List of Queue Items grabbed.
+    List of Queue Items retrieved.
     """
     # islice does not support negative values
     # `list` is necessary to freeze this iterator - now it won't break
@@ -166,7 +167,7 @@ def lookup_status(in_memory_queue, item_id):
     -----------
     in_memory_queue: InMemoryQueue_
     item_id: str
-        ID of Item.
+        ID of Queue Item.
 
     Returns:
     -----------

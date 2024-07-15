@@ -13,7 +13,8 @@ QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
 
 
 class QueueAddEventData(pydantic.BaseModel):
-    """Adds data to Event for adding Event to Event Store.
+    """Class with Queue information and Item data to be used when logging Event
+    in Event Store.
     """
     queue_index_key : str
     queue_item_data : pydantic.JsonValue
@@ -67,7 +68,7 @@ def add_to_queue_with_event(
     queue_add_event_name,
     new_items
 ):
-    """Adds Events from Items in Queue to Event Store.
+    """Adds Item to the Queue and logs the Event to an Event Store.
 
     Parameters:
     -----------
@@ -123,7 +124,7 @@ def get_from_queue_with_event(
     queue_move_event_name,
     n_items = 1
 ):
-    """Grabs Items in WAITING stage, creates Event, then adds to the Store.
+    """Retrieves Items in WAITING stage, logs Event, then adds to the Store.
 
     Parameters:
     -----------
@@ -137,7 +138,7 @@ def get_from_queue_with_event(
         Number of Items to get from Queue.
     Returns:
     -----------
-    List of Items grabbed from the Queue and moved to PROCESSING stage.
+    List of Items retrieved from the Queue and moved to PROCESSING stage.
     """
     if n_items < 0:
         n_items = 0
@@ -179,7 +180,7 @@ def record_queue_move_event(
     queue_move_event_name: str
         name of Event
     item_id: str
-        ID of Item
+        ID of Queue Item
     from_stage: QueueItemStage
         Stage Item is being moved from.
     to_stage: QueueItemStage
@@ -204,7 +205,7 @@ def queue_success_with_event(
     queue_move_event_name,
     item_id
 ):
-    """Moves Event Item from PROCESSING to SUCCESS stage.
+    """Moves Queue Item from PROCESSING to SUCCESS and logs the Event.
 
     Parameters:
     -----------
@@ -215,7 +216,7 @@ def queue_success_with_event(
     queue_move_event_name: str
         Name of Event.
     item_id: str
-        ID of Item.
+        ID of Queue Item.
     """
     record_queue_move_event(
         event_store,
@@ -233,7 +234,7 @@ def queue_fail_with_event(
     queue_move_event_name,
     item_id
 ):
-    """Moves Event Item from PROCESSING to FAIL stage.
+    """Moves Queue Item from PROCESSING to FAIL and logs the Event.
 
     Parameters:
     -----------
@@ -244,7 +245,7 @@ def queue_fail_with_event(
     queue_move_event_name: str
         Name of Event.
     item_id: str
-        ID of Item.
+        ID of Queue Item.
     """
     record_queue_move_event(
         event_store,
@@ -264,13 +265,14 @@ def QueueWithEvents(
     add_event_name = None,
     move_event_name = None
 ):
-    """Creates Queue with Events.
+    """Returns a QueueBase object with added functionality to log events as
+    queue items are retrieved and moved.
 
     Parameters:
     -----------
     queue: QueueBase
     event_store: EventStoreInterface
-        Event Store to track item movement.
+        Event Store to log item movement.
     event_base_name: str (default=None)
         Name of Base Event.
     add_event_name: str (default=None)

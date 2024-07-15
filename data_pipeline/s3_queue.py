@@ -39,10 +39,10 @@ def safe_s3fs_ls(filesystem, path, *args, **kwargs):
     Parameters:
     -----------
     filesystem: s3fs.S3FileSystem
-        Desired file system.
+        Instantiated s3fs.S3FileSystem Object.
     path: str
         Path to directory.
-    args*: str
+    *args: str
         Optional additional arguments.
     **kwargs: str
         More arguments.
@@ -153,8 +153,9 @@ def add_items_to_index(index_path, items):
     -----------
     index_path: str
         Path to index file.
-    items: str
-        Items to add to file.
+    items: List of Queue Items.
+        List of Queue Items to add to file, where Item is a key:value pair,
+        where key is the item ID and value is the queue item body.
     """
     fs = s3fs.S3FileSystem()
     with fs.open(index_path, 'a') as f:
@@ -171,8 +172,9 @@ def add_item_to_index(index_path, item):
     -----------
     index_path: str
         Path to index file.
-    item: str
-        Item to add to file.
+    item: Queue Item
+        Queue Item to add to file, where Item is a key:value pair, where key is
+        the item ID and value is the queue item body.
     """
     add_items_to_index(index_path, [item])
 
@@ -246,7 +248,8 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items):
     queue_index_path: str
         Path to s3 Queue Index.
     items: dict
-        Dictionary of Items to add Queue.
+        Dictionary of Queue Items to add Queue, where Item is a key:value pair,
+        where key is the item ID and value is the queue item body.
 
     Returns:
     -----------

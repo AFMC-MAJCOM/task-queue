@@ -40,7 +40,6 @@ def random_event(event_name, time=True, time_offset_sec=0):
     event_name: str
         Desired name of the event.
     time: boolean (default=True)
-        ?????
     time_offset_sec: int (default=0)
         Amount of time to offset event time.
 

@@ -16,15 +16,17 @@ class QueueWorkerInterface(ABC):
         Parameters:
         -----------
         item_id: str
-            Item ID
-        queue_item_body: List
-            Contents of Queue Item body.
+            Queue Item ID
+        queue_item_body: dict
+            Dictionary that must contain a key:value pair where the key is
+            'submit_body' and the value is a dictionary with the format
+            matching the submit_body schema.
         """
         pass
 
     @abstractmethod
     def poll_all_status(self):
-        """Requests status from workflows.
+        """Poll status of all jobs sent by the worker interface.
 
         Returns:
         -----------
@@ -51,14 +53,16 @@ class DummyWorkerInterface(QueueWorkerInterface):
         Parameters:
         -----------
         item_id: str
-            Item ID
-        queue_item_body: List
-            Contents of Queue Item body.
+            Queue Item ID
+        queue_item_body: dict
+            Dictionary that must contain a key:value pair where the key is
+            'submit_body' and the value is a dictionary with the format
+            matching the submit_body schema.
         """
         self._job_status[item_id] = QueueItemStage.PROCESSING
 
     def poll_all_status(self):
-        """Requests status from workflows.
+        """Poll status of all jobs sent by the worker interface.
 
         Returns:
         -----------
@@ -72,7 +76,7 @@ class DummyWorkerInterface(QueueWorkerInterface):
         Parameters:
         -----------
         item_id: str
-            ID of Item.
+            Queue ID of Item.
         """
         self._job_status[item_id] = QueueItemStage.SUCCESS
 

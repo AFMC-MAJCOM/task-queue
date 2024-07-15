@@ -41,7 +41,7 @@ class EventStoreInterface(ABC):
         event_name: str
             Name of Event Store
         time_since: datetime (default=None)
-            Desired time since.
+            Get every event that was logged after the provided time_since.
 
         Returns:
         -----------

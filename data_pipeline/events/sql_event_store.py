@@ -34,7 +34,7 @@ def to_event(self):
     )
 
 def from_event(event):
-    """Takes an event and creates an SQLEventStoreModel and returns it.
+    """Takes an event and creates a SQLEventStoreModel and returns it.
     """
     # This `if/else` is necessary because if `id` is set to anything (even
     # None) then it will be set when dumped to a dict using `model_dump`, even
@@ -102,7 +102,7 @@ class SqlEventStore(EventStoreInterface):
         event_name: str
             Name of Event Store
         time_since: datetime (default=None)
-            Desired time since.
+            Get every event that was logged after the provided time_since.
 
         Returns:
         -----------

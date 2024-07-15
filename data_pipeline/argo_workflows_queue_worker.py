@@ -178,7 +178,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             raise e
 
     def _construct_poll_query(self):
-        """Creates the dictionary for poll query.
+        """Creates a dictionary used to ping Argo for information regarding all
+        jobs relevant to worker_interface_id.
 
         Returns:
         -----------
@@ -205,9 +206,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         completed: str
-            String to show the completion status, may be 'true' or 'false'
+            Completion status from the label. ["true", "false"]
         phase: str
-            String representation of item stage
+            Workflow phase, ["Succeeded", "Failed"]
 
         Returns:
         -----------
