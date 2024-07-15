@@ -55,25 +55,28 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 
 #### Implementation Details
 
-1. `POST` a new workflow to a template when a job is submitted. Add a label for the queue item ID and the name of this queue. 
+1. `POST` a new workflow to a template when a job is submitted. Add a label for the queue item ID and the name of this queue.
 2. `GET` the status of the workflows by filtering on the label with the name of the interface, checking the label for the queue item ID, and looking at the status in the JSON response.
     - Workflow status is in `labels: workflows.argoproj.io/phase`
 
 # Work Queue Service
 
-The `work_queue_service_cli.py` file will run a persistent service that periodically starts new jobs from a queue's `WAITING` stage with a queue worker. It's currently configured to try to keep no more than some amount of jobs in the `PROCESSING` stage, but it should be rather easy to change. 
+The `work_queue_service_cli.py` file will run a persistent service that periodically starts new jobs from a queue's `WAITING` stage with a queue worker. It's currently configured to try to keep no more than some amount of jobs in the `PROCESSING` stage, but it should be rather easy to change.
 
 # Running tests
 
-1. Get AWS CLI credentials
+1. Get AWS CLI credentials or to run with kubernetes:
+    - `minikube start`
+    - `kubectl create namespace pivot`
+    - `kubectl apply -n pivot -f task-queue/resources/quick-start-minimal.yaml`
 2. Make sure the test workflow template is deployed to argo
-    - `kubectl apply -n pivot ./resources/test_workflow_template.yaml`
+    - `kubectl apply -n pivot task-queue/resources/test_workflow_template.yaml`
 3. Port-forward the argo workflows server pod
     - `shift+f` on K9s or `kubectl port-forward -n pivot <pod-name> <port>:<port>`
 4. Start the local postgresql and minio server
-    - `docker compose -f data_pipelines/resources/docker-compose.test.yaml up`
-5. pip install the `data_pipeline` package
-6. `python -m pytest data_pipeline`
+    - `docker compose -f task-queue/resources/docker-compose.test.yaml up`
+5. pip install the `task-queue` package
+6. `python -m pytest task-queue`
 
 
 ### S3 Connection

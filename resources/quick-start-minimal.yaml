@@ -1,4 +1,10 @@
-# This is an auto-generated file. DO NOT EDIT
+# This file was downloaded from https://github.com/argoproj/argo-workflows/blob/main/manifests/quick-start-minimal.yaml
+# If the file ever needs to be redownloaded, the following changes need to be made to run argo workflow tests locally with minikube:
+# 1. All instances of 'namespace: argo' need to be replaced with 'namespace: pivot' (line 900, 906, and 12 more instances)
+# 2. For the argo-server deployment, HTTPS needs to be replaced with HTTP (line 1816)
+# 3. For the argo-server deployment, under the spec: containers: args: add '--secure=false' to the args (line 1805)
+# 4. The retention policy limits need to be increased. Recommended 20, 10, 10 for completed, failed, and errored. (line 1542)
+# The line numbers of the changes in this file are listed for reference but may be different in new versions downlaoded from the argoproj repo.
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
