@@ -83,7 +83,7 @@ An external MinIO or S3 service is required for the tests to run and the followi
 - `FSSPEC_S3_ENDPOINT_URL` (If using a service outside Amazon S3 Services. e.g. MinIO)
 
 ### SQL Connection
-An external SQL service is required for the tests to run and the following environment variables must be set.
+An external postgreSQL service is required for the tests to run and the following environment variables must be set.
 - `SQL_HOST`
 - `SQL_PASSWORD`
 - `SQL_PORT`
