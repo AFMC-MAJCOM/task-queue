@@ -110,13 +110,13 @@ jobs:
     needs: [version_check] # ADD THESE WHEN THEY PASS!!!, pylint, ruff, pytest-linux]
     #if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    with:
-      github_token: ${{ secrets.PAT }}
-      branch: refs/pull/42/merge
-      directory: .
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - with:
+        github_token: ${{ secrets.PAT }}
+        branch: refs/pull/42/merge
+      directory: .
       - name: Create and push tag
         run: |
           version=$(python setup.py --version)
