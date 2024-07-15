@@ -95,7 +95,7 @@ You will need docker installed on you machine to use the Task Queue.
 
 ## Downloading Docker Image
 
-To download the docker image run the following command.
+To download the docker image, go to the registry and select the desired image tag (https://github.com/AFMC-MAJCOM/task-queue/pkgs/container/task-queue%2Ftask-queue). The image tags mirror the version associated with the task-queue python package installed inside the image. For this example, the `latest` image will be used.
 
 ```
 docker pull ghcr.io/afmc-majcom/task-queue/task-queue:latest
