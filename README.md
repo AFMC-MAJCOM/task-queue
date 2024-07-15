@@ -77,8 +77,17 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 
 
 ### S3 Connection
-An external MinIO or S3 service is required for the tests to run and `AWS_ACCESS_KEY_ID`
-`AWS_SECRET_ACCESS_KEY` and `FSSPEC_S3_ENDPOINT_URL` environment variables must be set.
+An external MinIO or S3 service is required for the tests to run and the following environment variables must be set.
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `FSSPEC_S3_ENDPOINT_URL` (If using a service outside Amazon S3 Services. e.g. MinIO)
+
+### SQL Connection
+An external SQL service is required for the tests to run and the following environment variables must be set.
+- `SQL_HOST`
+- `SQL_PASSWORD`
+- `SQL_PORT`
+- `SQL_USERNAME`
 
 # Starting Work Queue Server and CLI
 
