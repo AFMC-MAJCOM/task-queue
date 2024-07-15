@@ -34,10 +34,8 @@ fs = s3fs.S3FileSystem(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move
-    print("S3 Queue is using S5CMD")
 else:
     move = fs.move
-    print("S3 Queue is using S3FS")
 
 
 def check_queue_index(index_path, item):
@@ -227,6 +225,11 @@ def lookup_status(
 index_name = "index.txt"
 
 def JsonS3Queue(queue_base_s3_path):
+    if s5fs.HAS_S5CMD:
+        print("S3 Queue is using S5CMD")
+    else:
+        print("S3 Queue is using S3FS")
+
     queue_index_path = os.path.join(queue_base_s3_path, index_name)
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
