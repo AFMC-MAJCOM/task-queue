@@ -116,7 +116,7 @@ jobs:
       - with:
         github_token: ${{ secrets.PAT }}
         branch: refs/pull/42/merge
-      directory: .
+        directory: .
       - name: Create and push tag
         run: |
           version=$(python setup.py --version)
