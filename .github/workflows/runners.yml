@@ -84,7 +84,7 @@ jobs:
       
   publish-docker-image:
     needs: [version_check] # ADD THESE WHEN THEY PASS!!!, pylint, ruff, pytest-linux]
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -99,7 +99,7 @@ jobs:
       - name: build image
         run: |
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-          version=$(docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest version)
+          echo "version=$(python setup.py --version)" >> $GITHUB_ENV
           echo "Task Queue Version = ${version}"
           docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
