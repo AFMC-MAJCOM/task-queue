@@ -141,5 +141,3 @@ Run the following command to output help from CLI
 docker run --rm ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
 ```
 
-### Get the version of
-
