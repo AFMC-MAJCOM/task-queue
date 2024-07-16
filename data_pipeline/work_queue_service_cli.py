@@ -162,7 +162,6 @@ if __name__ == "__main__":
              "when including this flag."
     )
 
-    # extra stuff
     parser.add_argument(
         "--processing-limit",
         default=10,
@@ -177,7 +176,7 @@ if __name__ == "__main__":
 
     known_args, _ = parser.parse_known_args()
 
-    # dynamically add extra arguments based on worker/queue choice
+    # Dynamically add extra arguments based on worker/queue choice
     if known_args.worker_interface == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
         parser.add_argument("--worker-interface-id", 
                             required=True,
