@@ -36,7 +36,9 @@ def add_json_to_sql_queue(engine, queue_name, items):
     queue_name: str
         Name of Queue.
     items: dict
-        Dictionary of Items to add to Queue.
+        Dictionary of Items to add to Queue. The key value pairs in the
+        dictionary are key=index_key, and value is the json expected when the
+        job is submitted for processing.
 
     Returns:
     -----------

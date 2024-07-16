@@ -156,7 +156,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         item_id: str
             Item ID
-        queue_item_body: List
+        queue_item_body: Dict
             Dictionary that must contain a key:value pair where the key is
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
