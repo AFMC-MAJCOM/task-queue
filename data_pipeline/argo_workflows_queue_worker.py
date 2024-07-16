@@ -97,10 +97,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         submit_options = payload.get('submitOptions', {})
 
         labels = submit_options.get('labels', "")
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
-            ={self._worker_interface_id}"
-        labels += f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL} \
-            ={item_id}"
+        labels += (f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}"
+            f"={self._worker_interface_id}")
+        labels += (f",{ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL}"
+            f"={item_id}")
         labels = labels.strip(",")
 
         submit_options['labels'] = labels
@@ -130,9 +130,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
     def _construct_poll_query(self):
         # select labels that match this object
         return {
-            "listOptions.labelSelector": f" \
-                {ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL} \
-                ={self._worker_interface_id}",
+            "listOptions.labelSelector": (
+                f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}"
+                f"={self._worker_interface_id}"),
             "fields": "items.metadata.labels,metadata.resourceVersion"
         }
 

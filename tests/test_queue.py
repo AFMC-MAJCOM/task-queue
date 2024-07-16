@@ -2,6 +2,7 @@ import random
 import os
 
 import pytest
+import s3fs
 
 import data_pipeline.s3_queue as s3q
 from data_pipeline.in_memory_queue import in_memory_queue
@@ -16,6 +17,30 @@ AWS_UNIT_TEST_QUEUE_BASE = \
     "s3://data-dev-998806663306/unit-test-space/s3_queue_"
 LOCAL_UNIT_TEST_QUEUE_BASE = "s3://unit-tests/queue/queue_"
 UNIT_TEST_QUEUE_BASE = LOCAL_UNIT_TEST_QUEUE_BASE
+
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_s3_bucket():
+    """Create a 'unit-tests' S3 bucket for testing purposes.
+    """
+    fs = s3fs.S3FileSystem()
+
+    test_bucket_name = 'unit-tests'
+    if fs.exists(test_bucket_name):
+        fs.rm(test_bucket_name, recursive=True)
+    fs.mkdir(test_bucket_name)
+
+    yield
+    cleanup_bucket(test_bucket_name, fs)
+
+
+def cleanup_bucket(test_bucket_name, fs):
+    """Delete the created bucket that was used for testing.
+    """
+    if fs.exists(test_bucket_name):
+        fs.rm(test_bucket_name)
+
 
 def new_s3_queue(request):
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
@@ -46,7 +71,7 @@ def new_empty_queue(request):
         yield new_sql_queue(request)
     elif request.param == "s3":
         yield from new_s3_queue(request)
-    elif request.param == "memory": 
+    elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
         store = InMemoryEventStore()

@@ -1,17 +1,8 @@
+"""Functions used to setup and help testing"""
 # Source: https://stackoverflow.com/questions/69281822
 # /how-to-only-run-a-pytest-fixture-cleanup-on-test-error-or-failure
 
-import os
-
 import pytest
-
-
-# make sure environment variables are all good
-# kind of a hack
-os.environ['AWS_ACCESS_KEY_ID'] = 'minioadmin'
-os.environ['AWS_SECRET_ACCESS_KEY'] = 'minioadmin'
-os.environ['FSSPEC_S3_ENDPOINT_URL'] = 'http://localhost:9000'
-os.environ['S3_ENDPOINT_URL'] = 'http://localhost:9000'
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)

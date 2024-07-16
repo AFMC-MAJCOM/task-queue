@@ -30,19 +30,16 @@ def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
             pass
     return []
 
-
 fs = s3fs.S3FileSystem(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move
-    print("S3 Queue is using S5CMD")
 else:
     move = fs.move
-    print("S3 Queue is using S3FS")
 
 
 def check_queue_index(index_path, item):
-    other_fs = s3fs.S3FileSystem()
+    other_fs = s3fs.S3FileSystem(default_cache_type="none)
     if other_fs.exists(index_path):
         with other_fs.open(index_path, 'r') as f:
             line = f.readline()
@@ -58,7 +55,7 @@ def get_queue_index_items(index_path):
     """
     the queue index file is a text file with one item entry per line
     """
-    other_fs = s3fs.S3FileSystem()
+    other_fs = s3fs.S3FileSystem(default_cache_type="none")
     if not other_fs.exists(index_path):
         return []
     with other_fs.open(index_path, "r") as f:
@@ -82,7 +79,7 @@ def subtract_duplicates(main_list, *other_lists):
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
-    other_fs = s3fs.S3FileSystem()
+    other_fs = s3fs.S3FileSystem(default_cache_type="none")
     with other_fs.open(index_path, 'a') as f:
         # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))
@@ -226,8 +223,14 @@ def lookup_status(
 
 INDEX_NAME = "index.txt"
 
+
 def json_s3_queue(queue_base_s3_path):
+    if s5fs.HAS_S5CMD:
+        print("S3 Queue is using S5CMD")
+    else:
+        print("S3 Queue is using S3F
     queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
+
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
     processing_path = os.path.join(queue_base_s3_path,

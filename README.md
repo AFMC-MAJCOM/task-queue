@@ -75,13 +75,27 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 5. pip install the `data_pipeline` package
 6. `python -m pytest data_pipeline`
 
+
+### S3 Connection
+An external MinIO or S3 service is required for the tests to run and the following environment variables must be set.
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `FSSPEC_S3_ENDPOINT_URL` (If using a service outside Amazon S3 Services. e.g. MinIO)
+
+### SQL Connection
+An external postgreSQL service is required for the tests to run and the following environment variables must be set.
+- `SQL_HOST`
+- `SQL_PASSWORD`
+- `SQL_PORT`
+- `SQL_USERNAME`
+
 # Starting Work Queue Server and CLI
 
 You will need docker installed on you machine to use the Task Queue.
 
 ## Downloading Docker Image
 
-To download the docker image run the following command.
+To download the docker image, go to the registry and select the desired image tag (https://github.com/AFMC-MAJCOM/task-queue/pkgs/container/task-queue%2Ftask-queue). The image tags mirror the version associated with the task-queue python package installed inside the image. For this example, the `latest` image will be used.
 
 ```
 docker pull ghcr.io/afmc-majcom/task-queue/task-queue:latest
