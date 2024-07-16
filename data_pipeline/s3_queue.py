@@ -42,13 +42,13 @@ else:
 
 
 def check_queue_index(index_path, item):
-    fs = s3fs.S3FileSystem()
-    if (fs.exists(index_path)):
-        with fs.open(index_path, 'r') as f:
+    other_fs = s3fs.S3FileSystem()
+    if other_fs.exists(index_path):
+        with other_fs.open(index_path, 'r') as f:
             line = f.readline()
-            while (line != ''):
+            while line != '':
                 line = line.replace("\n", '')
-                if (line == item):
+                if line == item:
                     return True
                 line = f.readline()
 
@@ -58,10 +58,10 @@ def get_queue_index_items(index_path):
     """
     the queue index file is a text file with one item entry per line
     """
-    fs = s3fs.S3FileSystem()
-    if not fs.exists(index_path):
+    other_fs = s3fs.S3FileSystem()
+    if not other_fs.exists(index_path):
         return []
-    with fs.open(index_path, "r") as f:
+    with other_fs.open(index_path, "r") as f:
         return [
             line.strip()
             for line in f.readlines()
@@ -75,15 +75,15 @@ def subtract_duplicates(main_list, *other_lists):
     """
     others_set = reduce(
         set.union,
-        (set(l) for l in other_lists),
+        (set(sublist) for sublist in other_lists),
         set()
     )
 
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
-    fs = s3fs.S3FileSystem()
-    with fs.open(index_path, 'a') as f:
+    other_fs = s3fs.S3FileSystem()
+    with other_fs.open(index_path, 'a') as f:
         # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))
         # trailing newline so the next add doesn't append to the end of the
@@ -111,7 +111,7 @@ def maybe_write_s3_json(s3_path, json_data):
     try:
         with fs.open(s3_path, "wt") as f:
             json.dump(json_data, f, indent=4)
-    except Exception as e:
+    except FileNotFoundError as e:
         print(e)
         # what was written to the S3 file before the exception will still show
         # up in S3, so let's just delete that
@@ -160,7 +160,7 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
             for item, success in zip(items_to_add, queue_write_success)
             if not success
         ]
-        raise BaseException("Error writing at least one queue object to S3:",
+        raise ValueError("Error writing at least one queue object to S3:",
                             fail_items)
 
     return len(added_items)
@@ -168,8 +168,7 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
 
 def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
     # once bitten, twice shy
-    if n_items < 0:
-        n_items = 0
+    n_items = max(n_items, 0)
 
     queue_items = safe_s3fs_ls(
         fs,
@@ -188,7 +187,7 @@ def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
             item_data = json.load(f)
 
         # move item to processing
-        destination = s3_move(item_path, processing_path)
+        s3_move(item_path, processing_path)
         output.append((fname_to_id(item_path), item_data))
 
     return output
@@ -225,10 +224,10 @@ def lookup_status(
     raise KeyError(item_id)
 
 
-index_name = "index.txt"
+INDEX_NAME = "index.txt"
 
-def JsonS3Queue(queue_base_s3_path):
-    queue_index_path = os.path.join(queue_base_s3_path, index_name)
+def json_s3_queue(queue_base_s3_path):
+    queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
     processing_path = os.path.join(queue_base_s3_path,

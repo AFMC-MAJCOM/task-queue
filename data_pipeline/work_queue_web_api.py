@@ -5,15 +5,15 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 
 from data_pipeline.queue_base import QueueBase, QueueItemStage
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.s3_queue import json_s3_queue
+from data_pipeline.sql_queue import json_sql_queue
 
 
 app = FastAPI()
 
 @dataclass
 class QueueSettings():
-    def from_env(env_dict:dict):
+    def from_env(self, env_dict:dict):
         return QueueSettings()
 
     def make_queue(self) -> QueueBase:
@@ -24,13 +24,13 @@ class QueueSettings():
 class S3QueueSettings(QueueSettings):
     s3_base_path : str
 
-    def from_env(env_dict:dict):
+    def from_env(self, env_dict:dict):
         return S3QueueSettings(
             env_dict['S3_QUEUE_BASE_PATH']
         )
 
     def make_queue(self):
-        return JsonS3Queue(self.s3_base_path)
+        return json_s3_queue(self.s3_base_path)
 
 
 @dataclass
@@ -38,7 +38,7 @@ class SqlQueueSettings(QueueSettings):
     connection_string : str
     queue_name : str
 
-    def from_env(env_dict:dict):
+    def from_env(self, env_dict:dict):
         if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
             conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
         else:
@@ -56,7 +56,7 @@ class SqlQueueSettings(QueueSettings):
         )
 
     def make_queue(self):
-        return JsonSQLQueue(
+        return json_sql_queue(
             create_engine(self.connection_string),
             self.queue_name
         )
@@ -65,10 +65,11 @@ class SqlQueueSettings(QueueSettings):
 def queue_settings_from_env(env_dict) -> QueueSettings:
     impl = env_dict['QUEUE_IMPLEMENTATION']
     if impl == "s3-json":
-        return S3QueueSettings.from_env(env_dict)
-    elif impl == "sql-json":
-        return SqlQueueSettings.from_env(env_dict)
-
+        obj = S3QueueSettings(env_dict['S3_QUEUE_BASE_PATH'])
+        return obj
+    if impl == "sql-json":
+        return SqlQueueSettings.from_env(env_dict=env_dict)
+    return None
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 

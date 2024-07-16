@@ -6,11 +6,11 @@ from sqlalchemy import create_engine
 
 from data_pipeline.work_queue import WorkQueue
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.s3_queue import json_s3_queue
+from data_pipeline.sql_queue import json_sql_queue
 from data_pipeline.queue_base import QueueBase, QueueItemStage
 from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.queue_with_events import QueueWithEvents
+from data_pipeline.queue_with_events import queue_with_events
 
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
@@ -28,23 +28,25 @@ def handle_worker_interface_choice(choice:str, args):
             args.endpoint,
             args.namespace
         )
+    return None
 
 def handle_queue_implementation_choice(choice:str, args):
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
-        queue = JsonS3Queue(args.s3_base_path)
+        queue = json_s3_queue(args.s3_base_path)
     elif choice == JSON_SQL_QUEUE_CLI_CHOICE:
-        queue = JsonSQLQueue(
+        queue = json_sql_queue(
             create_engine(args.connection_string),
             args.queue_name
         )
 
     if args.with_queue_events:
+        store = None
         if args.event_store_implementation == SQL_EVENT_STORE_CLI_CHOICE:
             store = SqlEventStore(
                 create_engine(args.connection_string)
             )
 
-        queue = QueueWithEvents(
+        queue = queue_with_events(
             queue,
             store,
             add_event_name=args.add_to_queue_event_name,
@@ -62,8 +64,7 @@ def start_jobs_with_processing_limit(
     to_start = max_processing_limit - n_processing
 
     # this case should never happen but I've been wrong before
-    if to_start < 0:
-        to_start = 0
+    to_start = max(to_start, 0)
 
     started_jobs = work_queue.push_next_jobs(to_start)
     print(f"start_jobs_with_processing_limit: Started {len(started_jobs)} jobs")
@@ -142,27 +143,27 @@ if __name__ == "__main__":
         parser.add_argument("--add-to-queue-event-name", required=True)
         parser.add_argument("--move-queue-event-name", required=True)
 
-    args = parser.parse_args()
+    unqiue_args = parser.parse_args()
 
-    worker_interface = handle_worker_interface_choice(
-        args.worker_interface,
-        args
+    unqiue_worker_interface = handle_worker_interface_choice(
+        unqiue_args.worker_interface,
+        unqiue_args
     )
 
-    queue = handle_queue_implementation_choice(
-        args.queue_implementation,
-        args
+    unqiue_queue = handle_queue_implementation_choice(
+        unqiue_args.queue_implementation,
+        unqiue_args
     )
 
-    work_queue = WorkQueue(
-        queue,
-        worker_interface
+    unqiue_work_queue = WorkQueue(
+        unqiue_queue,
+        unqiue_worker_interface
     )
 
-    periodic_functions = [
-        lambda: start_jobs_with_processing_limit(args.processing_limit,
-                                                 queue,
-                                                 work_queue)
+    unqiue_periodic_functions = [
+        lambda: start_jobs_with_processing_limit(unqiue_args.processing_limit,
+                                                 unqiue_queue,
+                                                 unqiue_work_queue)
     ]
 
-    main(periodic_functions, work_queue, args.periodic_seconds)
+    main(unqiue_periodic_functions, unqiue_work_queue, unqiue_args.periodic_seconds)

@@ -8,7 +8,6 @@ from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from data_pipeline.queue_base import QueueItemStage
 
 
-random_number = lambda: random.randint(0, 9999999)
 
 run_argo_tests = os.environ.get('RUN_ARGO_TESTS', False)
 
@@ -16,7 +15,7 @@ if not run_argo_tests:
     pytest.skip(allow_module_level=True)
 
 def make_queue_item(fail=False):
-    queue_item_id = f"test-item-{random_number()}"
+    queue_item_id = f"test-item-{random.randint(0, 9999999)}"
 
     queue_item_body = {
         "submit_body": {
@@ -24,7 +23,7 @@ def make_queue_item(fail=False):
             "resourceName": "queue-test-template",
             "submitOptions": {
                 "parameters": [
-                    f"bin_file=fake_bin_file_{random_number()}",
+                    f"bin_file=fake_bin_file_{random.randint(0, 9999999)}",
                     f"force-fail={fail}"
                 ]
             }
@@ -36,7 +35,7 @@ def make_queue_item(fail=False):
 
 def port_forwarded_worker():
     return ArgoWorkflowsQueueWorker(
-        f"test-worker-{random_number()}",
+        f"test-worker-{random.randint(0, 9999999)}",
         "http://localhost:2746",
         "pivot"
     )

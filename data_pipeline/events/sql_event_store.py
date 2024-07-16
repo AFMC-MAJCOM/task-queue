@@ -41,15 +41,15 @@ def from_event(event:Event):
             event_metadata = json.dumps(event.event_metadata),
             time = event.time
         )
-    else:
-        return SqlEventStoreModel(
-            id = event.id,
-            name = event.name,
-            version = event.version,
-            json_data = json.dumps(event.data),
-            event_metadata = json.dumps(event.event_metadata),
-            time = event.time
-        )
+
+    return SqlEventStoreModel(
+        id = event.id,
+        name = event.name,
+        version = event.version,
+        json_data = json.dumps(event.data),
+        event_metadata = json.dumps(event.event_metadata),
+        time = event.time
+    )
 
 
 class SqlEventStore(EventStoreInterface):

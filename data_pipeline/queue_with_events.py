@@ -25,14 +25,13 @@ class QueueMoveEventData(pydantic.BaseModel):
     # will automatically convert the QueueItemStage fields to their integer
     # values when dumped with `model_dump`
     @pydantic.field_validator('stage_from', 'stage_to')
-    def _internal_validator(cls, v):
+    def _internal_validator(self, cls, v):
         if isinstance(v, QueueItemStage):
             return v
-        else:
-            return QueueItemStage(v)
+        return QueueItemStage(v)
 
     @pydantic.field_serializer('stage_from', 'stage_to')
-    def _internal_serializer(v):
+    def _internal_serializer(self, v):
         return v.value
 
 
@@ -57,7 +56,7 @@ def add_to_queue_with_event(
                     data=QueueAddEventData(
                         queue_index_key=k,
                         queue_item_data=v,
-                        queue_info=queue._description
+                        queue_info=queue.description
                     ).model_dump()
                 )
             )
@@ -83,8 +82,7 @@ def get_from_queue_with_event(
     n_items = 1
 ):
     # you can never be too careful
-    if n_items < 0:
-        n_items = 0
+    n_items = max(n_items, 0)
 
     items = queue.get(n_items)
 
@@ -160,7 +158,7 @@ def queue_fail_with_event(
     queue.fail(item_id)
 
 
-def QueueWithEvents(
+def queue_with_events(
     queue : QueueBase,
     event_store : EventStoreInterface,
     event_base_name : str = None,
@@ -187,6 +185,6 @@ def QueueWithEvents(
         {
             "implementation": "event",
             "event_base_name": event_base_name,
-            "base_queue_description": queue._description
+            "base_queue_description": queue.description
         }
     )

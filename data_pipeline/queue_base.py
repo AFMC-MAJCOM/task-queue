@@ -18,3 +18,7 @@ class QueueBase():
     size : Callable[[QueueItemStage], int]
     lookup_status : Callable[[str], QueueItemStage]
     _description : Dict[str, str]
+    
+    @property
+    def description(self) -> Dict[str, str]:
+        return self._description

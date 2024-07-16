@@ -21,7 +21,7 @@ class WorkQueue():
         for queue_item_id, queue_item_body in next_items:
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
-            except:
+            except (AttributeError, ValueError):
                 # Error in submission -> fail
                 self._queue.fail(queue_item_id)
 
