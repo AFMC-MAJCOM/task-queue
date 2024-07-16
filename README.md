@@ -65,10 +65,9 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 
 # Running tests
 
-1. Get AWS CLI credentials or to run with kubernetes:
-    - `minikube start`
-    - `kubectl create namespace pivot`
-    - `kubectl apply -n pivot -f task-queue/resources/quick-start-minimal.yaml`
+### Running Tests in AWS
+
+1. Get AWS CLI credentials:
 2. Make sure the test workflow template is deployed to argo
     - `kubectl apply -n pivot task-queue/resources/test_workflow_template.yaml`
 3. Port-forward the argo workflows server pod
@@ -78,19 +77,25 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 5. pip install the `task-queue` package
 6. `python -m pytest task-queue`
 
+### Running Argo Workflow Tests in minikube
+
+1. Spin up the pods:
+    - `minikube start`
+    - `kubectl create namespace pivot`
+    - `kubectl apply -n pivot -f task-queue/resources/quick-start-minimal.yaml`
+2. Make sure the test workflow template is deployed to argo
+    - `kubectl apply -n pivot task-queue/resources/test_workflow_template.yaml`
+    - If you have the Argo CLI installed, you can use:
+    - `argo -n pivot template create resources/test_workflow_template.yaml`
+3. Port-forward the argo workflows server pod
+    - `shift+f` on K9s or `kubectl port-forward -n pivot service/argo-server 2746:2746`
+5. pip install the `task-queue` package (you will likely need to run this in a python virtual environment)
+6. `python -m pytest task-queue/tests/test_argo_workflows_worker_interface.py`
+
 
 ### S3 Connection
-An external MinIO or S3 service is required for the tests to run and the following environment variables must be set.
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `FSSPEC_S3_ENDPOINT_URL` (If using a service outside Amazon S3 Services. e.g. MinIO)
-
-### SQL Connection
-An external postgreSQL service is required for the tests to run and the following environment variables must be set.
-- `SQL_HOST`
-- `SQL_PASSWORD`
-- `SQL_PORT`
-- `SQL_USERNAME`
+An external MinIO or S3 service is required for the tests to run and `AWS_ACCESS_KEY_ID`
+`AWS_SECRET_ACCESS_KEY` and `FSSPEC_S3_ENDPOINT_URL` environment variables must be set.
 
 # Starting Work Queue Server and CLI
 
@@ -98,7 +103,7 @@ You will need docker installed on you machine to use the Task Queue.
 
 ## Downloading Docker Image
 
-To download the docker image, go to the registry and select the desired image tag (https://github.com/AFMC-MAJCOM/task-queue/pkgs/container/task-queue%2Ftask-queue). The image tags mirror the version associated with the task-queue python package installed inside the image. For this example, the `latest` image will be used.
+To download the docker image run the following command.
 
 ```
 docker pull ghcr.io/afmc-majcom/task-queue/task-queue:latest
