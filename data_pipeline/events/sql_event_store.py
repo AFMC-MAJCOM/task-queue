@@ -1,25 +1,29 @@
-from typing import List
+"""Wherein is contained the implementation of the SQL Event Store.
+"""
 from datetime import datetime
 import json
 
 from sqlmodel import Field, Session, SQLModel, select
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import Engine
 
 from .event_store_interface import EventStoreInterface
 from .event import Event
 
 
 class SqlEventStoreModel(SQLModel, table=True):
+    """Initializes the SQLEventStoreModel.
+    """
     __tablename__ = "sqleventstore"
     id : int | None = Field(default=None, primary_key=True)
     name : str
     version : str
-    json_data : str # json blob
-    event_metadata : str # json blob
+    json_data : str # JSON blob
+    event_metadata : str # JSON blob
     time : datetime
 
-def to_event(self) -> Event:
+def to_event(self):
+    """Creates and returns an Event.
+    """
     return Event(
         id = self.id,
         name = self.name,
@@ -29,8 +33,10 @@ def to_event(self) -> Event:
         time = self.time
     )
 
-def from_event(event:Event):
-    # this `if/else` is necessary because if `id` is set to anything (even
+def from_event(event):
+    """Takes an event and creates a SQLEventStoreModel and returns it.
+    """
+    # This `if/else` is necessary because if `id` is set to anything (even
     # None) then it will be set when dumped to a dict using `model_dump`, even
     # with `exlude_unset=True`.
     if event.id is None:
@@ -53,12 +59,23 @@ def from_event(event:Event):
 
 
 class SqlEventStore(EventStoreInterface):
-    def __init__(self, engine:Engine):
+    """Creates the SQL Event Store.
+    """
+    def __init__(self, engine):
+        """Initializes the SQL Event Store.
+        """
         SQLModel.metadata.create_all(engine)
         self.engine = engine
 
 
-    def _add_raw(self, events: List[Event]):
+    def _add_raw(self, events):
+        """Add events to Event Store.
+
+        Parameters:
+        -----------
+        events: List[Event]
+            List of Events
+        """
         if not events:
             # empty list causes issues on SQL insert
             return
@@ -77,8 +94,20 @@ class SqlEventStore(EventStoreInterface):
             session.exec(statement)
             session.commit()
 
+    def get(self, event_name, time_since=None):
+        """Returns list of events that have happened since a specific time.
 
-    def get(self, event_name: str, time_since: datetime = None) -> List[Event]:
+        Parameters:
+        -----------
+        event_name: str
+            Name of Event Store
+        time_since: datetime (default=None)
+            Get every event that was logged after the provided time_since.
+
+        Returns:
+        -----------
+        Returns a List of Events.
+        """
         sql_query = event_name == SqlEventStoreModel.name
 
         if time_since is not None:
