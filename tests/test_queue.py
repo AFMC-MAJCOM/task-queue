@@ -1,3 +1,5 @@
+"""Pytests for queue functionality.
+"""
 import random
 import os
 
@@ -43,23 +45,29 @@ def cleanup_bucket(test_bucket_name, fs):
 
 
 def new_s3_queue(request):
+    """Creates a new s3 queue for tests and prints results.
+    """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
                               str(random.randint(0, 9999999)))
     yield s3q.JsonS3Queue(queue_base)
 
-    #If the test passes
+    # If the test passes
     if request.node.rep_call.passed:
         print("Cleaning up results")
-        # clean up the queue to reduce clutter
+        # Clean up the queue to reduce clutter
         if s3q.fs.exists(queue_base):
             s3q.fs.rm(queue_base, recursive=True)
     elif request.node.rep_call.failed:
         print(f"Failed results at {queue_base}")
 
 def new_in_memory_queue(request):
+    """Returns an in-memory queue.
+    """
     return in_memory_queue()
 
 def new_sql_queue(request):
+    """Returns an SQL queue.
+    """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
     return sqlq.JsonSQLQueue(test_sql_engine, queue_name)
 
@@ -67,6 +75,12 @@ def new_sql_queue(request):
 ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
 @pytest.fixture
 def new_empty_queue(request):
+    """Fixture to create an empty queue of one given type.
+
+    This is then broadcasted across ALL_QUEUE_TYPES for each test by way of the
+    pytest.mark.parametrize decorators, so each test is run four times, one for
+    each queue type in the list.
+    """
     if request.param == "sql":
         yield new_sql_queue(request)
     elif request.param == "s3":
@@ -81,48 +95,72 @@ def new_empty_queue(request):
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):
+    """Tests put and get function as expected.
+    """
     qtest.test_put_get(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_mixed_duplicates(new_empty_queue):
+    """Tests that duplicates are not added to queue but new items are.
+    """
     qtest.test_mixed_duplicates(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_add_to_queue_no_duplicates(new_empty_queue):
+    """Tests that no duplicates are added to the queue.
+    """
     qtest.test_add_to_queue_no_duplicates(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_get_empty_queue(new_empty_queue):
+    """Tests the results of calling get on an empty queue.
+    """
     qtest.test_get_empty_queue(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_exception(new_empty_queue):
+    """Tests that put will not add non-JSON serializable items.
+    """
     qtest.test_put_exception(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_queue_size(new_empty_queue):
+    """Test that sizes are properly tracked.
+    """
     qtest.test_queue_size(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_out_of_order(new_empty_queue):
+    """Tests out of order.
+    """
     qtest.test_out_of_order(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_get_zero_items(new_empty_queue):
+    """Tests get 0 items works as expected.
+    """
     qtest.test_get_zero_items(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_lookup(new_empty_queue):
+    """Tests that lookup_status works as expected.
+    """
     qtest.test_lookup(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_multiple_get(new_empty_queue):
+    """Test multiple get calls.
+    """
     qtest.test_multiple_get(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_multiple_get_empty(new_empty_queue):
+    """Test multiple get calls.
+    """
     qtest.test_multiple_get_empty(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_empty(new_empty_queue):
+    """Tests put with an empty dict does not throw an error.
+    """
     new_empty_queue.put({})

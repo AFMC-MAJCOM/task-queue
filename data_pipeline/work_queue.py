@@ -1,18 +1,35 @@
-from data_pipeline.queue_worker_interface import QueueWorkerInterface
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+"""Wherein is contained the WorkQueue class.
+"""
+from data_pipeline.queue_base import QueueItemStage
 
 class WorkQueue():
-    def __init__(
-        self,
-        queue:QueueBase,
-        interface:QueueWorkerInterface
-    ):
+    """Class for the WorkQueue initialization and supporting functions.
+    """
+    def __init__(self, queue, interface):
+        """Initializes Work Queue.
+
+        Parameters:
+        -----------
+        queue: QueueBase
+        interface: QueueWorkerInterface
+        """
         self._queue = queue
         self._interface = interface
         self._cached_statuses = {}
 
 
     def push_next_jobs(self, n_jobs=None):
+        """Sends jobs from Queue.
+
+        Parameters:
+        -----------
+        n_jobs: int (default=None)
+            Number of jobs to send.
+
+        Returns:
+        -----------
+        Returns the jobs selected from Queue.
+        """
         if n_jobs is None:
             n_jobs = 1
 
@@ -29,14 +46,13 @@ class WorkQueue():
 
 
     def update_job_status(self):
-        statuses = self._interface.poll_all_status()
+        """Updates job statuses in Queue.
 
-        # new_statuses = {
-        #     k : v
-        #     for k,v in statuses.items()
-        #     if k not in self._cached_statuses or self._cached_statuses[k] \
-        # != v
-        # }
+        Returns:
+        -----------
+        Returns dictionary of all statuses as Dict[Any, QueueItemStage]
+        """
+        statuses = self._interface.poll_all_status()
 
         print("Processing new statuses from worker interface")
         for queue_item_id, status in statuses.items():
@@ -49,7 +65,5 @@ class WorkQueue():
                 self._queue.success(queue_item_id)
             elif status == QueueItemStage.FAIL:
                 self._queue.fail(queue_item_id)
-
-        # self._cached_statuses = new_statuses
 
         return statuses

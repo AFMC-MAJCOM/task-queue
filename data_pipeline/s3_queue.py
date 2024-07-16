@@ -1,3 +1,5 @@
+"""Wherein is contained the functionality for the s3 Queue.
+"""
 import json
 import os
 from functools import partial, reduce
@@ -9,18 +11,47 @@ from . import queue_base
 
 
 def ensure_s3_prefix(path:str):
+    """Returns a valid s3 path.
+    """
     if not path.startswith("s3://"):
         return "s3://" + path
     return path
 
 
 def safe_s5fs_move(source, dest):
+    """Uses s5fs to move from source to destination.
+
+    Parameters:
+    -----------
+    source: str
+        Path of source
+    dest: str
+        Path of destination
+    """
     s5fs.move(
         ensure_s3_prefix(source),
         ensure_s3_prefix(dest)
     )
 
-def safe_s3fs_ls(filesystem:s3fs.S3FileSystem, path, *args, **kwargs):
+def safe_s3fs_ls(filesystem, path, *args, **kwargs):
+    """Lists the contents of the file.
+
+    Parameters:
+    -----------
+    filesystem: s3fs.S3FileSystem
+        Instantiated s3fs.S3FileSystem Object.
+    path: str
+        Path to directory.
+    *args: str
+        Optional additional arguments.
+    **kwargs: str
+        More arguments.
+
+    Returns:
+    -----------
+    Returns a list of the contents in the directory if the directory exists,
+    otherwise returns an empty list instead of throwing an exception
+    """
     fs.invalidate_cache()
     path = str(path)
     if filesystem.exists(path):
@@ -39,6 +70,19 @@ else:
 
 
 def check_queue_index(index_path, item):
+    """Check if Item is in the Queue index.
+
+    Parameters:
+    -----------
+    index_path: str
+        Path to index.
+    item: str
+        Item to look for.
+
+    Returns:
+    -----------
+    Returns True if Item is in index file, or else False.
+    """
     other_fs = s3fs.S3FileSystem(default_cache_type="none)
     if other_fs.exists(index_path):
         with other_fs.open(index_path, 'r') as f:
@@ -52,8 +96,18 @@ def check_queue_index(index_path, item):
     return False
 
 def get_queue_index_items(index_path):
-    """
-    the queue index file is a text file with one item entry per line
+    """Gets all contents from the Queue index file.
+
+    The queue index file is a text file with one item entry per line
+
+    Parameters:
+    -----------
+    index_path: str
+        Path to index file.
+
+    Returns:
+    -----------
+    Returns list of contents of file.
     """
     other_fs = s3fs.S3FileSystem(default_cache_type="none")
     if not other_fs.exists(index_path):
@@ -66,9 +120,20 @@ def get_queue_index_items(index_path):
         ]
 
 def subtract_duplicates(main_list, *other_lists):
-    """
-    remove duplicate items in `main_list`, and optionally subtract duplicates
-    from `other_lists` as well
+    """Remove duplicate items in `main_list`.
+
+    Optionally subtract duplicates from `other_lists` as well.
+
+    Parameters:
+    -----------
+    main_list: List
+        List to remove dupicate items from
+    *other_lists: List (optional)
+        Optional other lists to remove duplicates from.
+
+    Returns:
+    -----------
+    List of items with no duplicates.
     """
     others_set = reduce(
         set.union,
@@ -79,39 +144,90 @@ def subtract_duplicates(main_list, *other_lists):
     return list(set(main_list) - others_set)
 
 def add_items_to_index(index_path, items):
+    """Add items to the Queue index file.
+
+    Parameters:
+    -----------
+    index_path: str
+        Path to index file.
+    items: List of Queue Items.
+        List of Queue Items to add to file, where Item is a key:value pair,
+        where key is the item ID and value is the queue item body.
+    """
     other_fs = s3fs.S3FileSystem(default_cache_type="none")
     with other_fs.open(index_path, 'a') as f:
-        # note: for some reason `f.writelines` didn't work here
         f.write("\n".join(items))
-        # trailing newline so the next add doesn't append to the end of the
-        # last item line we put there
+        # Trailing newline so the next add doesn't append to the end of the
+        # Last item line we put there
         f.write("\n")
 
 
 def add_item_to_index(index_path, item):
+    """Add an item to the Queue index file.
+
+    Parameters:
+    -----------
+    index_path: str
+        Path to index file.
+    item: Queue Item
+        Queue Item to add to file, where Item is a key:value pair, where key is
+        the item ID and value is the queue item body.
+    """
     add_items_to_index(index_path, [item])
 
 
 def id_to_fname(item_id):
+    """Converts an Item ID into a filename.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Item.
+
+    Returns:
+    -----------
+    Returns a valid JSON filename with the Item ID.
+    """
     return f"{item_id}.json"
 
-def fname_to_id(item_fname:str):
+def fname_to_id(item_fname):
+    """Converts a filename to an Item ID.
+
+    Parameters:
+    -----------
+    item_fname: str
+        Filename of Item.
+
+    Returns:
+    -----------
+    Returns a valid Item ID using the filename.
+    """
     return os.path.splitext(os.path.basename(item_fname))[0]
 
 
 def maybe_write_s3_json(s3_path, json_data):
-    """
-    Fault-tolerant write to S3: if the write fails, simply return False instead
-    of raising an exception.
+    """Fault-tolerant write to S3.
 
+    If the write fails, return False instead of raising an exception.
+
+    Parameters:
+    -----------
+    s3_path: str
+        s3 path
+    json_data: Dict
+        Dictionary of data.
+
+    Returns:
+    -----------
+    Returns boolean to show if it successfully wrote file.
     """
     try:
         with fs.open(s3_path, "wt") as f:
             json.dump(json_data, f, indent=4)
     except FileNotFoundError as e:
         print(e)
-        # what was written to the S3 file before the exception will still show
-        # up in S3, so let's just delete that
+        # What was written to the S3 file before the exception will still show
+        # Up in S3, so let's just delete that
         fs.rm(s3_path)
         return False
 
@@ -119,38 +235,54 @@ def maybe_write_s3_json(s3_path, json_data):
     return fs.exists(s3_path)
 
 
-def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
-    # get a list of item keys that are already in the index, and remove them
-    # from the incoming items list
+def add_json_to_s3_queue(queue_path, queue_index_path, items):
+    """Add Items to the s3 Queue.
+
+    Parameters:
+    -----------
+    queue_path: str
+        Path to s3 Queue.
+    queue_index_path: str
+        Path to s3 Queue Index.
+    items: dict
+        Dictionary of Queue Items to add Queue, where Item is a key:value pair,
+        where key is the item ID and value is the queue item body.
+
+    Returns:
+    -----------
+    Returns the length of the list of added items.
+    """
+    # Get a list of item keys that are already in the index, and remove them
+    # From the incoming items list
     in_index = get_queue_index_items(queue_index_path)
     item_keys_to_add = subtract_duplicates(items.keys(), in_index)
 
-    # these are only items whose keys are not in the index
+    # These are only items whose keys are not in the index
     items_to_add = { k:items[k] for k in item_keys_to_add }
 
-    # path of each item is its ID
+    # Path of each item is its ID
     item_paths = {
         k: os.path.join(queue_path, id_to_fname(k))
         for k in items_to_add.keys()
     }
 
-    # write item data to each file
+    # Write item data to each file
     queue_write_success = [
         maybe_write_s3_json(item_paths[item], items_to_add[item])
         for item in items_to_add.keys()
     ]
 
-    # check successes
+    # Check successes
     added_items = [
         item
         for item, success in zip(items_to_add, queue_write_success)
         if success
     ]
 
-    # add successful queue item writes to the index
+    # Add successful queue item writes to the index
     add_items_to_index(queue_index_path, added_items)
 
-    # check for any failures and raise if there were
+    # Check for any failures and raise if there were
     if not all(queue_write_success):
         fail_items = [
             item
@@ -164,7 +296,22 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items:dict):
 
 
 def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
-    # once bitten, twice shy
+    """Grabs Items from s3 Queue.
+
+    Parameters:
+    -----------
+    queue_path: str
+        Path to s3 Queue.
+    processing_path: str
+        Path to processing, where items are moved to after being moved from
+        the Queue.
+    n_items: int (default=1)
+        Number of items to get from Queue.
+
+    Returns:
+    -----------
+    Returns list containing item IDs and data.
+    """
     n_items = max(n_items, 0)
 
     queue_items = safe_s3fs_ls(
@@ -191,6 +338,19 @@ def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
 
 
 def s3_move(item_path, dest_path):
+    """Moves an item from one place to another.
+
+    Parameters:
+    -----------
+    item_path: str
+        Current Item path.
+    dest_path: str
+        Path of destination.
+
+    Returns:
+    -----------
+    Returns the new path of the Item.
+    """
     name = os.path.basename(item_path)
     dest = os.path.join(dest_path, name)
 
@@ -199,13 +359,30 @@ def s3_move(item_path, dest_path):
     return dest
 
 
-def lookup_status(
-    waiting_path,
-    success_path,
-    fail_path,
-    processing_path,
-    item_id
-):
+def lookup_status(waiting_path,
+                  success_path,
+                  fail_path,
+                  processing_path,
+                  item_id
+                 ):
+    """Look up the status of Item.
+
+    Parameters:
+    waiting_path: str
+        Path of WAITING Items.
+    success_path: str
+        Path of SUCCESS Items.
+    fail_path: str
+        Path of FAIL Items.
+    processing_path: str
+        Path of PROCESSING Items.
+    item_id: str
+        ID of Item.
+
+    Returns:
+    -----------
+    Returns the status of desired Item.
+    """
     paths_with_status = [
         (waiting_path, queue_base.QueueItemStage.WAITING),
         (success_path, queue_base.QueueItemStage.SUCCESS),
@@ -225,6 +402,8 @@ INDEX_NAME = "index.txt"
 
 
 def json_s3_queue(queue_base_s3_path):
+    """Returns the s3 Queue.
+    """
     if s5fs.HAS_S5CMD:
         print("S3 Queue is using S5CMD")
     else:

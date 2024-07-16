@@ -1,3 +1,5 @@
+"""Pytests for argo workflow queue worker.
+"""
 import random
 import time
 import os
@@ -15,7 +17,18 @@ if not run_argo_tests:
     pytest.skip(allow_module_level=True)
 
 def make_queue_item(fail=False):
-    queue_item_id = f"test-item-{random.randint(0, 9999999)}"
+    """Creates a random queue item for testing.
+
+    Paramters:
+    ----------
+    fail: boolean (default=false)
+        Allows fail to be forced.
+
+    Returns:
+    ----------
+    Returns a queue item id and body to use for testing.
+    """
+    queue_item_id = f"test-item-{random.randint(0, 9999999)}"()}"
 
     queue_item_body = {
         "submit_body": {
@@ -34,6 +47,13 @@ def make_queue_item(fail=False):
 
 
 def port_forwarded_worker():
+    """Creates a test worker that connects to an argo workflows instance that
+    is port forwarded to this host on port 2746 (the default port).
+
+    Returns:
+    -----------
+    Test worker.
+    """
     return ArgoWorkflowsQueueWorker(
         f"test-worker-{random.randint(0, 9999999)}",
         "http://localhost:2746",
@@ -42,6 +62,12 @@ def port_forwarded_worker():
 
 
 def wait_for_finish(worker, queue_item_id):
+    """Runs until item moves out of processing stage.
+
+    Returns:
+    -----------
+    New status of the item.
+    """
     while True:
         results = worker.poll_all_status()
         status = results[queue_item_id]
@@ -55,6 +81,8 @@ def wait_for_finish(worker, queue_item_id):
 
 
 def test_argo_worker_end_to_end_success():
+    """Test item succeeds.
+    """
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item()
@@ -70,6 +98,8 @@ def test_argo_worker_end_to_end_success():
 
 
 def test_argo_worker_end_to_end_fail():
+    """Test item fails.
+    """
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item(fail=True)
@@ -85,6 +115,9 @@ def test_argo_worker_end_to_end_fail():
 
 
 def test_argo_worker_end_to_end_concurrent():
+    """Test multiple items running concurrently, with some succeeding and some
+    failing.
+    """
     worker = port_forwarded_worker()
 
     n_processes = 10
@@ -118,6 +151,8 @@ def test_argo_worker_end_to_end_concurrent():
 
 
 def test_argo_worker_no_workflows():
+    """Test worker with no workflows works as expected.
+    """
     worker = port_forwarded_worker()
 
     statuses = worker.poll_all_status()
@@ -125,14 +160,16 @@ def test_argo_worker_no_workflows():
     assert len(statuses) == 0
 
 def test_argo_worker_rerun_item():
+    """Tests argo can rerun a job.
+    """
     worker = port_forwarded_worker()
 
-    # set up the first job to fail
+    # Set up the first job to fail
     queue_item_id, queue_item_body = make_queue_item(fail=True)
     worker.send_job(queue_item_id, queue_item_body)
     wait_for_finish(worker, queue_item_id)
 
-    # and the second job to succeed
+    # And the second job to succeed
     _, queue_item_body = make_queue_item(fail=False)
     worker.send_job(queue_item_id, queue_item_body)
     status = wait_for_finish(worker, queue_item_id)
