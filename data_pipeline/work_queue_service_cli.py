@@ -83,64 +83,90 @@ def main(
 
         time.sleep(period_sec)
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    
     parser.add_argument(
         "worker_interface",
-        choices=[
-            ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE
-        ]
+        choices=[ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE],
+        help="Service used to run jobs."
     )
+
     parser.add_argument(
         "queue_implementation",
         choices=[
             JSON_S3_QUEUE_CLI_CHOICE,
             JSON_SQL_QUEUE_CLI_CHOICE
-        ]
+        ],
+        help="Service used to store the queue."
     )
+
     parser.add_argument(
         "event_store_implementation",
         choices=[
             NO_EVENT_STORE_CLI_CHOICE,
             SQL_EVENT_STORE_CLI_CHOICE
         ],
-        default=NO_EVENT_STORE_CLI_CHOICE
+        default=NO_EVENT_STORE_CLI_CHOICE,
+        help="Service used to store logs of queue state changes."
     )
+    
     parser.add_argument(
         "--with-queue-events",
         type=bool,
-        default=False
+        default=False,
+        help="Flag to signify that logs should be stored on queue state changes. "
+             "The 'event_store_implementation' argument should be set to 'sql-json' "
+             "when including this flag."
     )
 
     # extra stuff
     parser.add_argument(
         "--processing-limit",
         default=10,
-        type=int
+        type=int,
+        help="Number of jobs to be run concurrently."
     )
     parser.add_argument(
         "--periodic-seconds",
-        default=10
+        default=10,
+        help="Number of seconds to wait before checking if additional jobs can be submitted."
     )
 
     known_args, _ = parser.parse_known_args()
 
     # dynamically add extra arguments based on worker/queue choice
     if known_args.worker_interface == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
-        parser.add_argument("--worker-interface-id", required=True)
-        parser.add_argument("--endpoint", required=True)
-        parser.add_argument("--namespace", required=True)
+        parser.add_argument("--worker-interface-id", 
+                            required=True,
+                            help="User defined ID for the worker interface used to submit jobs. Can be any unique string.??")
+        parser.add_argument("--endpoint", 
+                            required=True,
+                           help="Endpoint URL used to point to the ARGO workflows API???")
+        parser.add_argument("--namespace", 
+                            required=True,
+                           help="Kubernetes namespace where argo is running???")
 
     if known_args.queue_implementation == JSON_SQL_QUEUE_CLI_CHOICE:
-        parser.add_argument("--connection-string", required=True)
-        parser.add_argument("--queue-name", required=True)
+        parser.add_argument("--connection-string", 
+                            required=True,
+                           help="Connection string associated with an external SQL server.")
+        parser.add_argument("--queue-name", 
+                            required=True,
+                           help="User defined name queue name. Can be any unique string??")
+    
     elif known_args.queue_implementation == JSON_S3_QUEUE_CLI_CHOICE:
-        parser.add_argument("--s3-base-path", required=True)
+        parser.add_argument("--s3-base-path", 
+                            required=True,
+                           help="S3 path where the queue will be stored.")
 
     if known_args.event_store_implementation != NO_EVENT_STORE_CLI_CHOICE:
-        parser.add_argument("--add-to-queue-event-name", required=True)
-        parser.add_argument("--move-queue-event-name", required=True)
+        parser.add_argument("--add-to-queue-event-name", 
+                            required=True,
+                           help="User defined event name used in the logs when queue items are added???")
+        parser.add_argument("--move-queue-event-name", 
+                            required=True,
+                           help="User defined event name used in the logs when queue items are moved???")
 
     args = parser.parse_args()
 
