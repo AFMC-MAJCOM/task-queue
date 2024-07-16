@@ -65,10 +65,8 @@ fs = s3fs.S3FileSystem(default_cache_type="none")
 
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move
-    print("S3 Queue is using S5CMD")
 else:
     move = fs.move
-    print("S3 Queue is using S3FS")
 
 
 def check_queue_index(index_path, item):
@@ -85,7 +83,7 @@ def check_queue_index(index_path, item):
     -----------
     Returns True if Item is in index file, or else False.
     """
-    fs = s3fs.S3FileSystem()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     if (fs.exists(index_path)):
         with fs.open(index_path, 'r') as f:
             line = f.readline()
@@ -111,7 +109,7 @@ def get_queue_index_items(index_path):
     -----------
     Returns list of contents of file.
     """
-    fs = s3fs.S3FileSystem()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     if not fs.exists(index_path):
         return []
     with fs.open(index_path, "r") as f:
@@ -156,7 +154,7 @@ def add_items_to_index(index_path, items):
         List of Queue Items to add to file, where Item is a key:value pair,
         where key is the item ID and value is the queue item body.
     """
-    fs = s3fs.S3FileSystem()
+    fs = s3fs.S3FileSystem(default_cache_type="none")
     with fs.open(index_path, 'a') as f:
         f.write("\n".join(items))
         # Trailing newline so the next add doesn't append to the end of the
@@ -406,6 +404,11 @@ index_name = "index.txt"
 def JsonS3Queue(queue_base_s3_path):
     """Returns the s3 Queue.
     """
+    if s5fs.HAS_S5CMD:
+        print("S3 Queue is using S5CMD")
+    else:
+        print("S3 Queue is using S3FS")
+
     queue_index_path = os.path.join(queue_base_s3_path, index_name)
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
