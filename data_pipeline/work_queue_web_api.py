@@ -1,10 +1,13 @@
+"""Wherein is contained the functions and classes concering the Work Queue Web
+API.
+"""
 from dataclasses import dataclass, asdict
 import os
 
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.s3_queue import JsonS3Queue
 from data_pipeline.sql_queue import JsonSQLQueue
 
@@ -13,32 +16,68 @@ app = FastAPI()
 
 @dataclass
 class QueueSettings():
-    def from_env(env_dict:dict):
+    """Class concerning the Queue Settings.
+    """
+    def from_env(env_dict):
+        """Returns instance of QueueSettings
+
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+        """
         return QueueSettings()
 
-    def make_queue(self) -> QueueBase:
+    def make_queue(self):
+        """Returns QueueBase object.
+        """
         pass
 
 
 @dataclass
 class S3QueueSettings(QueueSettings):
+    """Class concerning the s3 Queue settings.
+    """
     s3_base_path : str
 
-    def from_env(env_dict:dict):
+    def from_env(env_dict):
+        """Returns an S3QueueSettings object given an s3 Queue Base path.
+
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+        """
         return S3QueueSettings(
             env_dict['S3_QUEUE_BASE_PATH']
         )
 
     def make_queue(self):
+        """Creates and returns a JsonS3Queue.
+        """
         return JsonS3Queue(self.s3_base_path)
 
 
 @dataclass
 class SqlQueueSettings(QueueSettings):
+    """Class concerning the SQL queue settings.
+    """
     connection_string : str
     queue_name : str
 
-    def from_env(env_dict:dict):
+    def from_env(env_dict):
+        """Creates and returns an instance of SqlQueueSettings based on the
+        given env_dict.
+
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+
+        Returns:
+        -----------
+        Returns an instance of SQLQueueSettings.
+        """
         if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
             conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
         else:
@@ -56,13 +95,26 @@ class SqlQueueSettings(QueueSettings):
         )
 
     def make_queue(self):
+        """Creates and returns a JSONSQLQueue.
+        """
         return JsonSQLQueue(
             create_engine(self.connection_string),
             self.queue_name
         )
 
 
-def queue_settings_from_env(env_dict) -> QueueSettings:
+def queue_settings_from_env(env_dict):
+    """Creates an instance of QueueSettings from an environment dictionary.
+
+    Parameters:
+    -----------
+    env_dict: dict
+        Dictionary of environment variables.
+
+    Returns:
+    -----------
+    Returns QueueSettings.
+    """
     impl = env_dict['QUEUE_IMPLEMENTATION']
     if impl == "s3-json":
         return S3QueueSettings.from_env(env_dict)
@@ -74,6 +126,12 @@ queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes():
+    """API endpoint to get the number of jobs in each stage.
+
+    Returns:
+    ----------
+    Returns the number of jobs in each stage of the queue.
+    """
     return {
         s.name : queue.size(s)
         for s in QueueItemStage
@@ -81,10 +139,27 @@ async def get_queue_sizes():
 
 @app.get("/api/v1/queue/status/{item_id}")
 async def lookup_queue_item_status(item_id:str):
+    """API endpoint to look up the status of a specific item in queue.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Item.
+
+    Returns:
+    -----------
+    Returns the status of Item passed in.
+    """
     return queue.lookup_status(item_id)
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue():
+    """API endpoint to descibe the Queue.
+
+    Returns:
+    ----------
+    Returns a dictionary description of the Queue.
+    """
     return {
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)
