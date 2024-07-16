@@ -80,7 +80,7 @@ The `work_queue_service_cli.py` file will run a persistent service that periodic
 ### Running Argo Workflow Tests in minikube
 
 1. Spin up the pods:
-    - `minikube start`
+    - start minikube
     - `kubectl create namespace pivot`
     - `kubectl apply -n pivot -f task-queue/resources/quick-start-minimal.yaml`
 2. Make sure the test workflow template is deployed to argo
