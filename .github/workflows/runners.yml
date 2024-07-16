@@ -88,6 +88,7 @@ jobs:
 
   version_check:
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
     steps:
     - uses: actions/checkout@v3
       with:
@@ -101,7 +102,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
-    needs: [version_check] # ADD THESE WHEN THEY PASS!!!, pylint, ruff, pytest-linux]
+    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
