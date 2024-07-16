@@ -124,3 +124,21 @@ jobs:
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
           docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
+
+  create-git-tag:
+    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create and push tag
+        run: |
+          version=$(python setup.py --version)
+          echo "Task Queue Version = ${version}"
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag ${version}
+          git push origin ${version}
