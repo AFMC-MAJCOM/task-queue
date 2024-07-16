@@ -1,3 +1,5 @@
+"""Created SQL engine for pytests.
+"""
 import sqlalchemy as sqla
 import os
 

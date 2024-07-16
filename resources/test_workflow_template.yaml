@@ -1,37 +1,36 @@
-apiVersion: argoproj.io/v1alpha1                                                                                                  
-kind: WorkflowTemplate                                                                                                            
-metadata:                                                                                                                         
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
   name: queue-test-template
-spec:                                                                                                                             
+spec:
   entrypoint: run-a-test
   ttlStrategy:
     secondsAfterCompletion: 60
-  templates:                                                                                                                      
-  - inputs:                                                                                                                       
-      parameters:                                                                                                                 
-      - name: bin_file        
+  templates:
+  - inputs:
+      parameters:
+      - name: bin_file
       - name: force-fail
         value: False
-    name: run-a-test                                                                                                              
-    script:                                                                                                                       
-      command:                                                                                                                    
-      - python                                                                                                                    
-      image: python:3.8                                                                                                           
-      source: |-                                                                                                                  
-        import os                                                                                                                 
-        import sys                                                                                                                
-        sys.path.append(os.getcwd())                                                                                              
-        import json                                                                                                               
-        try: bin_file = json.loads(r'''{{inputs.parameters.bin_file}}''')                                                         
-        except: bin_file = r'''{{inputs.parameters.bin_file}}'''                                                                  
+    name: run-a-test
+    script:
+      command:
+      - python
+      image: python:3.8
+      source: |-
+        import os
+        import sys
+        sys.path.append(os.getcwd())
+        import json
+        try: bin_file = json.loads(r'''{{inputs.parameters.bin_file}}''')
+        except: bin_file = r'''{{inputs.parameters.bin_file}}'''
 
         if {{inputs.parameters.force-fail}}:
           exit(1)
 
-        import random                                                                                                             
-        import time                                                                                                               
-        print(f'Parsing {bin_file}')                                                                                              
-        dummy_parse_time = random.randint(1, 10)                                                                                 
-        time.sleep(dummy_parse_time)                                                                                              
-        print(f'Parsed {bin_file}')                                                                                               
-                                      
+        import random
+        import time
+        print(f'Parsing {bin_file}')
+        dummy_parse_time = random.randint(1, 10)
+        time.sleep(dummy_parse_time)
+        print(f'Parsed {bin_file}')
