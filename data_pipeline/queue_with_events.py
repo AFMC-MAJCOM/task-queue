@@ -31,7 +31,7 @@ class QueueMoveEventData(pydantic.BaseModel):
     # will automatically convert the QueueItemStage fields to their integer
     # values when dumped with `model_dump`
     @pydantic.field_validator('stage_from', 'stage_to')
-    def _internal_validator(self, cls, v):
+    def _internal_validator(cls, v):
         """Validates that the input is a QueueItemStage object.
 
         Parameters:
@@ -47,7 +47,7 @@ class QueueMoveEventData(pydantic.BaseModel):
         return QueueItemStage(v)
 
     @pydantic.field_serializer('stage_from', 'stage_to')
-    def _internal_serializer(self, v):
+    def _internal_serializer(v):
         """Serializes QueueItemStage by returning the int representation.
 
         Parameters:
