@@ -49,7 +49,7 @@ def new_s3_queue(request):
     """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
                               str(random.randint(0, 9999999)))
-    yield s3q.JsonS3Queue(queue_base)
+    yield s3q.json_s3_queue(queue_base)
 
     # If the test passes
     if request.node.rep_call.passed:
@@ -69,7 +69,7 @@ def new_sql_queue(request):
     """Returns an SQL queue.
     """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
-    return sqlq.JsonSQLQueue(test_sql_engine, queue_name)
+    return sqlq.json_sql_queue(test_sql_engine, queue_name)
 
 
 ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
@@ -90,7 +90,7 @@ def new_empty_queue(request):
     elif request.param == "with_events":
         store = InMemoryEventStore()
         queue = in_memory_queue()
-        yield eq.QueueWithEvents(queue, store, "TEST_EVENT_QUEUE")
+        yield eq.queue_with_events(queue, store, "TEST_EVENT_QUEUE")
 
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
