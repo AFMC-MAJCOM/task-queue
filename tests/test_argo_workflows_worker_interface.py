@@ -28,7 +28,7 @@ def make_queue_item(fail=False):
     ----------
     Returns a queue item id and body to use for testing.
     """
-    queue_item_id = f"test-item-{random.randint(0, 9999999)}"()}"
+    queue_item_id = f"test-item-{random.randint(0, 9999999)}"
 
     queue_item_body = {
         "submit_body": {

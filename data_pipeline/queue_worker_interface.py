@@ -22,7 +22,7 @@ class QueueWorkerInterface(ABC):
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
         """
-        pass
+
 
     @abstractmethod
     def poll_all_status(self):
@@ -32,7 +32,7 @@ class QueueWorkerInterface(ABC):
         -----------
         Returns Dict[Any, QueueItemStage]
         """
-        pass
+
 
 
 class DummyWorkerInterface(QueueWorkerInterface):

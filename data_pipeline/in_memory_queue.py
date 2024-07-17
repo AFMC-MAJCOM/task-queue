@@ -74,8 +74,8 @@ def is_json_serializable(o):
     try:
         json.dumps(o)
         return True
-    except (TypeError, ValueError):
-        pass
+    except Exception as e:
+        print(e)
     return False
 
 

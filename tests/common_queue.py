@@ -125,8 +125,8 @@ def test_put_exception(queue):
     # Make sure the good items are still added
     try:
         queue.put(items)
-    except (TypeError, ValueError):
-        pass
+    except Exception as e:
+        print(e)
 
     first_len = queue.size(qb.QueueItemStage.WAITING)
     assert first_len == len(items) - 1
@@ -134,8 +134,8 @@ def test_put_exception(queue):
     # Make sure the good items are not duplicated
     try:
         queue.put(items)
-    except (TypeError, ValueError):
-        pass
+    except Exception as e:
+        print(e)
 
     second_len = queue.size(qb.QueueItemStage.WAITING)
     assert second_len == len(items) - 1

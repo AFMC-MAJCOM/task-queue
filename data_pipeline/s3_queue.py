@@ -83,7 +83,7 @@ def check_queue_index(index_path, item):
     -----------
     Returns True if Item is in index file, or else False.
     """
-    other_fs = s3fs.S3FileSystem(default_cache_type="none)
+    other_fs = s3fs.S3FileSystem(default_cache_type="none")
     if other_fs.exists(index_path):
         with other_fs.open(index_path, 'r') as f:
             line = f.readline()
@@ -224,7 +224,7 @@ def maybe_write_s3_json(s3_path, json_data):
     try:
         with fs.open(s3_path, "wt") as f:
             json.dump(json_data, f, indent=4)
-    except FileNotFoundError as e:
+    except Exception as e:
         print(e)
         # What was written to the S3 file before the exception will still show
         # Up in S3, so let's just delete that
@@ -289,7 +289,7 @@ def add_json_to_s3_queue(queue_path, queue_index_path, items):
             for item, success in zip(items_to_add, queue_write_success)
             if not success
         ]
-        raise ValueError("Error writing at least one queue object to S3:",
+        raise BaseException("Error writing at least one queue object to S3:",
                             fail_items)
 
     return len(added_items)
@@ -407,9 +407,9 @@ def json_s3_queue(queue_base_s3_path):
     if s5fs.HAS_S5CMD:
         print("S3 Queue is using S5CMD")
     else:
-        print("S3 Queue is using S3F
-    queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
+        print("S3 Queue is using S3FS")
 
+    queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
     processing_path = os.path.join(queue_base_s3_path,

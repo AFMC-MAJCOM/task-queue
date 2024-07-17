@@ -16,7 +16,7 @@ class EventStoreInterface(ABC):
         events: List[Event]
             List of Events
         """
-        pass
+
 
 
     def add(self, event):
@@ -47,4 +47,3 @@ class EventStoreInterface(ABC):
         -----------
         Retuns a List of Events.
         """
-        pass

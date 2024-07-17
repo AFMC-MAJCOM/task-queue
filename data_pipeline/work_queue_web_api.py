@@ -18,6 +18,7 @@ app = FastAPI()
 class QueueSettings():
     """Class concerning the Queue Settings.
     """
+    @staticmethod
     def from_env(env_dict):
         """Returns instance of QueueSettings
 
@@ -31,7 +32,7 @@ class QueueSettings():
     def make_queue(self):
         """Returns QueueBase object.
         """
-        pass
+
 
 
 @dataclass
@@ -40,6 +41,7 @@ class S3QueueSettings(QueueSettings):
     """
     s3_base_path : str
 
+    @staticmethod
     def from_env(env_dict):
         """Returns an S3QueueSettings object given an s3 Queue Base path.
 
@@ -56,7 +58,7 @@ class S3QueueSettings(QueueSettings):
         """Creates and returns a JsonS3Queue.
         """
         return json_s3_queue(self.s3_base_path)
-       
+
 
 
 @dataclass
@@ -66,6 +68,7 @@ class SqlQueueSettings(QueueSettings):
     connection_string : str
     queue_name : str
 
+    @staticmethod
     def from_env(env_dict):
         """Creates and returns an instance of SqlQueueSettings based on the
         given env_dict.

@@ -221,15 +221,44 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             return QueueItemStage.FAIL
         return QueueItemStage.PROCESSING
 
-    # Changing lambda functions to def here --delete this
     def get_labels(self, wf):
+        """Gets workflows metadata labels
+
+        Parameters:
+        -----------
+        wf: 
+
+        Returns:
+        -----------
+        Return metadata label
+        """
         return wf['metadata']['labels']
 
     def get_workflow_queue_item_id(self, wf):
+        """Gets workflow item's ID
+
+        Parameters:
+        -----------
+        wf: 
+
+        Returns:
+        -----------
+        Return item ID label
+        """
         return self.get_labels(wf) \
         [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
 
     def get_workflow_status(self, wf):
+        """Gets the status of the workflow
+
+        Parameters:
+        -----------
+        wf: 
+
+        Returns:
+        -----------
+        Return workflow status
+        """
         argo_completed_label = "workflows.argoproj.io/completed"
         argo_phase_label = "workflows.argoproj.io/phase"
 
@@ -239,6 +268,16 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         )
 
     def get_workflow_create_time(self, wf):
+        """Gets the creation timestamp for the workflow from metadata
+
+        Parameters:
+        -----------
+        wf: 
+
+        Returns:
+        -----------
+        Returns a timestamp
+        """
         return pd.Timestamp(
             wf['metadata']['creationTimestamp'])
 

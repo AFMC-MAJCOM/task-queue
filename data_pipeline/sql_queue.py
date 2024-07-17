@@ -61,7 +61,7 @@ def add_json_to_sql_queue(engine, queue_name, items):
                     queue_name=queue_name
                 ).model_dump(exclude_unset=True)
             )
-        except (TypeError, ValueError, AttributeError) as e:
+        except BaseException as e:
             print(e)
 
     with Session(engine) as session:
@@ -71,7 +71,7 @@ def add_json_to_sql_queue(engine, queue_name, items):
         session.commit()
 
     if len(db_items) != len(items):
-        raise ValueError("Error writing at least one queue object to S3:",
+        raise BaseException("Error writing at least one queue object to S3:",
                             fail_items)
 
     return success
