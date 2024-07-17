@@ -74,8 +74,8 @@ def is_json_serializable(o):
     try:
         json.dumps(o)
         return True
-    except:
-        pass
+    except Exception as e:
+        print(e)
     return False
 
 
@@ -100,9 +100,6 @@ def add_to_memory_queue(in_memory_queue,new_items):
 
     # Add to queue
     in_memory_queue.waiting.update(filtered_items)
-
-    # Fix index
-    in_memory_queue.regenerate_index
 
 
 def move_dict_item(dict_from, dict_to, key):

@@ -44,8 +44,7 @@ class QueueMoveEventData(pydantic.BaseModel):
         """
         if isinstance(v, QueueItemStage):
             return v
-        else:
-            return QueueItemStage(v)
+        return QueueItemStage(v)
 
     @pydantic.field_serializer('stage_from', 'stage_to')
     def _internal_serializer(v):
@@ -140,8 +139,7 @@ def get_from_queue_with_event(
     -----------
     List of Items retrieved from the Queue and moved to PROCESSING stage.
     """
-    if n_items < 0:
-        n_items = 0
+    n_items = max(n_items, 0)
 
     items = queue.get(n_items)
 

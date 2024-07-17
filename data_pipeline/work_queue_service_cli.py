@@ -41,6 +41,7 @@ def handle_worker_interface_choice(choice, args):
             args.endpoint,
             args.namespace
         )
+    return None
 
 def handle_queue_implementation_choice(choice, args):
     """Handles the queue implementation choice.
@@ -63,6 +64,7 @@ def handle_queue_implementation_choice(choice, args):
         )
 
     if args.with_queue_events:
+        store = None
         if args.event_store_implementation == SQL_EVENT_STORE_CLI_CHOICE:
             store = SqlEventStore(
                 create_engine(args.connection_string)
@@ -95,8 +97,7 @@ def start_jobs_with_processing_limit(max_processing_limit,
     n_processing = queue.size(QueueItemStage.PROCESSING)
     to_start = max_processing_limit - n_processing
 
-    if to_start < 0:
-        to_start = 0
+    to_start = max(to_start, 0)
 
     started_jobs = work_queue.push_next_jobs(to_start)
     print(f"start_jobs_with_processing_limit: Started \
@@ -183,27 +184,27 @@ if __name__ == "__main__":
         parser.add_argument("--add-to-queue-event-name", required=True)
         parser.add_argument("--move-queue-event-name", required=True)
 
-    args = parser.parse_args()
+    unique_args = parser.parse_args()
 
-    worker_interface = handle_worker_interface_choice(
-        args.worker_interface,
-        args
+    unique_worker_interface = handle_worker_interface_choice(
+        unique_args.worker_interface,
+        unique_args
     )
 
-    queue = handle_queue_implementation_choice(
-        args.queue_implementation,
-        args
+    unique_queue = handle_queue_implementation_choice(
+        unique_args.queue_implementation,
+        unique_args
     )
 
-    work_queue = WorkQueue(
-        queue,
-        worker_interface
+    unique_work_queue = WorkQueue(
+        unique_queue,
+        unique_worker_interface
     )
 
-    periodic_functions = [
-        lambda: start_jobs_with_processing_limit(args.processing_limit,
-                                                 queue,
-                                                 work_queue)
+    unique_periodic_functions = [
+        lambda: start_jobs_with_processing_limit(unique_args.processing_limit,
+                                                 unique_queue,
+                                                 unique_work_queue)
     ]
 
-    main(periodic_functions, work_queue, args.periodic_seconds)
+    main(unique_periodic_functions, unique_work_queue, unique_args.periodic_seconds)

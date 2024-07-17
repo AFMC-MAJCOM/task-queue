@@ -186,7 +186,7 @@ def lookup_status(engine, queue_name, item_id):
 
         item = session.exec(statement).first()
 
-        if None == item:
+        if item is None:
             raise KeyError(item_id)
 
         return QueueItemStage(item)

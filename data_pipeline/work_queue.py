@@ -38,8 +38,9 @@ class WorkQueue():
         for queue_item_id, queue_item_body in next_items:
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
-            except:
+            except Exception as e:
                 # Error in submission -> fail
+                print(e)
                 self._queue.fail(queue_item_id)
 
         return next_items

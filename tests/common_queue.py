@@ -31,7 +31,7 @@ default_items = dict([random_item() for _ in range(n_items)])
 def test_put_get(queue):
     """Tests put and get function as expected.
     """
-    put = queue.put(default_items)
+    queue.put(default_items)
     get = queue.get(len(default_items))
 
     print(get)
@@ -62,9 +62,9 @@ def test_multiple_get_empty(queue):
     """Tests multiple get calls.
     """
     first_item = list(default_items.keys())[0]
-    put = queue.put({first_item:default_items[first_item]})
+    queue.put({first_item:default_items[first_item]})
 
-    get = queue.get()
+    queue.get()
     get_2 = queue.get()
 
     assert len(get_2) == 0
@@ -125,7 +125,8 @@ def test_put_exception(queue):
     # Make sure the good items are still added
     try:
         queue.put(items)
-    except:
+    except BaseException as e:
+        print(e)
         pass
 
     first_len = queue.size(qb.QueueItemStage.WAITING)
@@ -134,7 +135,8 @@ def test_put_exception(queue):
     # Make sure the good items are not duplicated
     try:
         queue.put(items)
-    except:
+    except BaseException as e:
+        print(e)
         pass
 
     second_len = queue.size(qb.QueueItemStage.WAITING)
