@@ -207,4 +207,6 @@ if __name__ == "__main__":
                                                  unqiue_work_queue)
     ]
 
-    main(unqiue_periodic_functions, unqiue_work_queue, unqiue_args.periodic_seconds)
+    main(unqiue_periodic_functions,
+         unqiue_work_queue,
+         unqiue_args.periodic_seconds)
