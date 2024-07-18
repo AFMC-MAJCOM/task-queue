@@ -143,7 +143,8 @@ def update_stage(engine, queue_name, new_stage, item_key):
         session.commit()
 
 # Pylint cannot correctly tell that func has a count method
-# This raises an error that can be ignored because func.count is a method that is callable
+# This raises an error that can be ignored
+# because func.count is a method that is callable
 # pylint: disable=not-callable
 def queue_size(engine, queue_name, stage):
     """Gets the number of items in a certain stage.
