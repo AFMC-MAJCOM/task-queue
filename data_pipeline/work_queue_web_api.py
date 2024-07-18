@@ -8,8 +8,8 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 
 from data_pipeline.queue_base import QueueItemStage
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.s3_queue import json_s3_queue
+from data_pipeline.sql_queue import json_sql_queue
 
 
 app = FastAPI()
@@ -18,6 +18,9 @@ app = FastAPI()
 class QueueSettings():
     """Class concerning the Queue Settings.
     """
+    # Disabled because this method is inherited
+    # and uses env_dict as a param later
+    # pylint: disable=unused-argument
     @staticmethod
     def from_env(env_dict):
         """Returns instance of QueueSettings
@@ -57,7 +60,7 @@ class S3QueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
         """
-        return JsonS3Queue(self.s3_base_path)
+        return json_s3_queue(self.s3_base_path)
 
 
 @dataclass
@@ -100,7 +103,7 @@ class SqlQueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JSONSQLQueue.
         """
-        return JsonSQLQueue(
+        return json_sql_queue(
             create_engine(self.connection_string),
             self.queue_name
         )

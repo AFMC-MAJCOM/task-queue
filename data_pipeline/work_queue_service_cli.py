@@ -7,11 +7,11 @@ from sqlalchemy import create_engine
 
 from data_pipeline.work_queue import WorkQueue
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.s3_queue import json_s3_queue
+from data_pipeline.sql_queue import json_sql_queue
 from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.queue_with_events import QueueWithEvents
+from data_pipeline.queue_with_events import queue_with_events
 
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
@@ -56,9 +56,9 @@ def handle_queue_implementation_choice(choice, args):
     Constructs the queue implementation from the arguments.
     """
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
-        queue = JsonS3Queue(args.s3_base_path)
+        queue = json_s3_queue(args.s3_base_path)
     elif choice == JSON_SQL_QUEUE_CLI_CHOICE:
-        queue = JsonSQLQueue(
+        queue = json_sql_queue(
             create_engine(args.connection_string),
             args.queue_name
         )
@@ -70,7 +70,7 @@ def handle_queue_implementation_choice(choice, args):
                 create_engine(args.connection_string)
             )
 
-        queue = QueueWithEvents(
+        queue = queue_with_events(
             queue,
             store,
             add_event_name=args.add_to_queue_event_name,

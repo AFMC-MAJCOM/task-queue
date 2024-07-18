@@ -5,8 +5,8 @@ import random
 import pytest
 
 from data_pipeline.events.in_memory_event_store import InMemoryEventStore
-from data_pipeline.in_memory_queue import InMemoryQueue
-from data_pipeline.queue_with_events import QueueWithEvents, QueueAddEventData
+from data_pipeline.in_memory_queue import in_memory_queue
+from data_pipeline.queue_with_events import queue_with_events, QueueAddEventData
 from data_pipeline.queue_with_events import QueueMoveEventData
 from data_pipeline.queue_base import QueueItemStage
 from .common_queue import default_items
@@ -18,24 +18,24 @@ ADD_EVENT_NAME = f"TEST_QUEUE_ADD_EVENT_{random_number}"
 MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 
 @pytest.fixture
-def queue_with_events():
+def queue_with_event():
     """Fixture to create queue with events for testing.
     """
-    q = InMemoryQueue()
+    q = in_memory_queue()
     s = InMemoryEventStore()
 
-    return q, s, QueueWithEvents(
+    return q, s, queue_with_events(
         q,
         s,
         add_event_name=ADD_EVENT_NAME,
         move_event_name=MOVE_EVENT_NAME
     )
 
-def test_event_queue_add(queue_with_events):
+def test_event_queue_add(queue_with_event):
     """Tests that every event was added to the queue and every item has an
     event.
     """
-    _, s, eq = queue_with_events
+    _, s, eq = queue_with_event
 
     eq.put(default_items)
 
@@ -51,10 +51,10 @@ def test_event_queue_add(queue_with_events):
     assert len(add_events) == len(default_items)
 
 
-def test_event_queue_lifecycle(queue_with_events):
+def test_event_queue_lifecycle(queue_with_event):
     """Test event queue lifestyle works as expected.
     """
-    _, s, eq = queue_with_events
+    _, s, eq = queue_with_event
 
     eq.put(default_items)
 

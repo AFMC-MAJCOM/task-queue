@@ -204,7 +204,9 @@ def fname_to_id(item_fname):
     """
     return os.path.splitext(os.path.basename(item_fname))[0]
 
-
+# Pylint exception caught is disabled so that anything writen before
+# an exception was caught will be correctly deleted from S3
+# pylint: disable=broad-exception-caught
 def maybe_write_s3_json(s3_path, json_data):
     """Fault-tolerant write to S3.
 
@@ -234,7 +236,8 @@ def maybe_write_s3_json(s3_path, json_data):
     # If the output file exists, we succeeded.
     return fs.exists(s3_path)
 
-
+# BaseExeption is used to tell the user the failed items
+# pylint: disable=broad-exception-raised
 def add_json_to_s3_queue(queue_path, queue_index_path, items):
     """Add Items to the s3 Queue.
 
@@ -400,7 +403,7 @@ def lookup_status(waiting_path,
 
 INDEX_NAME = "index.txt"
 
-def JsonS3Queue(queue_base_s3_path):
+def json_s3_queue(queue_base_s3_path):
     """Returns the s3 Queue.
     """
     if s5fs.HAS_S5CMD:

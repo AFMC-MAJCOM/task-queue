@@ -26,7 +26,11 @@ class SqlQueue(SQLModel, table=True):
     index_key: str
     queue_name: str
 
-
+# Disabled pylint because BaseException is used to record
+# and keep the program running correctly until the raise
+# BaseException is used to report on the error
+# pylint: disable=broad-exception-caught
+# pylint: disable=broad-exception-raised
 def add_json_to_sql_queue(engine, queue_name, items):
     """Adds Items to the SQL Queue.
 
@@ -138,7 +142,9 @@ def update_stage(engine, queue_name, new_stage, item_key):
         session.add(item)
         session.commit()
 
-
+# Pylint cannot correctly tell that func has a count method
+# This raises an error that can be ignored because func.count is a method that is callable
+# pylint: disable=not-callable
 def queue_size(engine, queue_name, stage):
     """Gets the number of items in a certain stage.
 
@@ -192,7 +198,7 @@ def lookup_status(engine, queue_name, item_id):
         return QueueItemStage(item)
 
 
-def JsonSQLQueue(engine:Engine, queue_name):
+def json_sql_queue(engine:Engine, queue_name):
     """Creates and returns the SQL Queue.
     """
     SQLModel.metadata.create_all(engine)

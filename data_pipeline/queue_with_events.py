@@ -30,6 +30,9 @@ class QueueMoveEventData(pydantic.BaseModel):
 
     # will automatically convert the QueueItemStage fields to their integer
     # values when dumped with `model_dump`
+    # Pylint no-self-argument diabled because @field_validator
+    # cannot be applied to instance methods
+    # pylint: disable=no-self-argument
     @pydantic.field_validator('stage_from', 'stage_to')
     def _internal_validator(cls, v):
         """Validates that the input is a QueueItemStage object.
@@ -60,7 +63,8 @@ class QueueMoveEventData(pydantic.BaseModel):
         """
         return v.value
 
-
+# Pylint disabled because BaseException is used to set exc
+# pylint: disable=broad-exception-caught
 def add_to_queue_with_event(
     queue,
     event_store,
@@ -256,7 +260,7 @@ def queue_fail_with_event(
     queue.fail(item_id)
 
 
-def QueueWithEvents(
+def queue_with_events(
     queue,
     event_store,
     event_base_name = None,
