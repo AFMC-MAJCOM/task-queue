@@ -98,7 +98,7 @@ def add_to_queue_with_event(
                     data=QueueAddEventData(
                         queue_index_key=k,
                         queue_item_data=v,
-                        queue_info=queue._description
+                        queue_info=queue.description
                     ).model_dump()
                 )
             )
@@ -302,6 +302,6 @@ def QueueWithEvents(
         {
             "implementation": "event",
             "event_base_name": event_base_name,
-            "base_queue_description": queue._description
+            "base_queue_description": queue.description
         }
     )

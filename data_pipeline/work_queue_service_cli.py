@@ -207,4 +207,6 @@ if __name__ == "__main__":
                                                  unique_work_queue)
     ]
 
-    main(unique_periodic_functions, unique_work_queue, unique_args.periodic_seconds)
+    main(unique_periodic_functions,
+         unique_work_queue,
+         unique_args.periodic_seconds)
