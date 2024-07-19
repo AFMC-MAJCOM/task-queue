@@ -51,7 +51,7 @@ jobs:
         kubectl create namespace pivot
         kubectl apply -n pivot -f resources/quick-start-minimal.yaml
         kubectl apply -n pivot -f resources/test_workflow_template.yaml
-        kubectl wait -n pivot --for=condition=Ready --all pods
+        kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
         kubectl port-forward -n pivot service/argo-server 2746:2746 
 
     - name: Install dependencies
