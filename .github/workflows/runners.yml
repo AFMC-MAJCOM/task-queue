@@ -42,6 +42,18 @@ jobs:
       run: |
         mkdir ~/minio
         minio server ~/minio --console-address :9090 &!
+    - name: Setup Minikube
+      id: minikube
+      uses: medyagh/setup-minikube@latest
+    - name: Prepare for Argo Tests
+      run: | 
+        export RUN_ARGO_TESTS=True
+        minikube start
+        kubectl create namespace pivot
+        kubectl apply -n pivot -f resources/quick-start-minimal.yaml
+        kubectl apply -n pivot -f resources/test_workflow_template.yaml
+        kubectl port-forward -n pivot service/argo-server 2746:2746
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
