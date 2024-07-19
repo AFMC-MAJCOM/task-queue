@@ -47,7 +47,6 @@ jobs:
       uses: medyagh/setup-minikube@latest
     - name: Prepare for Argo Tests
       run: | 
-        export RUN_ARGO_TESTS=True
         minikube start
         kubectl create namespace pivot
         kubectl apply -n pivot -f resources/quick-start-minimal.yaml
@@ -60,6 +59,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
+        export RUN_ARGO_TESTS=True
         export SQL_HOST=localhost
         export SQL_USERNAME=postgres
         export SQL_PASSWORD=postgres
