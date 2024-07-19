@@ -5,7 +5,7 @@ if [ $1 == "controller" ]; then
     python work_queue_service_cli.py "${@:2}"
 elif [ $1 == "server" ]; then
     echo "Running web api server"
-    uvicorn work_queue_web_api:app --reload --port=80 --host 0.0.0.0
+    uvicorn work_queue_web_api:app --port=8001 --host 0.0.0.0
 else
     echo "First argument must be 'controller' or 'server'"
 fi
