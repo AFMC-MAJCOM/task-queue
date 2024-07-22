@@ -89,7 +89,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns the URL to the argo workflows server which new workflows can
         be submitted to.
         """
-        return ArgoWorkflowsQueueWorker.urlconcat(
+        return self.urlconcat(
             self._argo_workflows_endpoint,
             "api",
             "v1",
@@ -103,7 +103,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns the URL to the argo workflows server that lists the
         workflows.
         """
-        return ArgoWorkflowsQueueWorker.urlconcat(
+        return self.urlconcat(
             self._argo_workflows_endpoint,
             "api",
             "v1",
@@ -225,35 +225,44 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     def get_labels(self, wf):
         """Gets workflows metadata labels
+
         Parameters:
         -----------
-        wf: 
+        wf: dict
+            Dictionary of Argo Workflow items
+
         Returns:
         -----------
-        Return metadata label
+        Metadata label
         """
         return wf['metadata']['labels']
 
     def get_workflow_queue_item_id(self, wf):
         """Gets workflow item's ID
+
         Parameters:
         -----------
-        wf: 
+        wf: dict
+            Dictionary of Argo Workflow items
+
         Returns:
         -----------
-        Return item ID label
+        Item ID label
         """
         return self.get_labels(wf) \
         [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
 
     def get_workflow_status(self, wf):
         """Gets the status of the workflow
+
         Parameters:
         -----------
-        wf: 
+        wf: dict
+            Dictionary of Argo Workflow items
+
         Returns:
         -----------
-        Return workflow status
+        Workflow status
         """
         argo_completed_label = "workflows.argoproj.io/completed"
         argo_phase_label = "workflows.argoproj.io/phase"
@@ -265,12 +274,15 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     def get_workflow_create_time(self, wf):
         """Gets the creation timestamp for the workflow from metadata
+
         Parameters:
         -----------
-        wf: 
+        wf: dict
+            Dictionary of Argo Workflow items
+
         Returns:
         -----------
-        Returns a timestamp
+        A timestamp
         """
         return pd.Timestamp(
             wf['metadata']['creationTimestamp'])

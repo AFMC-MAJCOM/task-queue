@@ -19,7 +19,7 @@ ADD_EVENT_NAME = f"TEST_QUEUE_ADD_EVENT_{random_number}"
 MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 
 @pytest.fixture
-def queue_with_event():
+def queue_with_events_fixture():
     """Fixture to create queue with events for testing.
     """
     q = in_memory_queue()
@@ -32,11 +32,11 @@ def queue_with_event():
         move_event_name=MOVE_EVENT_NAME
     )
 
-def test_event_queue_add(queue_with_event):
+def test_event_queue_add(queue_with_events_fixture):
     """Tests that every event was added to the queue and every item has an
     event.
     """
-    _, s, eq = queue_with_event
+    _, s, eq = queue_with_events_fixture
 
     eq.put(default_items)
 
@@ -52,10 +52,10 @@ def test_event_queue_add(queue_with_event):
     assert len(add_events) == len(default_items)
 
 
-def test_event_queue_lifecycle(queue_with_event):
+def test_event_queue_lifecycle(queue_with_events_fixture):
     """Test event queue lifestyle works as expected.
     """
-    _, s, eq = queue_with_event
+    _, s, eq = queue_with_events_fixture
 
     eq.put(default_items)
 

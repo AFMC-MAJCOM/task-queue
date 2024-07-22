@@ -127,7 +127,6 @@ def test_put_exception(queue):
         queue.put(items)
     except BaseException as e:
         print(e)
-        pass
 
     first_len = queue.size(qb.QueueItemStage.WAITING)
     assert first_len == len(items) - 1
@@ -137,7 +136,6 @@ def test_put_exception(queue):
         queue.put(items)
     except BaseException as e:
         print(e)
-        pass
 
     second_len = queue.size(qb.QueueItemStage.WAITING)
     assert second_len == len(items) - 1
