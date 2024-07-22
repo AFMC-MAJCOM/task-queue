@@ -35,7 +35,7 @@ class QueueSettings():
     def make_queue(self):
         """Returns QueueBase object.
         """
-        raise NotImplementedError("make_queue must be implemented in subclasses.")
+        raise NotImplementedError("make_queue not yet implemented.")
 
 
 @dataclass
