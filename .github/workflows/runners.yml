@@ -102,7 +102,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
-    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
+    needs: [pytest-linux, pylint, ruff]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -126,7 +126,7 @@ jobs:
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
 
   create-git-tag:
-    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
+    needs: [pytest-linux, pylint, ruff]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions: 
