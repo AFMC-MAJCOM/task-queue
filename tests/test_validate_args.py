@@ -1,4 +1,11 @@
-from data_pipeline.work_queue_service_cli import *
+from data_pipeline.work_queue_service_cli import (
+                                    validate_args,
+                                    JSON_S3_QUEUE_CLI_CHOICE, 
+                                    JSON_SQL_QUEUE_CLI_CHOICE, 
+                                    ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE, 
+                                    NO_EVENT_STORE_CLI_CHOICE, 
+                                    SQL_EVENT_STORE_CLI_CHOICE)
+                                                 
 
 def test_validate_args_s3_success():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -14,7 +21,7 @@ def test_validate_args_s3_success():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == True
+    assert success
     assert error_string == ''
 
 def test_validate_args_s3_missing_base_path():
@@ -31,8 +38,9 @@ def test_validate_args_s3_missing_base_path():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_sql_success():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -48,7 +56,7 @@ def test_validate_args_sql_success():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == True
+    assert success
     assert error_string == ''
 
 def test_validate_args_sql_missing_queue_name():
@@ -65,8 +73,9 @@ def test_validate_args_sql_missing_queue_name():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_sql_missing_connection_string():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -82,8 +91,9 @@ def test_validate_args_sql_missing_connection_string():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_worker_interface_success():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -99,7 +109,7 @@ def test_validate_args_worker_interface_success():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == True
+    assert success
     assert error_string == ''
 
 def test_validate_args_worker_interface_missing_id():
@@ -116,8 +126,9 @@ def test_validate_args_worker_interface_missing_id():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_worker_interface_missing_endpoint():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -133,8 +144,9 @@ def test_validate_args_worker_interface_missing_endpoint():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_worker_interface_missing_namespace():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -150,8 +162,9 @@ def test_validate_args_worker_interface_missing_namespace():
             'add_to_queue_event_name': None,
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_event_store_implementation_success():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -167,7 +180,7 @@ def test_validate_args_event_store_implementation_success():
             'add_to_queue_event_name': 'dummyeventname',
             'move_queue_event_name': 'dummyeventname2'}
     success, error_string = validate_args(args_dict)
-    assert success == True
+    assert success
     assert error_string == ''
 
 def test_validate_args_event_store_implementation_missing_add_name():
@@ -184,8 +197,9 @@ def test_validate_args_event_store_implementation_missing_add_name():
             'add_to_queue_event_name': None,
             'move_queue_event_name': 'dummyeventname2'}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_event_store_implementation_missing_move_name():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -201,8 +215,9 @@ def test_validate_args_event_store_implementation_missing_move_name():
             'add_to_queue_event_name': 'dummyevent',
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' \
+           in error_string
 
 def test_validate_args_event_store_implementation_sql_json_only_option():
     args_dict = {'worker_interface': 'argo-workflows',
@@ -218,5 +233,6 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
             'add_to_queue_event_name': 'dummyeventname',
             'move_queue_event_name': 'dummyeventname2'}
     success, error_string = validate_args(args_dict)
-    assert success == False
-    assert f'event_store_implementation must be set to {SQL_EVENT_STORE_CLI_CHOICE}' in error_string
+    assert not success
+    assert f'event_store_implementation must be set to {SQL_EVENT_STORE_CLI_CHOICE}' \
+           in error_string
