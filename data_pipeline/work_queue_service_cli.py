@@ -75,7 +75,7 @@ def validate_args(cli_args):
     if cli_args['with_queue_events']:
         if cli_args['event_store_implementation'] \
                                 != SQL_EVENT_STORE_CLI_CHOICE:
-            
+
             errors_found += f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
                             f"{SQL_EVENT_STORE_CLI_CHOICE}"
