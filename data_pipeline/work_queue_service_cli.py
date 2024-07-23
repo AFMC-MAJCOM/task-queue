@@ -226,7 +226,7 @@ if __name__ == "__main__":
                             f"Required when queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}")
 
     parser.add_argument("--queue-name", 
-                        help="User defined name queue name. Can be any unique string. "
+                        help="User defined queue name. Can be any unique string. "
                             f"Required when queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}")
 
     parser.add_argument("--s3-base-path", 
