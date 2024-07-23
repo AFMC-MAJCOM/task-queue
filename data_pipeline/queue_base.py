@@ -23,4 +23,4 @@ class QueueBase():
     fail : Callable[[str], Any]
     size : Callable[[QueueItemStage], int]
     lookup_status : Callable[[str], QueueItemStage]
-    _description : Dict[str, str]
+    description : Dict[str, str]

@@ -8,11 +8,11 @@ from sqlalchemy import create_engine
 
 from data_pipeline.work_queue import WorkQueue
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from data_pipeline.s3_queue import json_s3_queue
+from data_pipeline.sql_queue import json_sql_queue
 from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.queue_with_events import QueueWithEvents
+from data_pipeline.queue_with_events import queue_with_events
 
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
@@ -76,6 +76,7 @@ def handle_worker_interface_choice(choice, args):
             args.endpoint,
             args.namespace
         )
+    return None
 
 def handle_queue_implementation_choice(choice, args):
     """Handles the queue implementation choice.
@@ -90,20 +91,21 @@ def handle_queue_implementation_choice(choice, args):
     Constructs the queue implementation from the arguments.
     """
     if choice == JSON_S3_QUEUE_CLI_CHOICE:
-        queue = JsonS3Queue(args.s3_base_path)
+        queue = json_s3_queue(args.s3_base_path)
     elif choice == JSON_SQL_QUEUE_CLI_CHOICE:
-        queue = JsonSQLQueue(
+        queue = json_sql_queue(
             create_engine(args.connection_string),
             args.queue_name
         )
 
     if args.with_queue_events:
+        store = None
         if args.event_store_implementation == SQL_EVENT_STORE_CLI_CHOICE:
             store = SqlEventStore(
                 create_engine(args.connection_string)
             )
 
-        queue = QueueWithEvents(
+        queue = queue_with_events(
             queue,
             store,
             add_event_name=args.add_to_queue_event_name,
@@ -130,8 +132,7 @@ def start_jobs_with_processing_limit(max_processing_limit,
     n_processing = queue.size(QueueItemStage.PROCESSING)
     to_start = max_processing_limit - n_processing
 
-    if to_start < 0:
-        to_start = 0
+    to_start = max(to_start, 0)
 
     started_jobs = work_queue.push_next_jobs(to_start)
     print(f"start_jobs_with_processing_limit: Started \
@@ -241,8 +242,7 @@ if __name__ == "__main__":
                         help="User defined event name used in the logs when queue items are moved. "
                             f"Required when event-store-implementation is not set to {NO_EVENT_STORE_CLI_CHOICE}")
 
-
-    args = parser.parse_args()
+    unique_args = parser.parse_args()
     
     # Check if dependent arguments were provided
     args_dict = args.__dict__
@@ -251,27 +251,28 @@ if __name__ == "__main__":
 
     if not success:
         parser.error(error_string)
-    
 
-    worker_interface = handle_worker_interface_choice(
-        args.worker_interface,
-        args
+    unique_worker_interface = handle_worker_interface_choice(
+        unique_args.worker_interface,
+        unique_args
     )
 
-    queue = handle_queue_implementation_choice(
-        args.queue_implementation,
-        args
+    unique_queue = handle_queue_implementation_choice(
+        unique_args.queue_implementation,
+        unique_args
     )
 
-    work_queue = WorkQueue(
-        queue,
-        worker_interface
+    unique_work_queue = WorkQueue(
+        unique_queue,
+        unique_worker_interface
     )
 
-    periodic_functions = [
-        lambda: start_jobs_with_processing_limit(args.processing_limit,
-                                                 queue,
-                                                 work_queue)
+    unique_periodic_functions = [
+        lambda: start_jobs_with_processing_limit(unique_args.processing_limit,
+                                                 unique_queue,
+                                                 unique_work_queue)
     ]
 
-    main(periodic_functions, work_queue, args.periodic_seconds)
+    main(unique_periodic_functions,
+         unique_work_queue,
+         unique_args.periodic_seconds)

@@ -17,7 +17,8 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
-
+    # Pylint disabled because any except is used to call the queue fail
+    # pylint: disable=broad-exception-caught
     def push_next_jobs(self, n_jobs=None):
         """Sends jobs from Queue.
 
@@ -38,8 +39,9 @@ class WorkQueue():
         for queue_item_id, queue_item_body in next_items:
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
-            except:
+            except Exception as e:
                 # Error in submission -> fail
+                print(e)
                 self._queue.fail(queue_item_id)
 
         return next_items
