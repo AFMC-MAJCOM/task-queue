@@ -75,10 +75,10 @@ def is_json_serializable(o):
     """
     try:
         json.dumps(o)
-        return True
     except Exception as e:
         print(e)
-    return False
+        return False
+    return True
 
 
 def add_to_memory_queue(memory_queue,new_items):
