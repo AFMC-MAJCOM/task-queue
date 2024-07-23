@@ -73,7 +73,9 @@ def validate_args(cli_args):
             validation_success = False
 
     if cli_args['with_queue_events']:
-        if cli_args['event_store_implementation'] != SQL_EVENT_STORE_CLI_CHOICE:
+        if cli_args['event_store_implementation'] \
+                                != SQL_EVENT_STORE_CLI_CHOICE:
+            
             errors_found += f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
                             f"{SQL_EVENT_STORE_CLI_CHOICE}"
@@ -246,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--endpoint",
                         help="Endpoint URL used to point to the ARGO "
                              "Workflows API. Required when worker-interface "
-                             f"is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}")
+                            f"is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}")
 
     parser.add_argument("--namespace",
                         help="Kubernetes namespace where ARGO Workflows is "

@@ -39,7 +39,7 @@ def test_validate_args_s3_missing_base_path():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}' \
+    assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_sql_success():
@@ -74,7 +74,7 @@ def test_validate_args_sql_missing_queue_name():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' \
+    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_sql_missing_connection_string():
@@ -92,7 +92,7 @@ def test_validate_args_sql_missing_connection_string():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}' \
+    assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_worker_interface_success():
@@ -127,7 +127,7 @@ def test_validate_args_worker_interface_missing_id():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_worker_interface_missing_endpoint():
@@ -145,7 +145,7 @@ def test_validate_args_worker_interface_missing_endpoint():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_worker_interface_missing_namespace():
@@ -163,7 +163,7 @@ def test_validate_args_worker_interface_missing_namespace():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}' \
+    assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_event_store_implementation_success():
@@ -198,7 +198,7 @@ def test_validate_args_event_store_implementation_missing_add_name():
             'move_queue_event_name': 'dummyeventname2'}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' \
+    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_event_store_implementation_missing_move_name():
@@ -216,7 +216,7 @@ def test_validate_args_event_store_implementation_missing_move_name():
             'move_queue_event_name': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}' \
+    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
            in error_string
 
 def test_validate_args_event_store_implementation_sql_json_only_option():
@@ -234,5 +234,6 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
             'move_queue_event_name': 'dummyeventname2'}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event_store_implementation must be set to {SQL_EVENT_STORE_CLI_CHOICE}' \
+    assert  "event_store_implementation must be set to "\
+           f"{SQL_EVENT_STORE_CLI_CHOICE}"\
            in error_string
