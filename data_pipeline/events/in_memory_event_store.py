@@ -23,10 +23,10 @@ class InMemoryEventStore(EventStoreInterface):
             List of Events
         """
         for event in events:
-            if not event.name in self.events:
+            if event.name not in self.events:
                 self.events[event.name] = []
 
-            event._id = len(self.events[event.name])
+            event.id = len(self.events[event.name])
             self.events[event.name].append(event)
 
     def get(self, event_name, time_since=None):

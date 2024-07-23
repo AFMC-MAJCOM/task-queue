@@ -18,7 +18,7 @@ def default_work_queue() -> work_queue.WorkQueue:
     A default work_queue to be used for pytests.
 
     """
-    queue = mq.InMemoryQueue()
+    queue = mq.in_memory_queue()
     queue.put(default_items)
     interface = DummyWorkerInterface()
     return work_queue.WorkQueue(queue, interface)

@@ -10,7 +10,7 @@ from data_pipeline.queue_base import QueueBase, QueueItemStage
 
 
 @dataclass
-class InMemoryQueue_():
+class InMemoryQueue():
     """Queue items are objects in a python dictionary.
 
     Primarily used for prototyping and testing.
@@ -58,7 +58,9 @@ class InMemoryQueue_():
             case QueueItemStage.FAIL:
                 return self.fail
 
-
+# Pylint is disabled because the goal is to just have
+# the function return False and not fail
+# pylint: disable=broad-exception-caught
 def is_json_serializable(o):
     """Determines if the object passed in is JSON serializable.
 
@@ -73,18 +75,18 @@ def is_json_serializable(o):
     """
     try:
         json.dumps(o)
-        return True
-    except:
-        pass
-    return False
+    except Exception as e:
+        print(e)
+        return False
+    return True
 
 
-def add_to_memory_queue(in_memory_queue,new_items):
+def add_to_memory_queue(memory_queue,new_items):
     """Adds Items to In Memory Queue.
 
     Parameters:
     -----------
-    in_memory_queue: InMemoryQueue_
+    memory_queue: InMemoryQueue
         InMemoryQueue object
     new_items: Dict[str, Any]
         Dictionary of new Items to add to Queue, where the key is the item_id
@@ -94,15 +96,12 @@ def add_to_memory_queue(in_memory_queue,new_items):
     filtered_items = {
         k:v
         for k,v in new_items.items()
-        if k not in in_memory_queue.index
+        if k not in memory_queue.index
         if is_json_serializable(v)
     }
 
     # Add to queue
-    in_memory_queue.waiting.update(filtered_items)
-
-    # Fix index
-    in_memory_queue.regenerate_index
+    memory_queue.waiting.update(filtered_items)
 
 
 def move_dict_item(dict_from, dict_to, key):
@@ -128,12 +127,12 @@ def move_dict_item(dict_from, dict_to, key):
     return item
 
 
-def get_from_memory_queue(in_memory_queue, n_items = 1):
+def get_from_memory_queue(memory_queue, n_items = 1):
     """Gets n number of Items from In Memory Queue.
 
     Parameters:
     -----------
-    in_memory_queue: InMemoryQueue_
+    memory_queue: InMemoryQueue
     n_items: int (default=1)
         Number of items to get.
 
@@ -144,28 +143,28 @@ def get_from_memory_queue(in_memory_queue, n_items = 1):
     # islice does not support negative values
     # `list` is necessary to freeze this iterator - now it won't break
     # When the dictionary changes size while iterating.
-    next_ids = list(itertools.islice(in_memory_queue.waiting, n_items))
+    next_ids = list(itertools.islice(memory_queue.waiting, n_items))
 
     queue_items = []
 
-    for id in next_ids:
+    for i in next_ids:
         queue_item = move_dict_item(
-            in_memory_queue.waiting,
-            in_memory_queue.processing,
-            id
+            memory_queue.waiting,
+            memory_queue.processing,
+            i
         )
 
-        queue_items.append((id, queue_item))
+        queue_items.append((i, queue_item))
 
     return queue_items
 
 
-def lookup_status(in_memory_queue, item_id):
+def lookup_status(memory_queue, item_id):
     """Looks up the status of an Item in InMemoryQueue.
 
     Parameters:
     -----------
-    in_memory_queue: InMemoryQueue_
+    memory_queue: InMemoryQueue
     item_id: str
         ID of Queue Item.
 
@@ -174,29 +173,29 @@ def lookup_status(in_memory_queue, item_id):
     Returns Item stage or will raise an error.
     """
     for item_stage in QueueItemStage:
-        dict_for_stage = in_memory_queue.get_for_stage(item_stage)
+        dict_for_stage = memory_queue.get_for_stage(item_stage)
         if item_id in dict_for_stage:
             return item_stage
 
     raise KeyError(item_id)
 
 
-def InMemoryQueue():
+def in_memory_queue():
     """Creates and returns InMemoryQueue using Base Queue Class.
     """
-    in_memory_queue = InMemoryQueue_()
-    print(in_memory_queue)
+    memory_queue = InMemoryQueue()
+    print(memory_queue)
 
     return QueueBase(
-        partial(add_to_memory_queue, in_memory_queue),
-        partial(get_from_memory_queue, in_memory_queue),
-        lambda item_id: move_dict_item(in_memory_queue.processing,
-                                       in_memory_queue.success,
+        partial(add_to_memory_queue, memory_queue),
+        partial(get_from_memory_queue, memory_queue),
+        lambda item_id: move_dict_item(memory_queue.processing,
+                                       memory_queue.success,
                                        item_id),
-        lambda item_id: move_dict_item(in_memory_queue.processing,
-                                       in_memory_queue.fail,
+        lambda item_id: move_dict_item(memory_queue.processing,
+                                       memory_queue.fail,
                                        item_id),
-        lambda stage: len(in_memory_queue.get_for_stage(stage)),
-        partial(lookup_status, in_memory_queue),
+        lambda stage: len(memory_queue.get_for_stage(stage)),
+        partial(lookup_status, memory_queue),
         {"implementation": "memory"}
     )

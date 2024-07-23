@@ -83,13 +83,13 @@ def check_queue_index(index_path, item):
     -----------
     Returns True if Item is in index file, or else False.
     """
-    fs = s3fs.S3FileSystem(default_cache_type="none")
-    if (fs.exists(index_path)):
-        with fs.open(index_path, 'r') as f:
+    func_fs = s3fs.S3FileSystem(default_cache_type="none")
+    if func_fs.exists(index_path):
+        with func_fs.open(index_path, 'r') as f:
             line = f.readline()
-            while (line != ''):
+            while line != '':
                 line = line.replace("\n", '')
-                if (line == item):
+                if line == item:
                     return True
                 line = f.readline()
 
@@ -109,10 +109,10 @@ def get_queue_index_items(index_path):
     -----------
     Returns list of contents of file.
     """
-    fs = s3fs.S3FileSystem(default_cache_type="none")
-    if not fs.exists(index_path):
+    func_fs = s3fs.S3FileSystem(default_cache_type="none")
+    if not func_fs.exists(index_path):
         return []
-    with fs.open(index_path, "r") as f:
+    with func_fs.open(index_path, "r") as f:
         return [
             line.strip()
             for line in f.readlines()
@@ -137,7 +137,7 @@ def subtract_duplicates(main_list, *other_lists):
     """
     others_set = reduce(
         set.union,
-        (set(l) for l in other_lists),
+        (set(sublist) for sublist in other_lists),
         set()
     )
 
@@ -154,8 +154,8 @@ def add_items_to_index(index_path, items):
         List of Queue Items to add to file, where Item is a key:value pair,
         where key is the item ID and value is the queue item body.
     """
-    fs = s3fs.S3FileSystem(default_cache_type="none")
-    with fs.open(index_path, 'a') as f:
+    func_fs = s3fs.S3FileSystem(default_cache_type="none")
+    with func_fs.open(index_path, 'a') as f:
         f.write("\n".join(items))
         # Trailing newline so the next add doesn't append to the end of the
         # Last item line we put there
@@ -204,7 +204,9 @@ def fname_to_id(item_fname):
     """
     return os.path.splitext(os.path.basename(item_fname))[0]
 
-
+# Pylint exception caught is disabled so that anything writen before
+# an exception was caught will be correctly deleted from S3
+# pylint: disable=broad-exception-caught
 def maybe_write_s3_json(s3_path, json_data):
     """Fault-tolerant write to S3.
 
@@ -234,7 +236,8 @@ def maybe_write_s3_json(s3_path, json_data):
     # If the output file exists, we succeeded.
     return fs.exists(s3_path)
 
-
+# BaseExeption is used to tell the user the failed items
+# pylint: disable=broad-exception-raised
 def add_json_to_s3_queue(queue_path, queue_index_path, items):
     """Add Items to the s3 Queue.
 
@@ -312,8 +315,7 @@ def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
     -----------
     Returns list containing item IDs and data.
     """
-    if n_items < 0:
-        n_items = 0
+    n_items = max(n_items, 0)
 
     queue_items = safe_s3fs_ls(
         fs,
@@ -332,7 +334,7 @@ def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
             item_data = json.load(f)
 
         # move item to processing
-        destination = s3_move(item_path, processing_path)
+        s3_move(item_path, processing_path)
         output.append((fname_to_id(item_path), item_data))
 
     return output
@@ -399,9 +401,9 @@ def lookup_status(waiting_path,
     raise KeyError(item_id)
 
 
-index_name = "index.txt"
+INDEX_NAME = "index.txt"
 
-def JsonS3Queue(queue_base_s3_path):
+def json_s3_queue(queue_base_s3_path):
     """Returns the s3 Queue.
     """
     if s5fs.HAS_S5CMD:
@@ -409,7 +411,7 @@ def JsonS3Queue(queue_base_s3_path):
     else:
         print("S3 Queue is using S3FS")
 
-    queue_index_path = os.path.join(queue_base_s3_path, index_name)
+    queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
     queue_path = os.path.join(queue_base_s3_path,
                               queue_base.QueueItemStage.WAITING.name)
     processing_path = os.path.join(queue_base_s3_path,
