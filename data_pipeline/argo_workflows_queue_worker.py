@@ -229,7 +229,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         wf: dict
-            Dictionary of Argo Workflow items
+            A workflow item from a list of response body items
 
         Returns:
         -----------
@@ -243,7 +243,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         wf: dict
-            Dictionary of Argo Workflow items
+            A workflow item from a list of response body items
 
         Returns:
         -----------
@@ -258,7 +258,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         wf: dict
-            Dictionary of Argo Workflow items
+            A workflow item from a list of response body items
 
         Returns:
         -----------
@@ -278,7 +278,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Parameters:
         -----------
         wf: dict
-            Dictionary of Argo Workflow items
+            A workflow item from a list of response body items
 
         Returns:
         -----------
