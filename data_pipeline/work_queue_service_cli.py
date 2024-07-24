@@ -79,10 +79,9 @@ def handle_queue_implementation_choice(choice, args):
     return queue
 
 def start_jobs_with_processing_limit(max_processing_limit,
-                                     queue,
                                      work_queue
                                     ):
-    """Pushes jobs without exceed the processing limit.
+    """Pushes jobs without exceeding the processing limit.
 
     Parameters:
     -----------
@@ -202,7 +201,6 @@ if __name__ == "__main__":
 
     unique_periodic_functions = [
         lambda: start_jobs_with_processing_limit(unique_args.processing_limit,
-                                                 unique_queue,
                                                  unique_work_queue)
     ]
 
