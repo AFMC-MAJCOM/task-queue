@@ -9,7 +9,6 @@ from data_pipeline.work_queue import WorkQueue
 from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from data_pipeline.s3_queue import json_s3_queue
 from data_pipeline.sql_queue import json_sql_queue
-from data_pipeline.queue_base import QueueItemStage
 from data_pipeline.events.sql_event_store import SqlEventStore
 from data_pipeline.queue_with_events import queue_with_events
 
@@ -93,7 +92,7 @@ def start_jobs_with_processing_limit(max_processing_limit,
     work_queue: WorkQueue
         Work Queue to orchestrate jobs.
     """
-    n_processing = work_queue.get_queue().size(QueueItemStage.PROCESSING)
+    n_processing = work_queue.get_queue_size()
     to_start = max_processing_limit - n_processing
 
     to_start = max(to_start, 0)

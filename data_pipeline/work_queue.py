@@ -17,14 +17,15 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
-    def get_queue(self):
-        """Gets the queue.
+    def get_queue_size(self):
+        """Gets the queue size.
 
         Returns:
         -----------
-        Returns the class queue.
+        The queue size from WorkQueue.
         """
-        return self._queue
+        queue_size = self._queue.size(QueueItemStage.PROCESSING)
+        return queue_size
 
     # Pylint disabled because any except is used to call the queue fail
     # pylint: disable=broad-exception-caught
