@@ -70,7 +70,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         self._argo_workflows_endpoint = argo_workflows_endpoint
         self._namespace = namespace
 
-    def urlconcat(*components):
+    def urlconcat(self, *components):
         """Concatenates URL components into one URL.
 
         Parameters:
@@ -89,7 +89,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns the URL to the argo workflows server which new workflows can
         be submitted to.
         """
-        return ArgoWorkflowsQueueWorker.urlconcat(
+        return self.urlconcat(
             self._argo_workflows_endpoint,
             "api",
             "v1",
@@ -103,7 +103,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """Returns the URL to the argo workflows server that lists the
         workflows.
         """
-        return ArgoWorkflowsQueueWorker.urlconcat(
+        return self.urlconcat(
             self._argo_workflows_endpoint,
             "api",
             "v1",
@@ -166,7 +166,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         response = requests.post(
             request_url,
-            json=request_body
+            json=request_body,
+            timeout=10
         )
 
         # Check that we got a good response
@@ -217,11 +218,74 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         if completed == 'true':
             if phase == "Succeeded":
                 return QueueItemStage.SUCCESS
-            else:
-                return QueueItemStage.FAIL
-        else:
-            return QueueItemStage.PROCESSING
 
+            return QueueItemStage.FAIL
+
+        return QueueItemStage.PROCESSING
+
+    def get_labels(self, wf):
+        """Gets workflows metadata labels
+
+        Parameters:
+        -----------
+        wf: dict
+            A workflow item from a list of response body items
+
+        Returns:
+        -----------
+        Metadata label
+        """
+        return wf['metadata']['labels']
+
+    def get_workflow_queue_item_id(self, wf):
+        """Gets workflow item's ID
+
+        Parameters:
+        -----------
+        wf: dict
+            A workflow item from a list of response body items
+
+        Returns:
+        -----------
+        Item ID label
+        """
+        return self.get_labels(wf) \
+        [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
+
+    def get_workflow_status(self, wf):
+        """Gets the status of the workflow
+
+        Parameters:
+        -----------
+        wf: dict
+            A workflow item from a list of response body items
+
+        Returns:
+        -----------
+        Workflow status
+        """
+        argo_completed_label = "workflows.argoproj.io/completed"
+        argo_phase_label = "workflows.argoproj.io/phase"
+
+        return self._get_workflow_status(
+        self.get_labels(wf).get(argo_completed_label, "false"),
+        self.get_labels(wf).get(argo_phase_label, "Pending")
+        )
+
+    def get_workflow_create_time(self, wf):
+        """Gets the creation timestamp for the workflow from metadata
+
+        Parameters:
+        -----------
+        wf: dict
+            A workflow item from a list of response body items
+
+        Returns:
+        -----------
+        A timestamp
+        """
+        return pd.Timestamp(
+            wf['metadata']['creationTimestamp'])
 
     def _get_response_ids_and_status(self, response_body):
         """"Converts the response body of the argo workflows server list
@@ -243,20 +307,6 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         if not workflows:
             workflows = []
 
-        argo_completed_label = "workflows.argoproj.io/completed"
-        argo_phase_label = "workflows.argoproj.io/phase"
-
-        # Queue item ID and status are labels in `metadata.labels`
-        labels = lambda wf: wf['metadata']['labels']
-        get_workflow_queue_item_id = lambda wf: labels(wf) \
-            [ArgoWorkflowsQueueWorker.WORK_QUEUE_ITEM_ID_LABEL]
-        get_workflow_status = lambda wf: self._get_workflow_status(
-            labels(wf).get(argo_completed_label, "false"),
-            labels(wf).get(argo_phase_label, "Pending")
-        )
-        get_workflow_create_time = lambda wf: pd.Timestamp(
-            wf['metadata']['creationTimestamp'])
-
         # We may still get older workflows with the same worker ID and queue
         # item ID if we have retried an item that has already been run. We can
         # handle this case by only taking the most recent one.
@@ -266,11 +316,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         completed_times = {}
 
         for workflow in workflows:
-            timestamp = get_workflow_create_time(workflow)
-            item_id = get_workflow_queue_item_id(workflow)
+            timestamp = self.get_workflow_create_time(workflow)
+            item_id = self.get_workflow_queue_item_id(workflow)
             if (item_id not in results) or \
                 (timestamp > completed_times[item_id]):
-                results[item_id] = get_workflow_status(workflow)
+                results[item_id] = self.get_workflow_status(workflow)
                 completed_times[item_id] = timestamp
 
         return results
@@ -291,6 +341,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         response = requests.get(
             request_url,
             params=request_params,
+            timeout=10
         )
 
         print("Got response from Argo")
