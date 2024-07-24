@@ -1,3 +1,5 @@
+"""Tests for validating input arguments passed to the CLI
+"""
 from data_pipeline.work_queue_service_cli import (
                                     validate_args,
                                     JSON_S3_QUEUE_CLI_CHOICE, 
@@ -8,6 +10,8 @@ from data_pipeline.work_queue_service_cli import (
                                                  
 
 def test_validate_args_s3_success():
+    """Test valid arguments for the S3 queue
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 's3-json',
             'event_store_implementation': 'none',
@@ -25,6 +29,8 @@ def test_validate_args_s3_success():
     assert error_string == ''
 
 def test_validate_args_s3_missing_base_path():
+    """Ensure base path is provided when using S3 queue
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 's3-json',
             'event_store_implementation': 'none',
@@ -43,6 +49,8 @@ def test_validate_args_s3_missing_base_path():
            in error_string
 
 def test_validate_args_sql_success():
+    """Test valid arguments for sql queue
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -60,6 +68,8 @@ def test_validate_args_sql_success():
     assert error_string == ''
 
 def test_validate_args_sql_missing_queue_name():
+    """Ensure queue name is provided when using sql queue
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -78,6 +88,8 @@ def test_validate_args_sql_missing_queue_name():
            in error_string
 
 def test_validate_args_sql_missing_connection_string():
+    """Ensure connection string is provided when using sql queue
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -96,6 +108,8 @@ def test_validate_args_sql_missing_connection_string():
            in error_string
 
 def test_validate_args_worker_interface_success():
+    """Test valid arguments for argo-workflows interface
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -113,6 +127,9 @@ def test_validate_args_worker_interface_success():
     assert error_string == ''
 
 def test_validate_args_worker_interface_missing_id():
+    """Ensure worker_interface_id is provided when using 
+       argo workflows worker interface
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -131,6 +148,9 @@ def test_validate_args_worker_interface_missing_id():
            in error_string
 
 def test_validate_args_worker_interface_missing_endpoint():
+    """Ensure endpoint is provided when using argo-workflows
+       worker_interface
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -149,6 +169,9 @@ def test_validate_args_worker_interface_missing_endpoint():
            in error_string
 
 def test_validate_args_worker_interface_missing_namespace():
+    """Ensure namespace is provided when using argo-workflows
+       worker_interface
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
@@ -167,6 +190,8 @@ def test_validate_args_worker_interface_missing_namespace():
            in error_string
 
 def test_validate_args_event_store_implementation_success():
+    """Test valid arguments for event store implementation.
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'sql-json',
@@ -184,6 +209,9 @@ def test_validate_args_event_store_implementation_success():
     assert error_string == ''
 
 def test_validate_args_event_store_implementation_missing_add_name():
+    """Ensure add_to_queue_event_name is provided when  
+       event_store_implementation is set to sql-json
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'sql-json',
@@ -202,6 +230,9 @@ def test_validate_args_event_store_implementation_missing_add_name():
            in error_string
 
 def test_validate_args_event_store_implementation_missing_move_name():
+    """Ensure move_queue_event_name is provided when  
+       event_store_implementation is set to sql-json
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'sql-json',
@@ -220,6 +251,9 @@ def test_validate_args_event_store_implementation_missing_move_name():
            in error_string
 
 def test_validate_args_event_store_implementation_sql_json_only_option():
+    """Ensure sql-json is selected for event_store_implementation if 
+       with_queue_events is set 
+    """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
             'event_store_implementation': 'none',
