@@ -17,6 +17,15 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
+    def get_queue(self):
+        """Gets the queue.
+
+        Returns:
+        -----------
+        Returns the class queue.
+        """
+        return self._queue
+
     # Pylint disabled because any except is used to call the queue fail
     # pylint: disable=broad-exception-caught
     def push_next_jobs(self, n_jobs=None):
