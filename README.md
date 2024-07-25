@@ -58,6 +58,33 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 1. `POST` a new workflow to a template when a job is submitted. Add a label for the queue item ID and the name of this queue.
 2. `GET` the status of the workflows by filtering on the label with the name of the interface, checking the label for the queue item ID, and looking at the status in the JSON response.
     - Workflow status is in `labels: workflows.argoproj.io/phase`
+  
+# Work Queue Api Client
+
+There is a work queue api client designed to allow users to access the api endpoints easily in their python code. It wraps all of the api endpoints into callable methods.
+
+## Getting Started
+
+To use the Api Client you will need to specify what type of queue implementation you are using and the required variables to connect to it in an env file.
+
+### SQL API
+
+An example for an SQL env file. You will either need the SQL_QUEUE_POSTGRES_USER, PASSWORD, HOSTNAME, DATABASE, or the SQL_QUEUE_CONNECTION_STRING. If both are provided the
+constructor will defualt to the connection string.
+
+```
+QUEUE_IMPLEMENTATION=sql-json,
+SQL_QUEUE_NAME=<name>,
+SQL_QUEUE_POSTGRES_USER=<your sql username>,
+SQL_QUEUE_POSTGRES_PASSWORD=<your sql password>,
+SQL_QUEUE_POSTGRES_HOSTNAME=<your sql hostname>,
+SQL_QUEUE_POSTGRES_DATABASE=<your sql database>,
+SQL_QUEUE_CONNECTION_STRING=postgresql://<username>:<password>@<hostname>/<database>
+```
+
+### S3 API
+
+TODO
 
 # Work Queue Service
 

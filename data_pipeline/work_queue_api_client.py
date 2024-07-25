@@ -5,10 +5,26 @@ from .queue_base import QueueItemStage
 
 class ApiClient(): #TODO inherit from QueueBaseABC
     """Class for the ApiClient initialization and supporting functions.
+
+    Parameters:
+    -----------
+    env_dict: dict
+        A dictionary containing the configurations necessary to access
+        the api endpoint.
     """
-    def __init__(self, base_url):
-        self.base_url = base_url
-    
+    def __init__(self, env_dict: dict):
+        if env_dict["QUEUE_IMPLEMENTATION"] == "sql-json":
+            if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
+                # TODO
+            else:
+                # TODO
+        else if env_dict["QUEUE_IMPLEMENTATION"] == "s3-json":
+
+        else:
+            raise ValueError("QUEUE_IMPLEMENTATION parameter:" \
+                             + f"{env_dict["QUEUE_IMPLEMENTATION"]}" \
+                             + "is invalid. Must be sql-json or s3-json.")
+
     def put(item_id: str, body):
         """Adds a new item to the queue in the WAITING state.
 
@@ -33,7 +49,7 @@ class ApiClient(): #TODO inherit from QueueBaseABC
         -----------
         Returns a list of items from the queue.
         """
-        return None # return List[Tuple[str, Any]]
+        return None # returns List[Tuple[str, Any]]
 
     def success(item_id: str):
         """Classifies an item as successfully completed.
@@ -67,7 +83,7 @@ class ApiClient(): #TODO inherit from QueueBaseABC
         -----------
         Returns the size of the requested item stage.
         """
-        return None # return int
+        return None # returns int
 
     def lookup_status(item_id: str):
         """Returns the item stage of a given item.
@@ -81,8 +97,8 @@ class ApiClient(): #TODO inherit from QueueBaseABC
         -----------
         Returns the queue stage of the requested item.
         """
-        return None # return QueueItemStage
-        
+        return None # returns QueueItemStage
+
     def describe():
         """Returns a description of the queue.
 
@@ -90,5 +106,4 @@ class ApiClient(): #TODO inherit from QueueBaseABC
         -----------
         Returns a dictionary description of the queue.
         """
-        return None # return Dict[str, str]
-        
+        return None # returns Dict[str, str]
