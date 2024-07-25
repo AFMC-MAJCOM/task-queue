@@ -96,7 +96,7 @@ class QueueBase(ABC):
         """
 
     @abstractmethod
-    def description():
+    def description(self):
         """A brief description of the Queue.
 
         Returns:

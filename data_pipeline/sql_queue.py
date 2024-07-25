@@ -27,7 +27,8 @@ class SqlQueue(SQLModel, table=True):
 
 
 class SQLQueue(QueueBase):
-    """"""
+    """Creates the SQL Queue.
+    """
     def __init__(self, engine:Engine, queue_name):
         """Initializes the QueueBase class.
         """

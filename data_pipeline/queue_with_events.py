@@ -65,6 +65,8 @@ class QueueMoveEventData(pydantic.BaseModel):
 class QueueWithEvents(QueueBase):
     """Class for QueueWithEvents.
     """
+    # Pylint does not like more than 5 parameters
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         queue,

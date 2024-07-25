@@ -6,9 +6,9 @@ from functools import reduce
 
 import s3fs
 
+from data_pipeline.queue_base import QueueBase
 from . import s5fs
 from . import queue_base
-from data_pipeline.queue_base import QueueBase
 
 INDEX_NAME = "index.txt"
 
@@ -20,11 +20,23 @@ class JsonS3Queue(QueueBase):
     """
     def __init__(self, queue_base_s3_path):
         self.queue_base_path = queue_base_s3_path
-        self.queue_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.WAITING.name)
-        self.processing_path = os.path.join(queue_base_s3_path, queue_base.QueueItemStage.PROCESSING.name)
+        self.queue_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.WAITING.name
+        )
+        self.processing_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.PROCESSING.name
+        )
         self.queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
-        self.success_path = os.path.join(queue_base_s3_path,queue_base.QueueItemStage.SUCCESS.name)
-        self.fail_path = os.path.join(queue_base_s3_path,queue_base.QueueItemStage.FAIL.name)
+        self.success_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.SUCCESS.name
+        )
+        self.fail_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.FAIL.name
+        )
 
     # BaseExeption is used to tell the user the failed items
     # pylint: disable=broad-exception-raised
@@ -168,7 +180,7 @@ class JsonS3Queue(QueueBase):
         )
         return item_stage_size
 
-    def lookup_status(self, item_id):
+    def lookup_status(self, queue_item_id):
         """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
@@ -189,10 +201,10 @@ class JsonS3Queue(QueueBase):
 
         for p, s in paths_with_status:
             item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
-            if item_id in item_ids:
+            if queue_item_id in item_ids:
                 return s
 
-        raise KeyError(item_id)
+        raise KeyError(queue_item_id)
 
     def description(self):
         """A brief description of the Queue.
@@ -203,7 +215,7 @@ class JsonS3Queue(QueueBase):
         """
         desc = {
             "implementation": "s3",
-            "s3_path": self.queue_base_s3_path
+            "s3_path": self.queue_base_path
         }
         return desc
 
