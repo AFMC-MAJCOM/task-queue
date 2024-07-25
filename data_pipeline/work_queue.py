@@ -17,14 +17,19 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
-    def get_queue_size(self):
-        """Gets the queue size.
+    def get_queue_size(self, queue_item_stage):
+        """Gets the queue size for the given QueueItemStage stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: enum
+               The requested enum from QueueItemStage 
 
         Returns:
         -----------
-        The queue size from WorkQueue.
+        The queue size from WorkQueue for the given stage.
         """
-        queue_size = self._queue.size(QueueItemStage.PROCESSING)
+        queue_size = self._queue.size(queue_item_stage)
         return queue_size
 
     # Pylint disabled because any except is used to call the queue fail
