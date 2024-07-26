@@ -1,3 +1,7 @@
+<h1 align="center">
+<img src="./task_queue_architecture.png" width="300">
+</h1>
+
 # Queue
 
 For each queue implementation, there are the following methods:
