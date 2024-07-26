@@ -6,11 +6,11 @@ import os
 import pytest
 import s3fs
 
-import data_pipeline.s3_queue as s3q
-from data_pipeline.in_memory_queue import in_memory_queue
-import data_pipeline.sql_queue as sqlq
-import data_pipeline.queue_with_events as eq
-from data_pipeline.events.in_memory_event_store import InMemoryEventStore
+import task_queue.s3_queue as s3q
+from task_queue.in_memory_queue import in_memory_queue
+import task_queue.sql_queue as sqlq
+import task_queue.queue_with_events as eq
+from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
 from .utils import test_sql_engine
 

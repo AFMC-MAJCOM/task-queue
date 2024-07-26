@@ -4,8 +4,8 @@ import requests
 
 import pandas as pd
 
-from data_pipeline.queue_worker_interface import QueueWorkerInterface
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.queue_worker_interface import QueueWorkerInterface
+from task_queue.queue_base import QueueItemStage
 
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):

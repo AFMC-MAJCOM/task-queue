@@ -7,9 +7,9 @@ import os
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 
-from data_pipeline.queue_base import QueueItemStage
-from data_pipeline.s3_queue import json_s3_queue
-from data_pipeline.sql_queue import json_sql_queue
+from task_queue.queue_base import QueueItemStage
+from task_queue.s3_queue import json_s3_queue
+from task_queue.sql_queue import json_sql_queue
 
 
 app = FastAPI()

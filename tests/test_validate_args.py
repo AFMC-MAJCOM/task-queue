@@ -1,6 +1,6 @@
 """Tests for validating input arguments passed to the CLI
 """
-from data_pipeline.work_queue_service_cli import (
+from task_queue.work_queue_service_cli import (
                                     validate_args,
                                     JSON_S3_QUEUE_CLI_CHOICE, 
                                     JSON_SQL_QUEUE_CLI_CHOICE, 
