@@ -1,4 +1,4 @@
-cd data_pipeline
+cd task_queue
 
 if [ $1 == "controller" ]; then
     echo "Runner controller cli with args ${@:2}"

@@ -4,8 +4,8 @@ from typing import Dict
 
 import pydantic
 
-from data_pipeline.queue_base import QueueBase, QueueItemStage
-from data_pipeline.events.event import Event
+from task_queue.queue_base import QueueBase, QueueItemStage
+from task_queue.events.event import Event
 
 
 QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
