@@ -5,13 +5,13 @@ import time
 
 from sqlalchemy import create_engine
 
-from data_pipeline.work_queue import WorkQueue
-from data_pipeline.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from data_pipeline.s3_queue import json_s3_queue
-from data_pipeline.sql_queue import json_sql_queue
-from data_pipeline.queue_base import QueueItemStage
-from data_pipeline.events.sql_event_store import SqlEventStore
-from data_pipeline.queue_with_events import queue_with_events
+from task_queue.work_queue import WorkQueue
+from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
+from task_queue.s3_queue import json_s3_queue
+from task_queue.sql_queue import json_sql_queue
+from task_queue.queue_base import QueueItemStage
+from task_queue.events.sql_event_store import SqlEventStore
+from task_queue.queue_with_events import queue_with_events
 
 
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE = "argo-workflows"
