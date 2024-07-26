@@ -16,9 +16,9 @@ def get_version(rel_path: str) -> str:
     raise RuntimeError("Unable to find version string.")
 
 setup(
-    name="data_pipeline",
-    version=get_version("data_pipeline/__init__.py"),
-    packages = ["data_pipeline", "data_pipeline.events"],
+    name="task_queue",
+    version=get_version("task_queue/__init__.py"),
+    packages = ["task_queue", "task_queue.events"],
     install_requires = [
         "pendulum >= 2.1.2",
         "s3fs >= 2023.6.0",

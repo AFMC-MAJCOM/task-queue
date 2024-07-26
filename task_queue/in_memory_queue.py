@@ -6,7 +6,7 @@ from functools import partial
 import itertools
 import json
 
-from data_pipeline.queue_base import QueueBase, QueueItemStage
+from task_queue.queue_base import QueueBase, QueueItemStage
 
 
 @dataclass

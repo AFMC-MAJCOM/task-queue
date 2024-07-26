@@ -1,6 +1,6 @@
 """Wherein is contained the WorkQueue class.
 """
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.queue_base import QueueItemStage
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
@@ -23,7 +23,7 @@ class WorkQueue():
         Parameters:
         -----------
         queue_item_stage: enum
-               The requested enum from QueueItemStage 
+               The requested enum from QueueItemStage
 
         Returns:
         -----------
