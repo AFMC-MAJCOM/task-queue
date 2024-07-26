@@ -32,6 +32,7 @@ class SQLQueue(QueueBase):
     def __init__(self, engine:Engine, queue_name):
         """Initializes the QueueBase class.
         """
+        SQLModel.metadata.create_all(engine)
         self.queue_name = queue_name
         self.engine = engine
 
@@ -243,5 +244,4 @@ def update_stage(engine, queue_name, new_stage, item_key):
 def json_sql_queue(engine:Engine, queue_name):
     """Creates and returns the SQL Queue.
     """
-    SQLModel.metadata.create_all(engine)
     return SQLQueue(engine, queue_name)

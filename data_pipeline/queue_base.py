@@ -16,10 +16,6 @@ class QueueItemStage(Enum):
 class QueueBase(ABC):
     """Abstract Base Class for Queue.
     """
-    @abstractmethod
-    def __init__(self):
-        """Initializes the QueueBase class.
-        """
 
     @abstractmethod
     def put(self, items):

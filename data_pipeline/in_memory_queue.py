@@ -62,10 +62,10 @@ class MemoryQueue():
 class InMemoryQueue(QueueBase):
     """Creates the In Memory Queue.
     """
-    def __init__(self, memory_queue):
+    def __init__(self):
         """Initializes the QueueBase class.
         """
-        self.memory_queue = memory_queue
+        self.memory_queue = MemoryQueue()
 
     def put(self, items):
         """Adds a new Item to the Queue in the WAITING stage.
@@ -237,5 +237,4 @@ def move_dict_item(dict_from, dict_to, key):
 def in_memory_queue():
     """Creates and returns an InMemoryQueue object.
     """
-    memory_queue = MemoryQueue()
-    return InMemoryQueue(memory_queue)
+    return InMemoryQueue()

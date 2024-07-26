@@ -38,6 +38,11 @@ class JsonS3Queue(QueueBase):
             queue_base.QueueItemStage.FAIL.name
         )
 
+        if s5fs.HAS_S5CMD:
+            print("S3 Queue is using S5CMD")
+        else:
+            print("S3 Queue is using S3FS")
+
     # BaseExeption is used to tell the user the failed items
     # pylint: disable=broad-exception-raised
     def put(self, items):
@@ -467,8 +472,4 @@ def s3_move(item_path, dest_path):
 def json_s3_queue(queue_base_s3_path):
     """Creates and returns the S3 Queue.
     """
-    if s5fs.HAS_S5CMD:
-        print("S3 Queue is using S5CMD")
-    else:
-        print("S3 Queue is using S3FS")
     return JsonS3Queue(queue_base_s3_path)

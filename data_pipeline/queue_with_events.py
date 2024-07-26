@@ -77,6 +77,14 @@ class QueueWithEvents(QueueBase):
     ):
         """Initializes the QueueWithEvents class.
         """
+        if event_base_name:
+            add_event_name = f"{event_base_name}_ADD"
+            move_event_name = f"{event_base_name}_MOVE"
+
+        # validate arguments
+        assert bool(add_event_name) and bool(move_event_name), \
+            "No event name supplied for queue"
+
         self.queue = queue
         self.event_store = event_store
         self.event_base_name = event_base_name
@@ -290,13 +298,6 @@ def queue_with_events(
 ):
     """Creates a QueueWithEvents object.
     """
-    if event_base_name:
-        add_event_name = f"{event_base_name}_ADD"
-        move_event_name = f"{event_base_name}_MOVE"
-
-    # validate arguments
-    assert bool(add_event_name) and bool(move_event_name), \
-        "No event name supplied for queue"
     return QueueWithEvents(
         queue,
         event_store,
