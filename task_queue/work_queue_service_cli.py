@@ -22,6 +22,67 @@ JSON_SQL_QUEUE_CLI_CHOICE = "sql-json"
 NO_EVENT_STORE_CLI_CHOICE = "none"
 SQL_EVENT_STORE_CLI_CHOICE = "sql-json"
 
+def validate_args(cli_args):
+    """Validates input arguments given to the CLI.
+
+    Parameters:
+    -----------
+    cli_args: dict
+        Python dictionary representing the arguments passed to the CLI. 
+        (parser.parse_args().__dict__)
+        
+    Returns:
+    -----------
+    validation_success: bool
+        True if the arguments met the requirements, False otherwise.
+    errors_found: str 
+        Error/s found if any. Empty string if validation_success = True.
+    """
+    errors_found = ""
+    validation_success = True
+    if cli_args['worker_interface'] == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
+        required_args = ['worker_interface_id', 'endpoint', 'namespace']
+        if not all(cli_args[i] is not None for i in required_args):
+            errors_found += f"{required_args} arguments required when " \
+                             "worker-interface is set to " \
+                            f"{ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}\n"
+            validation_success = False
+
+    if cli_args['queue_implementation'] == JSON_SQL_QUEUE_CLI_CHOICE:
+        required_args = ['connection_string', 'queue_name']
+        if not all(cli_args[i] is not None for i in required_args):
+            errors_found += f"{required_args} arguments required when " \
+                             "queue-implementation is set to " \
+                            f"{JSON_SQL_QUEUE_CLI_CHOICE}\n"
+            validation_success = False
+
+    elif cli_args['queue_implementation'] == JSON_S3_QUEUE_CLI_CHOICE:
+        required_args = ['s3_base_path']
+        if not all(cli_args[i] is not None for i in required_args):
+            errors_found += f"{required_args} arguments required when " \
+                             "queue-implementation is set to " \
+                            f"{JSON_S3_QUEUE_CLI_CHOICE}\n"
+            validation_success = False
+
+    if cli_args['event_store_implementation'] != NO_EVENT_STORE_CLI_CHOICE:
+        required_args = ['add_to_queue_event_name', 'move_queue_event_name']
+        if not all(cli_args[i] is not None for i in required_args):
+            errors_found += f"{required_args} arguments required when " \
+                             "event-store-implementation is not " \
+                            f"{NO_EVENT_STORE_CLI_CHOICE}\n"
+            validation_success = False
+
+    if cli_args['with_queue_events']:
+        if cli_args['event_store_implementation'] \
+                                != SQL_EVENT_STORE_CLI_CHOICE:
+
+            errors_found += f"If with_queue_events is specificied, " \
+                             "event_store_implementation must be set to " \
+                            f"{SQL_EVENT_STORE_CLI_CHOICE}"
+            validation_success = False
+
+    return validation_success, errors_found
+
 def handle_worker_interface_choice(choice, args):
     """Handles the worker interface choice.
 
@@ -128,63 +189,108 @@ def main(periodic_functions, work_queue, period_sec=10):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
     parser.add_argument(
         "worker_interface",
-        choices=[
-            ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE
-        ]
+        choices=[ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE],
+        help="worker-interface: Service used to run jobs."
     )
+
     parser.add_argument(
         "queue_implementation",
         choices=[
             JSON_S3_QUEUE_CLI_CHOICE,
             JSON_SQL_QUEUE_CLI_CHOICE
-        ]
+        ],
+        help="queue-implementation: Service used to store the queue."
     )
+
     parser.add_argument(
         "event_store_implementation",
         choices=[
             NO_EVENT_STORE_CLI_CHOICE,
             SQL_EVENT_STORE_CLI_CHOICE
         ],
-        default=NO_EVENT_STORE_CLI_CHOICE
+        default=NO_EVENT_STORE_CLI_CHOICE,
+        help="event-store-implementation: "
+             "Service used to store logs of queue state changes."
     )
+
     parser.add_argument(
         "--with-queue-events",
         type=bool,
-        default=False
+        default=False,
+        help="Flag to signify that logs should be stored on "
+             "queue state changes. The 'event_store_implementation' "
+             "argument should be set to 'sql-json' "
+             "when including this flag."
     )
 
-    # Extra stuff
     parser.add_argument(
         "--processing-limit",
         default=10,
-        type=int
+        type=int,
+        help="Number of jobs to be run concurrently."
     )
     parser.add_argument(
         "--periodic-seconds",
-        default=10
+        default=10,
+        help="Number of seconds to wait before checking if "
+             "additional jobs can be submitted."
     )
 
-    known_args, _ = parser.parse_known_args()
+    parser.add_argument("--worker-interface-id",
+                        help="User defined ID for the worker interface "
+                             "used to submit jobs. Can be any unique "
+                             "string. Required when worker-interface is set "
+                             f" to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}")
 
-    # Dynamically add extra arguments based on worker/queue choice
-    if known_args.worker_interface == ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE:
-        parser.add_argument("--worker-interface-id", required=True)
-        parser.add_argument("--endpoint", required=True)
-        parser.add_argument("--namespace", required=True)
+    parser.add_argument("--endpoint",
+                        help="Endpoint URL used to point to the ARGO "
+                             "Workflows API. Required when worker-interface "
+                            f"is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}")
 
-    if known_args.queue_implementation == JSON_SQL_QUEUE_CLI_CHOICE:
-        parser.add_argument("--connection-string", required=True)
-        parser.add_argument("--queue-name", required=True)
-    elif known_args.queue_implementation == JSON_S3_QUEUE_CLI_CHOICE:
-        parser.add_argument("--s3-base-path", required=True)
+    parser.add_argument("--namespace",
+                        help="Kubernetes namespace where ARGO Workflows is "
+                             "running. Required when worker-interface is set "
+                            f"to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}")
 
-    if known_args.event_store_implementation != NO_EVENT_STORE_CLI_CHOICE:
-        parser.add_argument("--add-to-queue-event-name", required=True)
-        parser.add_argument("--move-queue-event-name", required=True)
+    parser.add_argument("--connection-string",
+                        help="Connection string associated with an external "
+                             "SQL server. Required when queue-implementation "
+                             f"is set to {JSON_SQL_QUEUE_CLI_CHOICE}")
+
+    parser.add_argument("--queue-name",
+                        help="User defined queue name. Can be any unique "
+                             "string. Required when queue-implementation "
+                            f"is set to {JSON_SQL_QUEUE_CLI_CHOICE}")
+
+    parser.add_argument("--s3-base-path",
+                        help="S3 path where the queue will be stored. "
+                             "Required when queue-implementation is set to "
+                            f"{JSON_S3_QUEUE_CLI_CHOICE}")
+
+    parser.add_argument("--add-to-queue-event-name",
+                        help="User defined event name used in the logs "
+                             "when queue items are added. Required when "
+                             "event-store-implementation is not set to "
+                            f"{NO_EVENT_STORE_CLI_CHOICE}")
+
+    parser.add_argument("--move-queue-event-name",
+                        help="User defined event name used in the logs "
+                             "when queue items are moved. Required when "
+                             "event-store-implementation is not set to "
+                            f"{NO_EVENT_STORE_CLI_CHOICE}")
 
     unique_args = parser.parse_args()
+
+    # Check if dependent arguments were provided
+    args_dict = unique_args.__dict__
+    print(args_dict['with_queue_events'])
+    success, error_string = validate_args(args_dict)
+
+    if not success:
+        parser.error(error_string)
 
     unique_worker_interface = handle_worker_interface_choice(
         unique_args.worker_interface,
