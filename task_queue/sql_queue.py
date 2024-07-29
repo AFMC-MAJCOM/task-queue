@@ -184,7 +184,8 @@ class SQLQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         with Session(self.engine) as session:
             statement = (
@@ -210,7 +211,8 @@ class SQLQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body.
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)

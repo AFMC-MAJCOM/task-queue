@@ -169,8 +169,8 @@ class InMemoryQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object or it
-        will raise an error.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         for item_stage in QueueItemStage:
             dict_for_stage = self.memory_queue.get_for_stage(item_stage)
@@ -189,7 +189,8 @@ class InMemoryQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body.
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)

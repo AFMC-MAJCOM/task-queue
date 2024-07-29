@@ -236,7 +236,8 @@ class QueueWithEvents(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         return self.queue.lookup_status(queue_item_id)
 
@@ -250,7 +251,8 @@ class QueueWithEvents(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body.
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
         return self.queue.lookup_item(queue_item_id)
 

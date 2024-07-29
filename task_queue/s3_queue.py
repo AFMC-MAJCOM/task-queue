@@ -195,7 +195,8 @@ class JsonS3Queue(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         paths_with_status = [
             (self.queue_path, queue_base.QueueItemStage.WAITING),
@@ -221,7 +222,8 @@ class JsonS3Queue(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body.
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)
