@@ -2,12 +2,227 @@
 """
 import json
 import os
-from functools import partial, reduce
+from functools import reduce
 
 import s3fs
 
+from task_queue.queue_base import QueueBase
 from . import s5fs
 from . import queue_base
+
+INDEX_NAME = "index.txt"
+
+fs = s3fs.S3FileSystem(default_cache_type="none")
+
+
+class JsonS3Queue(QueueBase):
+    """Class for the JsonS3Queue.
+    """
+    def __init__(self, queue_base_s3_path):
+        self.queue_base_path = queue_base_s3_path
+        self.queue_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.WAITING.name
+        )
+        self.processing_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.PROCESSING.name
+        )
+        self.queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
+        self.success_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.SUCCESS.name
+        )
+        self.fail_path = os.path.join(
+            queue_base_s3_path,
+            queue_base.QueueItemStage.FAIL.name
+        )
+
+        if s5fs.HAS_S5CMD:
+            print("S3 Queue is using S5CMD")
+        else:
+            print("S3 Queue is using S3FS")
+
+    # BaseExeption is used to tell the user the failed items
+    # pylint: disable=broad-exception-raised
+    def put(self, items):
+        """Adds a new Item to the Queue in the WAITING stage.
+
+        Parameters:
+        -----------
+        items: dict
+            Dictionary of Queue Items to add Queue, where Item is a key:value
+            pair, where key is the item ID and value is the queue item body.
+
+        Returns:
+        -----------
+        Returns the length of the list of added items.
+        """
+        # Get a list of item keys that are already in the index, and remove
+        # them from the incoming items list
+        in_index = get_queue_index_items(self.queue_index_path)
+        item_keys_to_add = subtract_duplicates(items.keys(), in_index)
+
+        # These are only items whose keys are not in the index
+        items_to_add = { k:items[k] for k in item_keys_to_add }
+
+        # Path of each item is its ID
+        item_paths = {
+            k: os.path.join(self.queue_path, id_to_fname(k))
+            for k in items_to_add.keys()
+        }
+
+        # Write item data to each file
+        queue_write_success = [
+            maybe_write_s3_json(item_paths[item], items_to_add[item])
+            for item in items_to_add.keys()
+        ]
+
+        # Check successes
+        added_items = [
+            item
+            for item, success in zip(items_to_add, queue_write_success)
+            if success
+        ]
+
+        # Add successful queue item writes to the index
+        add_items_to_index(self.queue_index_path, added_items)
+
+        # Check for any failures and raise if there were
+        if not all(queue_write_success):
+            fail_items = [
+                item
+                for item, success in zip(items_to_add, queue_write_success)
+                if not success
+            ]
+            raise BaseException(
+                "Error writing at least one queue object to S3:",
+                fail_items
+            )
+
+        return len(added_items)
+
+    def get(self, n_items=1):
+        """Gets the next n items from the queue, moving them to PROCESSING.
+
+        Parameters:
+        -----------
+        n_items: int
+            Number of items to retrieve from queue.
+
+        Returns:
+        ------------
+        Returns a list of n_items from the queue, as
+        List[(queue_item_id, queue_item_body)]
+        """
+        n_items = max(n_items, 0)
+
+        queue_items = safe_s3fs_ls(
+            fs,
+            self.queue_path,
+            detail=False,
+            refresh=True
+        )
+
+        to_get = queue_items[:n_items]
+
+        output = []
+
+        for item_path in to_get:
+            # get item data and add to list
+            with fs.open(item_path) as f:
+                item_data = json.load(f)
+
+            # move item to processing
+            s3_move(item_path, self.processing_path)
+            output.append((fname_to_id(item_path), item_data))
+
+        return output
+
+    def success(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to SUCCESS.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+        """
+        s3_move(
+            os.path.join(self.processing_path, id_to_fname(queue_item_id)),
+            self.success_path
+        )
+
+    def fail(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to FAIL.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+        """
+        s3_move(
+            os.path.join(self.processing_path, id_to_fname(queue_item_id)),
+            self.fail_path
+        )
+
+    def size(self, queue_item_stage):
+        """Determines how many items are in some stage of the queue.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage object
+            The specific stage of the queue (PROCESSING, FAIL, etc.).
+
+        Returns:
+        ------------
+        Returns the number of items in that stage of the queue as an integer.
+        """
+        item_stage_size = len(
+            safe_s3fs_ls(
+                fs,
+                os.path.join(self.queue_base_path, queue_item_stage.name)
+            )
+        )
+        return item_stage_size
+
+    def lookup_status(self, queue_item_id):
+        """Lookup which stage in the Queue Item is currently in.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the current stage of the Item as a QueueItemStage object.
+        """
+        paths_with_status = [
+            (self.queue_path, queue_base.QueueItemStage.WAITING),
+            (self.success_path, queue_base.QueueItemStage.SUCCESS),
+            (self.fail_path, queue_base.QueueItemStage.FAIL),
+            (self.processing_path, queue_base.QueueItemStage.PROCESSING)
+        ]
+
+        for p, s in paths_with_status:
+            item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
+            if queue_item_id in item_ids:
+                return s
+
+        raise KeyError(queue_item_id)
+
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {
+            "implementation": "s3",
+            "s3_path": self.queue_base_path
+        }
+        return desc
 
 
 def ensure_s3_prefix(path:str):
@@ -61,13 +276,10 @@ def safe_s3fs_ls(filesystem, path, *args, **kwargs):
             pass
     return []
 
-fs = s3fs.S3FileSystem(default_cache_type="none")
-
 if s5fs.HAS_S5CMD:
     move = safe_s5fs_move
 else:
     move = fs.move
-
 
 def check_queue_index(index_path, item):
     """Check if Item is in the Queue index.
@@ -236,110 +448,6 @@ def maybe_write_s3_json(s3_path, json_data):
     # If the output file exists, we succeeded.
     return fs.exists(s3_path)
 
-# BaseExeption is used to tell the user the failed items
-# pylint: disable=broad-exception-raised
-def add_json_to_s3_queue(queue_path, queue_index_path, items):
-    """Add Items to the s3 Queue.
-
-    Parameters:
-    -----------
-    queue_path: str
-        Path to s3 Queue.
-    queue_index_path: str
-        Path to s3 Queue Index.
-    items: dict
-        Dictionary of Queue Items to add Queue, where Item is a key:value pair,
-        where key is the item ID and value is the queue item body.
-
-    Returns:
-    -----------
-    Returns the length of the list of added items.
-    """
-    # Get a list of item keys that are already in the index, and remove them
-    # From the incoming items list
-    in_index = get_queue_index_items(queue_index_path)
-    item_keys_to_add = subtract_duplicates(items.keys(), in_index)
-
-    # These are only items whose keys are not in the index
-    items_to_add = { k:items[k] for k in item_keys_to_add }
-
-    # Path of each item is its ID
-    item_paths = {
-        k: os.path.join(queue_path, id_to_fname(k))
-        for k in items_to_add.keys()
-    }
-
-    # Write item data to each file
-    queue_write_success = [
-        maybe_write_s3_json(item_paths[item], items_to_add[item])
-        for item in items_to_add.keys()
-    ]
-
-    # Check successes
-    added_items = [
-        item
-        for item, success in zip(items_to_add, queue_write_success)
-        if success
-    ]
-
-    # Add successful queue item writes to the index
-    add_items_to_index(queue_index_path, added_items)
-
-    # Check for any failures and raise if there were
-    if not all(queue_write_success):
-        fail_items = [
-            item
-            for item, success in zip(items_to_add, queue_write_success)
-            if not success
-        ]
-        raise BaseException("Error writing at least one queue object to S3:",
-                            fail_items)
-
-    return len(added_items)
-
-
-def get_json_from_s3_queue(queue_path, processing_path, n_items=1):
-    """Grabs Items from s3 Queue.
-
-    Parameters:
-    -----------
-    queue_path: str
-        Path to s3 Queue.
-    processing_path: str
-        Path to processing, where items are moved to after being moved from
-        the Queue.
-    n_items: int (default=1)
-        Number of items to get from Queue.
-
-    Returns:
-    -----------
-    Returns list containing item IDs and data.
-    """
-    n_items = max(n_items, 0)
-
-    queue_items = safe_s3fs_ls(
-        fs,
-        queue_path,
-        detail=False,
-        refresh=True
-    )
-
-    to_get = queue_items[:n_items]
-
-    output = []
-
-    for item_path in to_get:
-        # get item data and add to list
-        with fs.open(item_path) as f:
-            item_data = json.load(f)
-
-        # move item to processing
-        s3_move(item_path, processing_path)
-        output.append((fname_to_id(item_path), item_data))
-
-    return output
-
-
 def s3_move(item_path, dest_path):
     """Moves an item from one place to another.
 
@@ -361,92 +469,7 @@ def s3_move(item_path, dest_path):
 
     return dest
 
-
-def lookup_status(waiting_path,
-                  success_path,
-                  fail_path,
-                  processing_path,
-                  item_id
-                 ):
-    """Look up the status of Item.
-
-    Parameters:
-    waiting_path: str
-        Path of WAITING Items.
-    success_path: str
-        Path of SUCCESS Items.
-    fail_path: str
-        Path of FAIL Items.
-    processing_path: str
-        Path of PROCESSING Items.
-    item_id: str
-        ID of Item.
-
-    Returns:
-    -----------
-    Returns the status of desired Item.
-    """
-    paths_with_status = [
-        (waiting_path, queue_base.QueueItemStage.WAITING),
-        (success_path, queue_base.QueueItemStage.SUCCESS),
-        (fail_path, queue_base.QueueItemStage.FAIL),
-        (processing_path, queue_base.QueueItemStage.PROCESSING)
-    ]
-
-    for p, s in paths_with_status:
-        item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
-        if item_id in item_ids:
-            return s
-
-    raise KeyError(item_id)
-
-
-INDEX_NAME = "index.txt"
-
 def json_s3_queue(queue_base_s3_path):
-    """Returns the s3 Queue.
+    """Creates and returns the S3 Queue.
     """
-    if s5fs.HAS_S5CMD:
-        print("S3 Queue is using S5CMD")
-    else:
-        print("S3 Queue is using S3FS")
-
-    queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
-    queue_path = os.path.join(queue_base_s3_path,
-                              queue_base.QueueItemStage.WAITING.name)
-    processing_path = os.path.join(queue_base_s3_path,
-                                   queue_base.QueueItemStage.PROCESSING.name)
-    success_path = os.path.join(queue_base_s3_path,
-                                queue_base.QueueItemStage.SUCCESS.name)
-    fail_path = os.path.join(queue_base_s3_path,
-                             queue_base.QueueItemStage.FAIL.name)
-
-    return queue_base.QueueBase(
-        partial(add_json_to_s3_queue, queue_path, queue_index_path),
-        partial(get_json_from_s3_queue, queue_path, processing_path),
-
-        lambda item_id: s3_move(
-            os.path.join(processing_path, id_to_fname(item_id)),
-            success_path
-        ),
-
-        lambda item_id: s3_move(
-            os.path.join(processing_path, id_to_fname(item_id)),
-            fail_path
-        ),
-
-        lambda queue_item_stage: len(
-            safe_s3fs_ls(
-                fs,
-                os.path.join(queue_base_s3_path, queue_item_stage.name)
-            )
-        ),
-
-        partial(lookup_status, queue_path, success_path,
-                fail_path, processing_path),
-
-        {
-            "implementation": "s3",
-            "s3_path": queue_base_s3_path
-        }
-    )
+    return JsonS3Queue(queue_base_s3_path)
