@@ -226,6 +226,7 @@ class JsonS3Queue(QueueBase):
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)
         # Get item body
+        item_body = []
         for item_id in get_queue_index_items(self.queue_index_path):
             if queue_item_id == item_id:
                 fname = os.path.join(

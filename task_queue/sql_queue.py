@@ -215,12 +215,13 @@ class SQLQueue(QueueBase):
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)
         # Get item body
+        item_body = []
         with Session(self.engine) as session:
             stmt = select(SqlQueue).where(
                 (self.queue_name == SqlQueue.queue_name)
                 & (SqlQueue.index_key == queue_item_id))
             results = session.exec(stmt)
-            item_body = []
+
             for queue_item in results:
                 item_body = json.loads((queue_item.json_data))
 
