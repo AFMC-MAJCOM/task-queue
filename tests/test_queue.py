@@ -164,3 +164,15 @@ def test_put_empty(new_empty_queue):
     """Tests put with an empty dict does not throw an error.
     """
     new_empty_queue.put({})
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_lookup_item(new_empty_queue):
+    """Test that lookup_item works as expected.
+    """
+    qtest.test_lookup_item(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_lookup_item_fail(new_empty_queue):
+    """Tests that the proper error is thrown when lookup_item fails.
+    """
+    qtest.test_lookup_item(new_empty_queue)

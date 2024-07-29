@@ -200,6 +200,32 @@ class SQLQueue(QueueBase):
 
             return QueueItemStage(item)
 
+    def lookup_item(self, queue_item_id):
+        """Lookup an Item currently in the Queue.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the Queue Item ID, the status of that Item, and the body.
+        """
+        # Get item stage
+        item_stage = self.lookup_status(queue_item_id)
+        # Get item body
+        with Session(self.engine) as session:
+            stmt = select(SqlQueue).where(
+                (self.queue_name == SqlQueue.queue_name)
+                & (SqlQueue.index_key == queue_item_id))
+            results = session.exec(stmt)
+            item_body = []
+            for queue_item in results:
+                item_body = json.loads((queue_item.json_data))
+
+        return (queue_item_id, item_stage, item_body)
+
     def description(self):
         """A brief description of the Queue.
 
