@@ -10,9 +10,9 @@ from sqlalchemy import create_engine
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
+from test_api_endpoints import app
 
-
-app = FastAPI()
+# app = FastAPI()
 
 @dataclass
 class QueueSettings():
@@ -132,7 +132,7 @@ queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes():
+async def get_queue_sizes() -> dict:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -145,7 +145,7 @@ async def get_queue_sizes():
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str):
+async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -160,7 +160,7 @@ async def lookup_queue_item_status(item_id:str):
     return queue.lookup_status(item_id)
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue():
+async def describe_queue() -> dict:
     """API endpoint to descibe the Queue.
 
     Returns:
