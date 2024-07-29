@@ -1,7 +1,6 @@
 """Wherein is contained the functions for implementing the SQL Queue.
 """
 from typing import Optional
-from functools import partial
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
@@ -26,93 +25,193 @@ class SqlQueue(SQLModel, table=True):
     index_key: str
     queue_name: str
 
-# Disabled pylint because BaseException is used to record
-# and keep the program running correctly until the raise
-# BaseException is used to report on the error
-# pylint: disable=broad-exception-caught
-# pylint: disable=broad-exception-raised
-def add_json_to_sql_queue(engine, queue_name, items):
-    """Adds Items to the SQL Queue.
 
-    Parameters:
-    -----------
-    engine: Engine
-    queue_name: str
-        Name of Queue.
-    items: dict
-        Dictionary of Items to add to Queue. The key value pairs in the
-        dictionary are key=index_key, and value is the json expected when the
-        job is submitted for processing.
-
-    Returns:
-    -----------
-    Returns 0 if it was successful or else raises exception.
+class SQLQueue(QueueBase):
+    """Creates the SQL Queue.
     """
-    success = 0
+    def __init__(self, engine:Engine, queue_name):
+        """Initializes the QueueBase class.
+        """
+        SQLModel.metadata.create_all(engine)
+        self.queue_name = queue_name
+        self.engine = engine
 
-    if len(items) == 0:
+    # Disabled pylint because BaseException is used to record
+    # and keep the program running correctly until the raise
+    # BaseException is used to report on the error
+    # pylint: disable=broad-exception-caught
+    # pylint: disable=broad-exception-raised
+    def put(self, items):
+        """Adds a new Item to the Queue in the WAITING stage.
+
+        Parameters:
+        -----------
+        items: dict
+            Dictionary of Queue Items to add Queue, where Item is a key:value
+            pair, where key=index_key, and value is the json expected when the
+            job is submitted for processing.
+
+        Returns:
+        -----------
+        Returns 0 if it was successful or else raises exception.
+        """
+        success = 0
+
+        if len(items) == 0:
+            return success
+
+        fail_items = []
+
+        db_items = []
+        for k, v in items.items():
+            try:
+                db_items.append(
+                    SqlQueue(
+                        json_data=json.dumps(v),
+                        index_key=str(k),
+                        queue_name=self.queue_name
+                    ).model_dump(exclude_unset=True)
+                )
+            except BaseException as e:
+                print(e)
+
+        with Session(self.engine) as session:
+            statement = (insert(SqlQueue).values(db_items) \
+                         .on_conflict_do_nothing())
+            session.exec(statement)
+
+            session.commit()
+
+        if len(db_items) != len(items):
+            raise BaseException(
+                "Error writing at least one queue object to S3:",
+                fail_items)
+
         return success
 
-    fail_items = []
+    def get(self, n_items=1):
+        """Gets the next n items from the queue, moving them to PROCESSING.
 
-    db_items = []
-    for k, v in items.items():
-        try:
-            db_items.append(
-                SqlQueue(
-                    json_data=json.dumps(v),
-                    index_key=str(k),
-                    queue_name=queue_name
-                ).model_dump(exclude_unset=True)
+        Parameters:
+        -----------
+        n_items: int
+            Number of items to retrieve from queue.
+
+        Returns:
+        ------------
+        Returns a list of n_items from the queue, as
+        List[(queue_item_id, queue_item_body)]
+        """
+        with Session(self.engine) as session:
+            stmt = select(SqlQueue).where(
+                (self.queue_name == SqlQueue.queue_name)
+                & (SqlQueue.queue_item_stage == QueueItemStage.WAITING.value)
+            ).limit(n_items)
+            results = session.exec(stmt)
+
+            outputs = []
+            for queue_item in results:
+                outputs.append((queue_item.index_key,
+                                json.loads(queue_item.json_data)))
+                update_stage(self.engine,
+                             self.queue_name,
+                             QueueItemStage.PROCESSING,
+                             queue_item.index_key)
+
+            return outputs
+
+    def success(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to SUCCESS.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+        """
+        update_stage(
+            self.engine,
+            self.queue_name,
+            QueueItemStage.SUCCESS,
+            queue_item_id
+        )
+
+    def fail(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to FAIL.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+        """
+        update_stage(
+            self.engine,
+            self.queue_name,
+            QueueItemStage.FAIL,
+            queue_item_id
+        )
+
+    # Pylint cannot correctly tell that func has a count method
+    # This raises an error that can be ignored
+    # because func.count is a method that is callable
+    # pylint: disable=not-callable
+    def size(self, queue_item_stage):
+        """Determines how many Items are in some stage of the Queue.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage object
+            The specific stage of the Queue (PROCESSING, FAIL, etc.).
+
+        Returns:
+        ------------
+        Returns the number of Items in that stage of the Queue as an integer.
+        """
+        with Session(self.engine) as session:
+            statement = select(func.count(SqlQueue.id)).filter(
+                SqlQueue.queue_name == self.queue_name,
+                SqlQueue.queue_item_stage == queue_item_stage.value
             )
-        except BaseException as e:
-            print(e)
 
-    with Session(engine) as session:
-        statement = insert(SqlQueue).values(db_items).on_conflict_do_nothing()
-        session.exec(statement)
+            return session.exec(statement).first()
 
-        session.commit()
+    def lookup_status(self, queue_item_id):
+        """Lookup which stage in the Queue Item is currently in.
 
-    if len(db_items) != len(items):
-        raise BaseException("Error writing at least one queue object to S3:",
-                            fail_items)
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
 
-    return success
+        Returns:
+        ------------
+        Returns the current stage of the Item as a QueueItemStage object.
+        """
+        with Session(self.engine) as session:
+            statement = (
+                select(SqlQueue.queue_item_stage)
+                .where((self.queue_name == SqlQueue.queue_name) & \
+                       (str(queue_item_id) == SqlQueue.index_key))
+            )
 
+            item = session.exec(statement).first()
 
-def get_json_from_sql_queue(engine, queue_name, n_items=1):
-    """Grabs Items from SQL Queue.
+            if item is None:
+                raise KeyError(queue_item_id)
 
-    Parameters:
-    -----------
-    engine: Engine
-    queue_name: str
-        Name of Queue.
-    n_items: int (default=1)
-        Number of Items to get from Queue.
+            return QueueItemStage(item)
 
-    Returns:
-    -----------
-    Returns list of item keys and data from the Queue.
-    """
-    with Session(engine) as session:
-        stmt = select(SqlQueue).where(
-            (queue_name == SqlQueue.queue_name)
-            & (SqlQueue.queue_item_stage == QueueItemStage.WAITING.value)
-        ).limit(n_items)
-        results = session.exec(stmt)
+    def description(self):
+        """A brief description of the Queue.
 
-        outputs = []
-        for queue_item in results:
-            outputs.append((queue_item.index_key,
-                            json.loads(queue_item.json_data)))
-            update_stage(engine,
-                         queue_name,
-                         QueueItemStage.PROCESSING,
-                         queue_item.index_key)
-
-        return outputs
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {
+            "implementation": "sql",
+            "engine_url": str(self.engine.url)
+        }
+        return desc
 
 
 def update_stage(engine, queue_name, new_stage, item_key):
@@ -142,77 +241,7 @@ def update_stage(engine, queue_name, new_stage, item_key):
         session.add(item)
         session.commit()
 
-# Pylint cannot correctly tell that func has a count method
-# This raises an error that can be ignored
-# because func.count is a method that is callable
-# pylint: disable=not-callable
-def queue_size(engine, queue_name, stage):
-    """Gets the number of items in a certain stage.
-
-    Parameters:
-    -----------
-    engine: Engine
-    queue_name: str
-        Name of Queue.
-    stage: QueueItemStage.[STAGE]
-        Desired Stage to return size of.
-    Returns:
-    -----------
-    Returns the number of items in the Queue at that current stage.
-    """
-    with Session(engine) as session:
-        statement = select(func.count(SqlQueue.id)).filter(
-            SqlQueue.queue_name == queue_name,
-            SqlQueue.queue_item_stage == stage.value
-        )
-
-        return session.exec(statement).first()
-
-
-def lookup_status(engine, queue_name, item_id):
-    """Looks up what the current stage of a certain item is.
-
-    Parameters:
-    -----------
-    engine: Engine
-    queue_name: str
-        Name of Queue.
-    item_id: str
-        ID of item to return current stage.
-
-    Returns:
-    -----------
-    Returns a QueueItemStage object for the Item.
-    """
-    with Session(engine) as session:
-        statement = (
-            select(SqlQueue.queue_item_stage)
-            .where((queue_name == SqlQueue.queue_name) & \
-                   (str(item_id) == SqlQueue.index_key))
-        )
-
-        item = session.exec(statement).first()
-
-        if item is None:
-            raise KeyError(item_id)
-
-        return QueueItemStage(item)
-
-
 def json_sql_queue(engine:Engine, queue_name):
     """Creates and returns the SQL Queue.
     """
-    SQLModel.metadata.create_all(engine)
-
-    return QueueBase(
-        partial(add_json_to_sql_queue, engine, queue_name),
-        partial(get_json_from_sql_queue, engine, queue_name),
-        partial(update_stage, engine, queue_name, QueueItemStage.SUCCESS),
-        partial(update_stage, engine, queue_name, QueueItemStage.FAIL),
-        partial(queue_size, engine, queue_name),
-        partial(lookup_status, engine, queue_name),
-        {
-            "implementation": "sql",
-            "engine_url": str(engine.url)
-        }
-    )
+    return SQLQueue(engine, queue_name)
