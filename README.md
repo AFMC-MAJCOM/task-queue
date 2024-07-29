@@ -152,7 +152,6 @@ An external postgreSQL service is required for the tests to run and the followin
 - `SQL_PORT`
 - `SQL_USERNAME`
 
-## Running Tests
 All pytests other than tests that use Argo Workflows can be run without any additional setup. Running argo tests with AWS or minikube is detailed below. A python virtual enviroment may be needed to use pip and pytest depending on your local setup.
 
 By default, the argo tests are skipped. To run the argo tests, you can set an environment variable as follows:
