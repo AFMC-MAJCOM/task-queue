@@ -152,7 +152,13 @@ An external postgreSQL service is required for the tests to run and the followin
 - `SQL_PORT`
 - `SQL_USERNAME`
 
-### Running Tests in AWS
+## Running Tests
+All pytests other than tests that use Argo Workflows can be run without any additional setup. Running argo tests with AWS or minikube is detailed below. A python virtual enviroment may be needed to use pip and pytest depending on your local setup.
+
+By default, the argo tests are skipped. To run the argo tests, you can set an environment variable as follows:
+`export RUN_ARGO_TESTS=True`
+
+### Running Argo Workflow Tests in AWS
 
 1. Get AWS CLI credentials
 2. Make sure the test workflow template is deployed to argo
@@ -162,7 +168,7 @@ An external postgreSQL service is required for the tests to run and the followin
 4. Start the local postgresql and minio server
     - `docker compose -f task-queue/resources/docker-compose.test.yaml up`
 5. pip install the `task-queue` package
-6. `python -m pytest task-queue`
+6. `python -m pytest task-queue/tests/test_argo_workflows_worker_interface.py`
 
 ### Running Argo Workflow Tests in minikube
 
@@ -176,6 +182,5 @@ An external postgreSQL service is required for the tests to run and the followin
     - `argo -n pivot template create resources/test_workflow_template.yaml`
 3. Port-forward the argo workflows server pod
     - `shift+f` on K9s or `kubectl port-forward -n pivot service/argo-server 2746:2746`
-4. `export RUN_ARGO_TESTS=True`
-5. pip install the `task-queue` package (you will likely need to run this in a python virtual environment)
-6. `python -m pytest task-queue/tests/test_argo_workflows_worker_interface.py`
+4. pip install the `task-queue` package
+5. `python -m pytest task-queue/tests/test_argo_workflows_worker_interface.py`
