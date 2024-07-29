@@ -97,7 +97,7 @@ jobs:
         python3.10 -m pip install pytest
     # If you do not install dependencies then it will fail PyLint due to import-errors
     - name: Run pylint
-      run: pylint data_pipeline
+      run: pylint task_queue
 
   version_check:
     runs-on: ubuntu-latest
@@ -115,7 +115,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
-    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
+    needs: [pytest-linux, pylint, ruff]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -139,7 +139,7 @@ jobs:
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
 
   create-git-tag:
-    needs: [pytest-linux] # ADD THESE WHEN THEY PASS!!!, pylint, ruff]
+    needs: [pytest-linux, pylint, ruff]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions: 

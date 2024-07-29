@@ -2,7 +2,7 @@
 """
 from abc import ABC, abstractmethod
 
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.queue_base import QueueItemStage
 
 
 class QueueWorkerInterface(ABC):
@@ -22,7 +22,8 @@ class QueueWorkerInterface(ABC):
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
         """
-        pass
+        raise NotImplementedError("Please Implement this method")
+
 
     @abstractmethod
     def poll_all_status(self):
@@ -32,7 +33,7 @@ class QueueWorkerInterface(ABC):
         -----------
         Returns Dict[Any, QueueItemStage]
         """
-        pass
+        raise NotImplementedError("Please Implement this method")
 
 
 class DummyWorkerInterface(QueueWorkerInterface):

@@ -12,16 +12,16 @@
 ### resources
 <p>The <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/resources">resources</a> folder contains the .yaml files used for running tests.</p>
 
-### data_pipeline
-<p>The <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/data_pipeline">data_pipeline</a> folder contains the functionality of this repository with the <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/data_pipeline/events">events</a> folder containing the functionality of the event store.</p>
+### task_queue
+<p>The <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/task_queue">task_queue</a> folder contains the functionality of this repository with the <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/task_queue/events">events</a> folder containing the functionality of the event store.</p>
 
 ### tests
-<p>The files in the <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/tests">test</a> folder are used to test the main functionality files in the data_pipeline folder. These tests should be written using pytest.</p>
+<p>The files in the <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/tests">test</a> folder are used to test the main functionality files in the task_queue folder. These tests should be written using pytest.</p>
 
 ## Coding Standards
 <p>There are four tests run in the task-queue CI/CD workflow: pytest-linux, ruff, pylint, and version_check.</p>
 
-<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been updated in <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/data_pipeline/__init__.py">data_pipeline/__init__.py</a>.</p>
+<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been updated in <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/task_queue/__init__.py">task_queue/__init__.py</a>.</p>
 
 <p>When a pull request is created, the code must pass the four checks in the task-queue CI/CD workflow explained in the <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/CONTRIBUTING.md#githubworkflows">.github/workflows</a> folder. This helps ensures that the code follows our repository style guidelines.</p>
 

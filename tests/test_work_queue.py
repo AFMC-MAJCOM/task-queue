@@ -2,10 +2,10 @@
 """
 import pytest
 
-from data_pipeline import work_queue
-import data_pipeline.in_memory_queue as mq
-from data_pipeline.queue_worker_interface import DummyWorkerInterface
-from data_pipeline.queue_base import QueueItemStage
+from task_queue import work_queue
+import task_queue.in_memory_queue as mq
+from task_queue.queue_worker_interface import DummyWorkerInterface
+from task_queue.queue_base import QueueItemStage
 from tests.common_queue import default_items
 
 
@@ -18,7 +18,7 @@ def default_work_queue() -> work_queue.WorkQueue:
     A default work_queue to be used for pytests.
 
     """
-    queue = mq.InMemoryQueue()
+    queue = mq.in_memory_queue()
     queue.put(default_items)
     interface = DummyWorkerInterface()
     return work_queue.WorkQueue(queue, interface)

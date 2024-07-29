@@ -1,6 +1,6 @@
 """Wherein is contained the WorkQueue class.
 """
-from data_pipeline.queue_base import QueueItemStage
+from task_queue.queue_base import QueueItemStage
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
@@ -17,7 +17,23 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
+    def get_queue_size(self, queue_item_stage):
+        """Gets the queue size for the given QueueItemStage stage.
 
+        Parameters:
+        -----------
+        queue_item_stage: enum
+               The requested enum from QueueItemStage
+
+        Returns:
+        -----------
+        The queue size from WorkQueue for the given stage.
+        """
+        queue_size = self._queue.size(queue_item_stage)
+        return queue_size
+
+    # Pylint disabled because any except is used to call the queue fail
+    # pylint: disable=broad-exception-caught
     def push_next_jobs(self, n_jobs=None):
         """Sends jobs from Queue.
 
@@ -38,8 +54,9 @@ class WorkQueue():
         for queue_item_id, queue_item_body in next_items:
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
-            except:
+            except Exception as e:
                 # Error in submission -> fail
+                print(e)
                 self._queue.fail(queue_item_id)
 
         return next_items

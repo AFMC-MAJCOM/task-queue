@@ -7,9 +7,9 @@ import os
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 
-from data_pipeline.queue_base import QueueItemStage
-from data_pipeline.s3_queue import JsonS3Queue
-from data_pipeline.sql_queue import JsonSQLQueue
+from task_queue.queue_base import QueueItemStage
+from task_queue.s3_queue import json_s3_queue
+from task_queue.sql_queue import json_sql_queue
 
 
 app = FastAPI()
@@ -18,6 +18,10 @@ app = FastAPI()
 class QueueSettings():
     """Class concerning the Queue Settings.
     """
+    # Disabled because this method is inherited
+    # and uses env_dict as a param later
+    # pylint: disable=unused-argument
+    @staticmethod
     def from_env(env_dict):
         """Returns instance of QueueSettings
 
@@ -31,7 +35,7 @@ class QueueSettings():
     def make_queue(self):
         """Returns QueueBase object.
         """
-        pass
+        raise NotImplementedError("make_queue not yet implemented.")
 
 
 @dataclass
@@ -40,6 +44,7 @@ class S3QueueSettings(QueueSettings):
     """
     s3_base_path : str
 
+    @staticmethod
     def from_env(env_dict):
         """Returns an S3QueueSettings object given an s3 Queue Base path.
 
@@ -55,7 +60,7 @@ class S3QueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
         """
-        return JsonS3Queue(self.s3_base_path)
+        return json_s3_queue(self.s3_base_path)
 
 
 @dataclass
@@ -65,6 +70,7 @@ class SqlQueueSettings(QueueSettings):
     connection_string : str
     queue_name : str
 
+    @staticmethod
     def from_env(env_dict):
         """Creates and returns an instance of SqlQueueSettings based on the
         given env_dict.
@@ -97,7 +103,7 @@ class SqlQueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JSONSQLQueue.
         """
-        return JsonSQLQueue(
+        return json_sql_queue(
             create_engine(self.connection_string),
             self.queue_name
         )
@@ -118,8 +124,9 @@ def queue_settings_from_env(env_dict):
     impl = env_dict['QUEUE_IMPLEMENTATION']
     if impl == "s3-json":
         return S3QueueSettings.from_env(env_dict)
-    elif impl == "sql-json":
+    if impl == "sql-json":
         return SqlQueueSettings.from_env(env_dict)
+    return None
 
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()

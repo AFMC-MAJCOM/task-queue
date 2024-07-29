@@ -1,7 +1,15 @@
+# Task Queue
+
+## Task Queue Architecture
+
+<h1 align="center">
+<img src="./task_queue_architecture.png" width="750">
+</h1>
+
 # Queue
 
 For each queue implementation, there are the following methods:
-- put :: queue_item_id, queue_item_body -> ()
+- put :: items -> ()
     - Adds a new item to the queue in the WAITING stage
 - get :: int -> List [(queue_item_id, queue_item_body)]
     - Gets the next `n` items from the queue, moving them to PROCESSING
@@ -13,6 +21,8 @@ For each queue implementation, there are the following methods:
     - How many items are in some stage of the queue (PROCESSING, FAIL, etc)
 - lookup_status :: queue_item_id -> queue_item_stage
     - Lookup which stage a queue item is currently in
+- description :: () -> dict
+    - Provides a brief description of the queue.
 
 ## Implementations
 
@@ -22,6 +32,8 @@ For each queue implementation, there are the following methods:
     - Queue items are rows in a SQL table
 - `in_memory`
     - Queue items are objects in a python dictionary
+- `with_events`
+    - Queue items are stored in the queue implementation of your choice and item movement is tracked as events in an event store
 
 # Work Queue
 
