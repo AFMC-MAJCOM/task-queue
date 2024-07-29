@@ -1,5 +1,9 @@
+# Task Queue
+
+## Task Queue Architecture
+
 <h1 align="center">
-<img src="./task_queue_architecture.png" width="300">
+<img src="./task_queue_architecture.png" width="750">
 </h1>
 
 # Queue
