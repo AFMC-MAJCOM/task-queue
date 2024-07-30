@@ -227,6 +227,7 @@ class SQLQueue(QueueBase):
 
             item_ids = [item[0] for item in result]
             return item_ids
+        raise AttributeError(queue_item_stage)
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.

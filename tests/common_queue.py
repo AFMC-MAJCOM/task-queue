@@ -227,8 +227,8 @@ def test_lookup_state(queue: qb.QueueBase):
 def test_lookup_state_fail(queue: qb.QueueBase):
     """Test that proper error is thrown when lookup_state fails.
     """
-    result = queue.lookup_state("does-not-exist")
-    assert result == []
+    with pytest.raises(AttributeError):
+        queue.lookup_state(qb.QueueItemStage.NOTREAL)
 
 def test_lookup_item(queue: qb.QueueBase):
     """Test that lookup_item works as expected.

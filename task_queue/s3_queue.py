@@ -245,7 +245,7 @@ class JsonS3Queue(QueueBase):
             item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
             return list(item_ids)
 
-        raise KeyError(item_ids)
+        raise AttributeError(queue_item_stage)
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
