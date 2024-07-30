@@ -3,12 +3,12 @@
 import json
 import pytest
 
-if pytest.importorskip('httpx') is None:
-    pytest.skip(reason="httpx required for api testing",
-                allow_module_level=True)
+# if pytest.importorskip('httpx') is None:
+#     pytest.skip(reason="httpx required for api testing",
+#                 allow_module_level=True)
 
-# Ignoring import position here because we only want to run this file if httpx
-# is installed, and this line will crash otherwise.
+# # Ignoring import position here because we only want to run this file if httpx
+# # is installed, and this line will crash otherwise.
 # pylint: disable=wrong-import-position
 # ruff: noqa: E402
 from fastapi.testclient import TestClient
@@ -17,20 +17,19 @@ from fastapi.testclient import TestClient
 from fastapi import FastAPI
 
 import tests.common_queue as qtest
+from task_queue.queue_base import QueueItemStage
 from task_queue.in_memory_queue import in_memory_queue
-from task_queue.work_queue_web_api import app
+from task_queue.work_queue_web_api import app, queue
 # app = FastAPI()
 
 client = TestClient(app)
 
-n_items = 15
+n_items = 20
 default_items = dict([qtest.random_item() for _ in range(n_items)])
 
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
     """
-    queue = in_memory_queue()
-
     queue.put(default_items)
 
     proc, succ, fail = queue.get(3)
@@ -46,10 +45,8 @@ def test_v1_queue_sizes():
     }
 
     response = client.get(f"/api/v1/queue/sizes")
-
     assert response.status_code == 200
     assert response.json() == sizes
-    # is there a case where this will fail?
 
 def test_v1_queue_status():
     """Tests the status/{item_id} endpoint.
@@ -63,16 +60,15 @@ def test_v1_queue_status():
 
     response = client.get(f"/api/v1/queue/status/{proc[0]}")
     assert response.status_code == 200
-    assert response.json() == qb.QueueItemStage.PROCESSING
+    assert response.json() == QueueItemStage.PROCESSING.value
     response = client.get(f"/api/v1/queue/status/{succ[0]}")
     assert response.status_code == 200
-    assert response.json() == qb.QueueItemStage.SUCCESS
+    assert response.json() == QueueItemStage.SUCCESS.value
     response = client.get(f"/api/v1/queue/status/{fail[0]}")
     assert response.status_code == 200
-    assert response.json() == qb.QueueItemStage.FAIL
-    response = client.get(f"/api/v1/queue/status/{'bad-item-id'}")
-    # insert response type
-    # something about key error
+    assert response.json() == QueueItemStage.FAIL.value
+    with pytest.raises(KeyError):
+        response = client.get(f"/api/v1/queue/status/{'bad-item-id'}")
 
 def test_v1_queue_describe():
     """Tests the describe endpoint.

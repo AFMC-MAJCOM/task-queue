@@ -3,6 +3,7 @@
 import random
 
 import pytest
+import uuid
 
 import task_queue.queue_base as qb
 
@@ -17,7 +18,7 @@ def random_item():
     Random key and value.
 
     """
-    key = chr(random.randint(ord('a'), ord('z')))
+    key = str(uuid.uuid4())
     val = [
         random.randint(0, 100)
         for _ in range(random.randint(0, 10))
@@ -34,7 +35,7 @@ def test_put_get(queue):
     queue.put(default_items)
     get = queue.get(len(default_items))
 
-    print(get)
+    print(len(default_items))
 
     for k, v1 in get:
         assert any([
