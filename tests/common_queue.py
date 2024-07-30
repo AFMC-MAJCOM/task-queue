@@ -196,22 +196,22 @@ def test_lookup_state(queue: qb.QueueBase):
     """
     queue.put(default_items)
 
-    # wait test
+    # Waiting test
     wait_id_list = [x for x in default_items]
     assert wait_id_list.sort() == \
     queue.lookup_state(qb.QueueItemStage.WAITING).sort()
 
-    # proc tests
+    # Processing tests
     proc = queue.get(3)
     proc_id_list = [x for x,_ in proc]
 
-    # succ test
+    # Success test
     succ = queue.get(3)
     succ_id_list = [x for x,_ in succ]
     for i in succ:
         queue.success(i[0])
 
-    # fail test
+    # Fail test
     fail = queue.get(2)
     fail_id_list = [x for x,_ in fail]
     for i in fail:
