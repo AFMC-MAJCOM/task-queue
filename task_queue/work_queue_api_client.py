@@ -64,92 +64,92 @@ class ApiClient(QueueBase):
             is_valid = [i for i in vars_to_create_conn_string if i in keys]
             if (not all(is_valid) or not is_valid) and \
                 "SQL_QUEUE_CONNECTION_STRING" not in keys:
-                return False, "Provided sql variables are invalid to construct" \
-                    + " an ApiClient."
+                return False, "Provided sql variables are invalid to " \
+                    + "construct an ApiClient."
         if env_dict["QUEUE_IMPLEMENTATION"] == "s3-json":
             if "S3_QUEUE_BASE_PATH" not in keys:
                 return False, "No S3_QUEUE_BASE_PATH provided."
         return True, ""
 
-    def put(item_id: str, body):
-        """Adds a new item to the queue in the WAITING state.
+    def put(self, items):
+        """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
         -----------
-        item_id: string
-            The id of the item being added to the queue.
-        body: any
-            The body of the item being added to the queue.
+        items: dict
+            Dictionary of Queue Items to add Queue, where Item is a key:value
+            pair, where key is the item ID and value is the queue item body.
         """
         return None
 
-    def get(n_items: int):
-        """Returns n items from the queue.
+    def get(self, n_items=1):
+        """Gets the next n Items from the Queue, moving them to PROCESSING.
 
         Parameters:
         -----------
-        n_items: int
-            The number of items that will be returned.
+        n_items: int (default=1)
+            Number of items to retrieve from Queue.
 
         Returns:
-        -----------
-        Returns a list of items from the queue.
-        """
-        return None # returns List[Tuple[str, Any]]
-
-    def success(item_id: str):
-        """Classifies an item as successfully completed.
-
-        Parameters:
-        -----------
-        item_id: str
-            The id of the item that needs to be moved to success.
+        ------------
+        Returns a list of n_items from the Queue, as
+        List[(queue_item_id, queue_item_body)]
         """
         return None
 
-    def fail(item_id: str):
-        """Classifies an item as failed.
+    def success(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to SUCCESS.
 
         Parameters:
         -----------
-        item_id: str
-            The id of the item that needs to be moved to failed.
+        queue_item_id: str
+            ID of Queue Item
         """
         return None
 
-    def size(item_stage: QueueItemStage):
-        """Returns the number of items in specific queue stage.
+    def fail(self, queue_item_id):
+        """Moves a Queue Item from PROCESSING to FAIL.
 
         Parameters:
         -----------
-        item_stage: QueueItemStage
-            The stage being requested.
-
-        Returns:
-        -----------
-        Returns the size of the requested item stage.
+        queue_item_id: str
+            ID of Queue Item
         """
-        return None # returns int
+        return None
 
-    def lookup_status(item_id: str):
-        """Returns the item stage of a given item.
+    def size(self, queue_item_stage):
+        """Determines how many Items are in some stage of the Queue.
 
         Parameters:
         -----------
-        item_id: str
-            The id of the item being requested.
+        queue_item_stage: QueueItemStage object
+            The specific stage of the Queue (PROCESSING, FAIL, etc.).
 
         Returns:
-        -----------
-        Returns the queue stage of the requested item.
+        ------------
+        Returns the number of Items in that stage of the Queue as an integer.
         """
-        return None # returns QueueItemStage
+        return None
 
-    def description():
-        """Returns a description of the queue.
+    def lookup_status(self, queue_item_id):
+        """Lookuup which stage in the Queue Item is currently in.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
 
         Returns:
-        -----------
-        Returns a dictionary description of the queue.
+        ------------
+        Returns the current stage of the Item as a QueueItemStage object.
         """
-        return None # returns Dict[str, str]
+        return None
+
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        return None
