@@ -2,6 +2,7 @@
 """
 
 from .queue_base import QueueBase
+import requests
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -23,7 +24,7 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-        return None
+        requests.post(self.api_base_url, data=items)
 
     def get(self, n_items=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.

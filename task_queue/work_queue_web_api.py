@@ -171,3 +171,17 @@ async def describe_queue():
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)
     }
+
+@app.post("/api/v1/queue/put")
+async def put(items:dict):
+    """API endpoint to add items to the Queue.
+
+    Parameters:
+    -----------
+    items: dict
+        Dictionary of Queue Items to add Queue, where Item is a key:value
+        pair, where key is the item ID and value is the queue item body.
+    """
+    queue.put(items)
+
+
