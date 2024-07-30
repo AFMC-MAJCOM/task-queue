@@ -76,32 +76,10 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 # Work Queue Api Client
 
 There is a work queue api client designed to allow users to access the api endpoints easily in their python code. It wraps all of the api endpoints into callable methods.
-
-## Getting Started
-
-To use the Api Client you will need to specify what type of queue implementation you are using and the required variables to connect to it in an env file.
-
-### SQL API
-
-An example for an SQL env file. You will either need the SQL_QUEUE_POSTGRES_USER, PASSWORD, HOSTNAME, DATABASE, or the SQL_QUEUE_CONNECTION_STRING. If both are provided the
-constructor will defualt to the connection string.
+To use the client simply construct it with the url to the api. For example if your api is hosted locally on port 8080.
 
 ```
-QUEUE_IMPLEMENTATION=sql-json,
-SQL_QUEUE_NAME=<name>,
-SQL_QUEUE_POSTGRES_USER=<your sql username>,
-SQL_QUEUE_POSTGRES_PASSWORD=<your sql password>,
-SQL_QUEUE_POSTGRES_HOSTNAME=<your sql hostname>,
-SQL_QUEUE_POSTGRES_DATABASE=<your sql database>,
-SQL_QUEUE_CONNECTION_STRING=postgresql+psycopg2://<username>:<password>@<hostname>/<database>
-```
-
-### S3 API
-
-An example for an S3 env file.
-```
-QUEUE_IMPLEMENTATION=s3-json,
-S3_QUEUE_BASE_PATH=<you s3 base path>
+client = ApiClient("localhost:8080")
 ```
 
 # Work Queue Service
