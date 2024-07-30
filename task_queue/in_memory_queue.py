@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Any
 import itertools
 import json
+import warnings
 
 from task_queue.queue_base import QueueBase, QueueItemStage
 
@@ -188,6 +189,35 @@ class InMemoryQueue(QueueBase):
         """
         desc = {"implementation": "memory"}
         return desc
+
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that were moved from FAIL to WAITING.
+        """
+
+        if isinstance(item_ids, str):
+            item_ids = [item_ids]
+
+        requeued_items = []
+        for item in item_ids:
+            try:
+                move_dict_item(
+                    self.memory_queue.fail,
+                    self.memory_queue.waiting,
+                    item
+                )
+                requeued_items.append(item)
+            except KeyError:
+                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
+        return requeued_items
 
 
 # Pylint is disabled because the goal is to just have

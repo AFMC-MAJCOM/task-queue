@@ -2,6 +2,7 @@
 """
 from typing import Optional
 import json
+import warnings
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert
@@ -212,6 +213,48 @@ class SQLQueue(QueueBase):
             "engine_url": str(self.engine.url)
         }
         return desc
+
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that were moved from FAIL to WAITING.
+        """
+        if isinstance(item_ids, str):
+            item_ids = [item_ids]
+
+        # Get the list of item_ids that are in FAIL
+        with Session(self.engine) as session:
+            statement = select(SqlQueue).where(
+                (SqlQueue.queue_item_stage == QueueItemStage.FAIL.value) & \
+                    (SqlQueue.index_key.in_(item_ids)) & \
+                        (SqlQueue.queue_name == self.queue_name)
+            )
+            results = session.exec(statement)
+
+            items = results.all()
+            queue_items = [item.index_key for item in items]
+
+
+        # This could be more efficient with a mass SQL query
+        requeued_items = []
+        for item in item_ids:
+            if item not in queue_items:
+                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
+                continue
+
+            update_stage(self.engine,
+                         self.queue_name,
+                         QueueItemStage.WAITING,
+                         item)
+            requeued_items.append(item)
+        return requeued_items
 
 
 def update_stage(engine, queue_name, new_stage, item_key):

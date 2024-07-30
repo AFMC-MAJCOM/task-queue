@@ -99,3 +99,17 @@ class QueueBase(ABC):
         ------------
         Returns a dictionary with relevant information about the Queue.
         """
+
+    @abstractmethod
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that were moved from FAIL to WAITING
+        """

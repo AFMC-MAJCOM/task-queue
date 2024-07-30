@@ -224,6 +224,29 @@ class JsonS3Queue(QueueBase):
         }
         return desc
 
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        if isinstance(item_ids, str):
+            item_ids = [item_ids]
+
+        requeued_items = []
+        for item in item_ids:
+            try:
+                s3_move(
+                    os.path.join(self.processing_path, id_to_fname(item)),
+                    self.queue_path
+                )
+                requeued_items.append(item)
+            except:
+                pass
+        return requeued_items
+
 
 def ensure_s3_prefix(path:str):
     """Returns a valid s3 path.
