@@ -1,7 +1,7 @@
 """Wherein is contained the ApiClient class.
 """
 
-from .queue_base import QueueItemStage, QueueBase
+from .queue_base import QueueBase
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
