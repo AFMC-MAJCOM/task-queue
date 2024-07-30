@@ -202,19 +202,16 @@ class SQLQueue(QueueBase):
             return QueueItemStage(item)
 
     def lookup_state(self, queue_item_stage):
-        """Looks up all item ids from the given QueueItemStage.
+        """Lookup which item ids are in the current Queue stage.
 
         Parameters:
         -----------
-        engine: Engine
-        queue_name: str
-            Name of Queue.
-        item_stage: QueueItemStage
-            Specific stage from QueueItemStage
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
 
         Returns:
-        -----------
-        Returns a QueueItemStage object for the Item.
+        ------------
+        Returns a list of all item ids in the current queue stage.
         """
         with Session(self.engine) as session:
             statement = (

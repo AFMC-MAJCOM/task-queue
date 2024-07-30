@@ -180,17 +180,16 @@ class InMemoryQueue(QueueBase):
         raise KeyError(queue_item_id)
 
     def lookup_state(self, queue_item_stage):
-        """Looks up the items of an InMemoryQueue status.
+        """Lookup which item ids are in the current Queue stage.
 
         Parameters:
         -----------
-        memory_queue: InMemoryQueue
-        stage: str
-            ID of Queue Item.
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
 
         Returns:
-        -----------
-        Returns all item ids of an InMemoryQueue status.
+        ------------
+        Returns a list of all item ids in the current queue stage.
         """
         if queue_item_stage in QueueItemStage:
             dict_for_stage = self.memory_queue.get_for_stage(queue_item_stage)

@@ -109,14 +109,16 @@ class QueueBase(ABC):
 
     @abstractmethod
     def lookup_state(self, queue_item_stage):
-        """Lookup which items are in the current Queue stage.
+        """Lookup which item ids are in the current Queue stage.
+
         Parameters:
         -----------
-        QueueItemStage: QueueItemStage
+        queue_item_stage: QueueItemStage
             stage of Queue Item
+
         Returns:
         ------------
-        Returns all item ids in the current queue stage.
+        Returns a list of all item ids in the current queue stage.
         """
 
     @abstractmethod

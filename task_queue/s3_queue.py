@@ -215,17 +215,16 @@ class JsonS3Queue(QueueBase):
     def lookup_state(self,
                  queue_item_stage
                  ):
-        """Look up the items in the status.
+        """Lookup which item ids are in the current Queue stage.
 
         Parameters:
-        path: str
-              Path of Items
-        item_stage: QueueItemStage
-            Implement.
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
 
         Returns:
-        -----------
-        Returns the list of items from the desired status.
+        ------------
+        Returns a list of all item ids in the current queue stage.
         """
         path_status = None
 
