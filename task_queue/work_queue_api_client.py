@@ -89,17 +89,18 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def lookup_item(self, item_id):
-        """Lookup an item in the Task Queue.
+    def lookup_item(self, queue_item_id):
+        """Lookup an Item currently in the Queue.
 
         Parameters:
         -----------
-        item_id: str
+        queue_item_id: str
             ID of Queue Item
 
         Returns:
         ------------
-        Returns the state of the item and the body of the item.
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
         return None
 
