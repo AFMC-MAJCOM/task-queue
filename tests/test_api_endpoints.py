@@ -3,13 +3,23 @@
 import json
 import pytest
 
+if pytest.importorskip('httpx') is None:
+    pytest.skip(reason="httpx required for api testing",
+                allow_module_level=True)
+
+# Ignoring import position here because we only want to run this file if httpx
+# is installed, and this line will crash otherwise.
+# pylint: disable=wrong-import-position
+# ruff: noqa: E402
+from fastapi.testclient import TestClient
+
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 
 import tests.common_queue as qtest
 from task_queue.in_memory_queue import in_memory_queue
-# from task_queue.work_queue_web_api import app
-app = FastAPI()
+from task_queue.work_queue_web_api import app
+# app = FastAPI()
 
 client = TestClient(app)
 
@@ -38,7 +48,7 @@ def test_v1_queue_sizes():
     response = client.get(f"/api/v1/queue/sizes")
 
     assert response.status_code == 200
-    assert response.json() = sizes
+    assert response.json() == sizes
     # is there a case where this will fail?
 
 def test_v1_queue_status():
