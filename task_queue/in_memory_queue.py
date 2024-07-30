@@ -194,7 +194,6 @@ class InMemoryQueue(QueueBase):
         """
         if queue_item_stage in QueueItemStage:
             dict_for_stage = self.memory_queue.get_for_stage(queue_item_stage)
-            print(f"LOOKUP_STATE = {list(dict_for_stage.keys())}")
             return list(dict_for_stage.keys())
 
         raise KeyError(queue_item_stage)

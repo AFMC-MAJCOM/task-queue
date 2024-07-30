@@ -225,7 +225,6 @@ class SQLQueue(QueueBase):
             result = session.exec(statement).all()
 
             item_ids = [item[0] for item in result]
-            print(f"LOOKUP_STATE = {item_ids}")
             return item_ids
 
     def description(self):

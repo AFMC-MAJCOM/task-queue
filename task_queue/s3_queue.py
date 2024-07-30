@@ -226,7 +226,6 @@ class JsonS3Queue(QueueBase):
         -----------
         Returns the list of items from the desired status.
         """
-        print(f"ITEM_STAGE == {queue_item_stage}")
         path_status = None
 
         if queue_item_stage == queue_base.QueueItemStage.WAITING:
@@ -243,7 +242,6 @@ class JsonS3Queue(QueueBase):
 
         for p in path_status:
             item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
-            print(f"LOOKUP_STATE = {item_ids}")
             return list(item_ids)
 
         raise KeyError(item_ids)
