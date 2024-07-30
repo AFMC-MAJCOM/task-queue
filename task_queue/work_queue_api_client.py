@@ -75,7 +75,7 @@ class ApiClient(QueueBase):
         return None
 
     def lookup_status(self, queue_item_id):
-        """Lookuup which stage in the Queue Item is currently in.
+        """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
         -----------
@@ -84,7 +84,22 @@ class ApiClient(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
+        """
+        return None
+
+    def lookup_item(self, item_id):
+        """Lookup an item in the Task Queue.
+
+        Parameters:
+        -----------
+        item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the state of the item and the body of the item.
         """
         return None
 

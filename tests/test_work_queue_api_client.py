@@ -1,8 +1,6 @@
 """Tests for validating the work queue api client
 """
 
-import pytest
-
 from task_queue.work_queue_api_client import ApiClient
 
 def test_constructor():
