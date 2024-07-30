@@ -75,6 +75,15 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 2. `GET` the status of the workflows by filtering on the label with the name of the interface, checking the label for the queue item ID, and looking at the status in the JSON response.
     - Workflow status is in `labels: workflows.argoproj.io/phase`
 
+# Work Queue Api Client
+
+There is a work queue api client designed to allow users to access the api endpoints easily in their python code. It wraps all of the api endpoints into callable methods.
+To use the client simply construct it with the url to the api. For example if your api is hosted locally on port 8080.
+
+```
+client = ApiClient("localhost:8080")
+```
+
 # Work Queue Service
 
 The `work_queue_service_cli.py` file will run a persistent service that periodically starts new jobs from a queue's `WAITING` stage with a queue worker. It's currently configured to try to keep no more than some amount of jobs in the `PROCESSING` stage, but it should be rather easy to change.
