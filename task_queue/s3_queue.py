@@ -2,6 +2,7 @@
 """
 import json
 import os
+import warnings
 from functools import reduce
 
 import s3fs
@@ -235,17 +236,17 @@ class JsonS3Queue(QueueBase):
         if isinstance(item_ids, str):
             item_ids = [item_ids]
 
-        requeued_items = []
+        items_requeued = []
         for item in item_ids:
             try:
                 s3_move(
-                    os.path.join(self.processing_path, id_to_fname(item)),
+                    os.path.join(self.fail_path, id_to_fname(item)),
                     self.queue_path
                 )
-                requeued_items.append(item)
-            except:
-                pass
-        return requeued_items
+                items_requeued.append(item)
+            except FileNotFoundError:
+                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
+        return items_requeued
 
 
 def ensure_s3_prefix(path:str):
