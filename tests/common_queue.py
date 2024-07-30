@@ -230,3 +230,22 @@ def test_lookup_state_fail(queue: qb.QueueBase):
     result = queue.lookup_state("does-not-exist")
     assert result == []
 
+def test_lookup_item(queue: qb.QueueBase):
+    """Test that lookup_item works as expected.
+    """
+    queue.put(default_items)
+    get = queue.get(1)
+
+    queue.success(get[0][0])
+
+    item_id, status, body = queue.lookup_item(get[0][0])
+
+    assert item_id == get[0][0]
+    assert status == qb.QueueItemStage.SUCCESS
+    assert body == get[0][1]
+
+def test_lookup_item_fail(queue: qb.QueueBase):
+    """Tests that the proper error is thrown when lookup_item fails.
+    """
+    with pytest.raises(KeyError):
+        queue.lookup_item("does-not-exist")

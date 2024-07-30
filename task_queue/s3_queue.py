@@ -195,7 +195,8 @@ class JsonS3Queue(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         paths_with_status = [
             (self.queue_path, queue_base.QueueItemStage.WAITING),
@@ -245,6 +246,35 @@ class JsonS3Queue(QueueBase):
             return list(item_ids)
 
         raise KeyError(item_ids)
+
+    def lookup_item(self, queue_item_id):
+        """Lookup an Item currently in the Queue.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
+        """
+        # Get item stage
+        item_stage = self.lookup_status(queue_item_id)
+        # Get item body
+        item_body = []
+        for item_id in get_queue_index_items(self.queue_index_path):
+            if queue_item_id == item_id:
+                fname = os.path.join(
+                    self.queue_base_path,
+                    item_stage.name,
+                    id_to_fname(item_id)
+                )
+                with fs.open(fname) as f:
+                    item_body = json.load(f)
+
+        return (queue_item_id, item_stage, item_body)
 
     def description(self):
         """A brief description of the Queue.
@@ -324,11 +354,11 @@ def check_queue_index(index_path, item):
     index_path: str
         Path to index.
     item: str
-        Item to look for.
+        Item ID to look for.
 
     Returns:
     -----------
-    Returns True if Item is in index file, or else False.
+    Returns True if Item ID is in index file, or else False.
     """
     func_fs = s3fs.S3FileSystem(default_cache_type="none")
     if func_fs.exists(index_path):
@@ -354,7 +384,7 @@ def get_queue_index_items(index_path):
 
     Returns:
     -----------
-    Returns list of contents of file.
+    Returns list of Item IDs in file.
     """
     func_fs = s3fs.S3FileSystem(default_cache_type="none")
     if not func_fs.exists(index_path):

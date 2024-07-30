@@ -169,8 +169,8 @@ class InMemoryQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object or it
-        will raise an error.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
         """
         for item_stage in QueueItemStage:
             dict_for_stage = self.memory_queue.get_for_stage(item_stage)
@@ -197,6 +197,27 @@ class InMemoryQueue(QueueBase):
             return list(dict_for_stage.keys())
 
         raise KeyError(queue_item_stage)
+
+    def lookup_item(self, queue_item_id):
+        """Lookup an Item currently in the Queue.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
+        """
+        # Get item stage
+        item_stage = self.lookup_status(queue_item_id)
+        # Get item body
+        dict_for_stage = self.memory_queue.get_for_stage(item_stage)
+        item_body = dict_for_stage[queue_item_id]
+
+        return (queue_item_id, item_stage, item_body)
 
     def description(self):
         """A brief description of the Queue.

@@ -79,7 +79,7 @@ class QueueBase(ABC):
 
     @abstractmethod
     def lookup_status(self, queue_item_id):
-        """Lookuup which stage in the Queue Item is currently in.
+        """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
         -----------
@@ -88,7 +88,23 @@ class QueueBase(ABC):
 
         Returns:
         ------------
-        Returns the current stage of the Item as a QueueItemStage object.
+        Returns the current stage of the Item as a QueueItemStage object, will
+        raise an error if Item is not in Queue.
+        """
+
+    @abstractmethod
+    def lookup_item(self, queue_item_id):
+        """Lookup an Item currently in the Queue.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the Queue Item ID, the status of that Item, and the body, or it
+        will raise an error if Item is not in Queue.
         """
 
     @abstractmethod
