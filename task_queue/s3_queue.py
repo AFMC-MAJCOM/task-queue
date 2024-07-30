@@ -211,6 +211,43 @@ class JsonS3Queue(QueueBase):
 
         raise KeyError(queue_item_id)
 
+    def lookup_state(self,
+                 queue_item_stage
+                 ):
+        """Look up the items in the status.
+
+        Parameters:
+        path: str
+              Path of Items
+        item_stage: QueueItemStage
+            Implement.
+
+        Returns:
+        -----------
+        Returns the list of items from the desired status.
+        """
+        print(f"ITEM_STAGE == {queue_item_stage}")
+        path_status = None
+
+        if queue_item_stage == queue_base.QueueItemStage.WAITING:
+            path_status = (self.queue_path, queue_item_stage)
+
+        if queue_item_stage == queue_base.QueueItemStage.PROCESSING:
+            path_status = (self.processing_path, queue_item_stage)
+
+        if queue_item_stage == queue_base.QueueItemStage.SUCCESS:
+            path_status = (self.success_path, queue_item_stage)
+
+        if queue_item_stage == queue_base.QueueItemStage.FAIL:
+            path_status = (self.fail_path, queue_item_stage)
+
+        for p in path_status:
+            item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
+            print(f"LOOKUP_STATE = {item_ids}")
+            return list(item_ids)
+
+        raise KeyError(item_ids)
+
     def description(self):
         """A brief description of the Queue.
 

@@ -190,3 +190,43 @@ def test_lookup_fail(queue: qb.QueueBase):
     """
     with pytest.raises(KeyError):
         queue.lookup_status("does-not-exist")
+
+def test_lookup_state(queue: qb.QueueBase):
+    """Tests that lookup_state works as expected with status-based lookup.
+    """
+    queue.put(default_items)
+
+    # wait test
+    wait_id_list = [x for x in default_items]
+    assert wait_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.WAITING).sort()
+
+    # proc tests
+    proc = queue.get(3)
+    proc_id_list = [x for x,_ in proc]
+
+    # succ test
+    succ = queue.get(3)
+    succ_id_list = [x for x,_ in succ]
+    for i in succ:
+        queue.success(i[0])
+
+    # fail test
+    fail = queue.get(2)
+    fail_id_list = [x for x,_ in fail]
+    for i in fail:
+        queue.fail(i[0])
+
+    assert proc_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.PROCESSING).sort()
+    assert succ_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.SUCCESS).sort()
+    assert fail_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.FAIL).sort()
+
+def test_lookup_state_fail(queue: qb.QueueBase):
+    """Test that proper error is thrown when lookup_state fails.
+    """
+    result = queue.lookup_state("does-not-exist")
+    assert result == []
+

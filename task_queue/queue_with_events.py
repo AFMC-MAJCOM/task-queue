@@ -240,6 +240,20 @@ class QueueWithEvents(QueueBase):
         """
         return self.queue.lookup_status(queue_item_id)
 
+    def lookup_state(self, queue_item_stage):
+        """Lookup which stage in the Queue Item is currently in.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns the current stage of the Item as a QueueItemStage object.
+        """
+        return self.queue.lookup_state(queue_item_stage)
+
     def description(self):
         """A brief description of the Queue.
 
