@@ -254,7 +254,6 @@ class QueueWithEvents(QueueBase):
         Returns the current stage of the Item as a QueueItemStage object.
         """
         return self.queue.lookup_state(queue_item_stage)
-        raise AttributeError(queue_item_stage)
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
