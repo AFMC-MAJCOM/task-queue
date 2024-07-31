@@ -66,6 +66,22 @@ class SqlEventStore(EventStoreInterface):
         SQLModel.metadata.create_all(engine)
         self.engine = engine
 
+    def _check_for_duplicates(self, event: Event):
+        sql_query = event.name == SqlEventStoreModel.name
+
+        sql_query = sql_query & (event.json_data == SqlEventStoreModel.json_data)
+
+        with Session(self.engine) as session:
+            statement = (
+                select(SqlEventStoreModel)
+                .where(sql_query)
+            )
+
+            items = session.exec(statement).all()
+            
+            if len(items) > 0:
+                return True
+            return False
 
     def _add_raw(self, events):
         """Add events to Event Store.
@@ -85,7 +101,10 @@ class SqlEventStore(EventStoreInterface):
         ]
 
         for db_evt in db_events:
-            print(db_evt)
+            if self._check_for_duplicates(db_evt):
+                db_events.remove(db_evt)
+            else:
+                print(db_evt)
 
         with Session(self.engine) as session:
             statement = insert(SqlEventStoreModel).values(db_events)
