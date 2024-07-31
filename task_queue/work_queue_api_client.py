@@ -31,7 +31,7 @@ class ApiClient(QueueBase):
             try:
                 items = json.loads(items)
             except Exception:
-                raise ValueError(f"The passed items are invalid")
+                raise ValueError("The passed items are invalid")
         try:
             r = requests.post(f"{self.api_base_url}put", json=items)
             if r.status_code >= 300:
