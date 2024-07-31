@@ -180,6 +180,24 @@ class InMemoryQueue(QueueBase):
 
         raise KeyError(queue_item_id)
 
+    def lookup_state(self, queue_item_stage):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+        if queue_item_stage in QueueItemStage:
+            dict_for_stage = self.memory_queue.get_for_stage(queue_item_stage)
+            return list(dict_for_stage.keys())
+
+        raise AttributeError(queue_item_stage)
+
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
 
@@ -218,27 +236,14 @@ class InMemoryQueue(QueueBase):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING.
         """
-
-        if isinstance(item_ids, str):
-            item_ids = [item_ids]
-
-        requeued_items = []
+        item_ids = self._requeue(item_ids)
         for item in item_ids:
-            try:
-                move_dict_item(
-                    self.memory_queue.fail,
-                    self.memory_queue.waiting,
-                    item
-                )
-                requeued_items.append(item)
-            except KeyError:
-                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
-        return requeued_items
+            move_dict_item(
+                self.memory_queue.fail,
+                self.memory_queue.waiting,
+                item
+            )
 
 
 # Pylint is disabled because the goal is to just have

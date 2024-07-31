@@ -21,6 +21,8 @@ For each queue implementation, there are the following methods:
     - How many items are in some stage of the queue (PROCESSING, FAIL, etc)
 - lookup_status :: queue_item_id -> queue_item_stage
     - Lookup which stage a queue item is currently in
+- lookup_state :: queue_item_stage -> List[queue_item_id]
+    - Lookup all the item ids in the given gueue item stage
 - lookup_item :: item_id -> (item_id, status, item_body)
     - Lookup an item in the queue
 - description :: () -> dict

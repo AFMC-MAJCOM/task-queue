@@ -213,6 +213,31 @@ class JsonS3Queue(QueueBase):
 
         raise KeyError(queue_item_id)
 
+    def lookup_state(self,
+                 queue_item_stage
+                 ):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+        path_status = os.path.join(
+            self.queue_base_path,
+            queue_item_stage.name
+        )
+
+        for p in path_status:
+            item_ids = map(fname_to_id, safe_s3fs_ls(fs, p))
+            return list(item_ids)
+
+        raise AttributeError(queue_item_stage)
+
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
 
@@ -263,20 +288,12 @@ class JsonS3Queue(QueueBase):
         item_ids: [str]
             ID of Queue Item
         """
-        if isinstance(item_ids, str):
-            item_ids = [item_ids]
-
-        items_requeued = []
+        item_ids = self._requeue(item_ids)
         for item in item_ids:
-            try:
-                s3_move(
-                    os.path.join(self.fail_path, id_to_fname(item)),
-                    self.queue_path
-                )
-                items_requeued.append(item)
-            except FileNotFoundError:
-                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
-        return items_requeued
+            s3_move(
+                os.path.join(self.fail_path, id_to_fname(item)),
+                self.queue_path
+            )
 
 
 def ensure_s3_prefix(path:str):

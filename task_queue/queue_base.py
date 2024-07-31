@@ -1,5 +1,6 @@
 """Wherein is contained the Abstract Base Classes for Queue.
 """
+import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -108,6 +109,20 @@ class QueueBase(ABC):
         """
 
     @abstractmethod
+    def lookup_state(self, queue_item_stage):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+
+    @abstractmethod
     def description(self):
         """A brief description of the Queue.
 
@@ -129,3 +144,26 @@ class QueueBase(ABC):
         ------------
         Returns a list of IDs that were moved from FAIL to WAITING
         """
+
+    def _requeue(self, item_ids):
+        """Remove ids from item_ids that are not in the FAIL state.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that to be requeued
+        """
+        if isinstance(item_ids, str):
+            item_ids = [item_ids]
+
+        failed_ids = self.lookup_state(QueueItemStage.FAIL)
+        missing_ids = list(set(item_ids) - set(failed_ids))
+        for id_ in missing_ids:
+            warnings.warn(f"Item {id_} not in a FAIL state. Skipping.")
+
+        item_ids = [id_ for id_ in item_ids if id_ in failed_ids]
+        return item_ids

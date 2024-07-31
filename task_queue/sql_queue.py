@@ -202,6 +202,31 @@ class SQLQueue(QueueBase):
 
             return QueueItemStage(item)
 
+    def lookup_state(self, queue_item_stage):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+        with Session(self.engine) as session:
+            statement = (
+                select(SqlQueue.index_key)
+                .where((self.queue_name == SqlQueue.queue_name) &
+                       (queue_item_stage.value == SqlQueue.queue_item_stage))
+            )
+
+            result = session.exec(statement).all()
+
+            item_ids = [item[0] for item in result]
+            return item_ids
+        raise AttributeError(queue_item_stage)
+
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
 
@@ -250,13 +275,8 @@ class SQLQueue(QueueBase):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING.
         """
-        if isinstance(item_ids, str):
-            item_ids = [item_ids]
+        item_ids = self._requeue(item_ids)
 
         # Get the list of item_ids that are in FAIL
         with Session(self.engine) as session:
@@ -270,18 +290,11 @@ class SQLQueue(QueueBase):
             items = results.all()
             queue_items = [item.index_key for item in items]
 
-        requeued_items = []
         for item in item_ids:
-            if item not in queue_items:
-                warnings.warn(f"Item {item} not in a FAIL state. Skipping")
-                continue
-
             update_stage(self.engine,
                          self.queue_name,
                          QueueItemStage.WAITING,
                          item)
-            requeued_items.append(item)
-        return requeued_items
 
 
 def update_stage(engine, queue_name, new_stage, item_key):

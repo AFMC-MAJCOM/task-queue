@@ -196,8 +196,7 @@ def test_requeue_empty(queue):
     """Tests requeue with no FAILED items does not raise error.
     """
     # Assert no failures
-    requeued = queue.requeue([])
-    assert len(requeued) == 0
+    queue.requeue([])
 
 
 def test_requeue_list_input(queue):
@@ -212,7 +211,7 @@ def test_requeue_list_input(queue):
     orig_fail_size = queue.size(qb.QueueItemStage.FAIL)
 
     requeue_ids = fail_ids[:3]
-    requeued = queue.requeue(requeue_ids)
+    queue.requeue(requeue_ids)
 
     new_waiting_size = queue.size(qb.QueueItemStage.WAITING)
     new_fail_size = queue.size(qb.QueueItemStage.FAIL)
@@ -221,7 +220,6 @@ def test_requeue_list_input(queue):
     assert new_waiting_size == orig_waiting_size + len(requeue_ids)
     assert new_fail_size == orig_fail_size - len(requeue_ids)
 
-    assert sorted(requeued) == sorted(requeue_ids)
     for requeue_id in requeue_ids:
         assert queue.lookup_status(requeue_id) == qb.QueueItemStage.WAITING
 
@@ -238,7 +236,7 @@ def test_requeue_string_input(queue):
     orig_fail_size = queue.size(qb.QueueItemStage.FAIL)
 
     requeue_id = fail_ids[0]
-    requeued = queue.requeue(requeue_id)
+    queue.requeue(requeue_id)
 
     new_waiting_size = queue.size(qb.QueueItemStage.WAITING)
     new_fail_size = queue.size(qb.QueueItemStage.FAIL)
@@ -247,7 +245,6 @@ def test_requeue_string_input(queue):
     assert new_waiting_size == orig_waiting_size + 1
     assert new_fail_size == orig_fail_size - 1
 
-    assert sorted(requeued) == sorted(requeue_id)
     assert queue.lookup_status(requeue_id) == qb.QueueItemStage.WAITING
 
 
@@ -265,7 +262,7 @@ def test_requeue_invalid_ids(queue):
     requeue_ids = fail_ids[:3]
     with warnings.catch_warnings(record=True) as warn:
         requeued = queue.requeue(requeue_ids + ["BAD_ID"])
-        expected_warning = "Item BAD_ID not in a FAIL state. Skipping"
+        expected_warning = "Item BAD_ID not in a FAIL state. Skipping."
 
         warning_list = [warn[i].message for i in range(len(warn))]
         assert len(warning_list) == 1
@@ -278,10 +275,47 @@ def test_requeue_invalid_ids(queue):
     assert new_waiting_size == orig_waiting_size + len(requeue_ids)
     assert new_fail_size == orig_fail_size - len(requeue_ids)
 
-    ## This could be reworked with queue.get_items_in_status()
-    assert sorted(requeued) == sorted(requeue_ids)
     for requeue_id in requeue_ids:
         assert queue.lookup_status(requeue_id) == qb.QueueItemStage.WAITING
+
+def test_lookup_state(queue: qb.QueueBase):
+    """Tests that lookup_state works as expected with status-based lookup.
+    """
+    queue.put(default_items)
+
+    # Waiting test
+    wait_id_list = [x for x in default_items]
+    assert wait_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.WAITING).sort()
+
+    # Processing tests
+    proc = queue.get(3)
+    proc_id_list = [x for x,_ in proc]
+
+    # Success test
+    succ = queue.get(3)
+    succ_id_list = [x for x,_ in succ]
+    for i in succ:
+        queue.success(i[0])
+
+    # Fail test
+    fail = queue.get(2)
+    fail_id_list = [x for x,_ in fail]
+    for i in fail:
+        queue.fail(i[0])
+
+    assert proc_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.PROCESSING).sort()
+    assert succ_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.SUCCESS).sort()
+    assert fail_id_list.sort() == \
+    queue.lookup_state(qb.QueueItemStage.FAIL).sort()
+
+def test_lookup_state_fail(queue: qb.QueueBase):
+    """Test that proper error is thrown when lookup_state fails.
+    """
+    with pytest.raises(AttributeError):
+        queue.lookup_state(qb.QueueItemStage.NOTREAL)
 
 def test_lookup_item(queue: qb.QueueBase):
     """Test that lookup_item works as expected.

@@ -190,6 +190,18 @@ def test_requeue_invalid_ids(new_empty_queue):
     qtest.test_requeue_invalid_ids(new_empty_queue)
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_lookup_state(new_empty_queue):
+    """Tests that lookup_state works as expected.
+    """
+    qtest.test_lookup_state(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_lookup_state_fail(new_empty_queue):
+    """Tests that lookup_state works as expected.
+    """
+    qtest.test_lookup_state_fail(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_lookup_item(new_empty_queue):
     """Test that lookup_item works as expected.
     """
