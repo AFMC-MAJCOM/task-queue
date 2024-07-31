@@ -293,7 +293,7 @@ class QueueWithEvents(QueueBase):
             ID of Queue Item
         """
         item_ids = self._requeue(item_ids)
-        requeued_items = self.queue.requeue(item_ids)
+        self.queue.requeue(item_ids)
         for item in item_ids:
             record_queue_move_event(
                 self.event_store,

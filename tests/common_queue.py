@@ -261,7 +261,7 @@ def test_requeue_invalid_ids(queue):
 
     requeue_ids = fail_ids[:3]
     with warnings.catch_warnings(record=True) as warn:
-        requeued = queue.requeue(requeue_ids + ["BAD_ID"])
+        queue.requeue(requeue_ids + ["BAD_ID"])
         expected_warning = "Item BAD_ID not in a FAIL state. Skipping."
 
         warning_list = [warn[i].message for i in range(len(warn))]

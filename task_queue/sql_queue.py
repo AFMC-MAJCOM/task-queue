@@ -2,7 +2,6 @@
 """
 from typing import Optional
 import json
-import warnings
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert
@@ -276,21 +275,7 @@ class SQLQueue(QueueBase):
         item_ids: [str]
             ID of Queue Item
         """
-        item_ids = self._requeue(item_ids)
-
-        # Get the list of item_ids that are in FAIL
-        with Session(self.engine) as session:
-            statement = select(SqlQueue).where(
-                (SqlQueue.queue_item_stage == QueueItemStage.FAIL.value) & \
-                    (SqlQueue.index_key.in_(item_ids)) & \
-                        (SqlQueue.queue_name == self.queue_name)
-            )
-            results = session.exec(statement)
-
-            items = results.all()
-            queue_items = [item.index_key for item in items]
-
-        for item in item_ids:
+        for item in self._requeue(item_ids):
             update_stage(self.engine,
                          self.queue_name,
                          QueueItemStage.WAITING,
