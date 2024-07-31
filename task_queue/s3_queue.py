@@ -235,7 +235,9 @@ class JsonS3Queue(QueueBase):
             queue_base.QueueItemStage.PROCESSING: self.processing_path,
         }
 
-        item_ids = map(fname_to_id, safe_s3fs_ls(fs, status_path_map[queue_item_stage]))
+        item_ids = map(
+            fname_to_id, safe_s3fs_ls(fs, status_path_map[queue_item_stage])
+        )
         return list(item_ids)
 
     def lookup_item(self, queue_item_id):
