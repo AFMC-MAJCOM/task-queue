@@ -69,7 +69,8 @@ class SqlEventStore(EventStoreInterface):
     def _check_for_duplicates(self, event: Event):
         sql_query = event.name == SqlEventStoreModel.name
 
-        sql_query = sql_query & (event.json_data == SqlEventStoreModel.json_data)
+        sql_query = sql_query & \
+                    (event.json_data == SqlEventStoreModel.json_data)
 
         with Session(self.engine) as session:
             statement = (
@@ -78,7 +79,7 @@ class SqlEventStore(EventStoreInterface):
             )
 
             items = session.exec(statement).all()
-            
+
             if len(items) > 0:
                 return True
             return False

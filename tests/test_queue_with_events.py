@@ -66,9 +66,20 @@ def test_event_queue_add_no_duplicates(queue_with_events_fixture):
     for e in add_events:
         queue_add_event = QueueAddEventData(**e.data)
 
+        # Make sure every item has an event
+        assert queue_add_event.queue_index_key in default_items
 
     # Make sure every item has an event
     assert len(add_events) == len(default_items)
+
+    eq.put(default_items)
+
+    add_events = s.get(ADD_EVENT_NAME)
+
+    for e in add_events:
+        queue_add_event = QueueAddEventData(**e.data)
+
+    assert len(add_events) == len(default_items)    
 
 def test_event_queue_lifecycle(queue_with_events_fixture):
     """Test event queue lifestyle works as expected.
@@ -164,7 +175,15 @@ def test_event_queue_add_no_duplicates_sql(sql_queue_with_events_fixture):
 
     for e in add_events:
         queue_add_event = QueueAddEventData(**e.data)
+        # Make sure every item has an event
+        assert queue_add_event.queue_index_key in default_items
 
+    eq.put(default_items)
+
+    add_events = s.get(ADD_EVENT_NAME)
+
+    for e in add_events:
+        queue_add_event = QueueAddEventData(**e.data)
 
     # Make sure every item has an event
     assert len(add_events) == len(default_items)
