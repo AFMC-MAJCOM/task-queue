@@ -241,8 +241,6 @@ class SQLQueue(QueueBase):
             items = results.all()
             queue_items = [item.index_key for item in items]
 
-
-        # This could be more efficient with a mass SQL query
         requeued_items = []
         for item in item_ids:
             if item not in queue_items:

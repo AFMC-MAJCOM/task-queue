@@ -222,7 +222,6 @@ def test_requeue_list_input(queue):
     assert new_waiting_size == orig_waiting_size + len(requeue_ids)
     assert new_fail_size == orig_fail_size - len(requeue_ids)
 
-    ## This could be reworked with queue.get_items_in_status()
     assert sorted(requeued) == sorted(requeue_ids)
     for requeue_id in requeue_ids:
         assert queue.lookup_status(requeue_id) == qb.QueueItemStage.WAITING
@@ -249,7 +248,6 @@ def test_requeue_string_input(queue):
     assert new_waiting_size == orig_waiting_size + 1
     assert new_fail_size == orig_fail_size - 1
 
-    ## This could be reworked with queue.get_items_in_status()
     assert sorted(requeued) == sorted(requeue_id)
     assert queue.lookup_status(requeue_id) == qb.QueueItemStage.WAITING
 

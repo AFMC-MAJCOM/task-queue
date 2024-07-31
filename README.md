@@ -23,6 +23,8 @@ For each queue implementation, there are the following methods:
     - Lookup which stage a queue item is currently in
 - description :: () -> dict
     - Provides a brief description of the queue.
+- requeue :: ([item_id]) -> [Requed_Ids]
+    - requeue move an item from FAIL to WAITING
 
 ## Implementations
 
