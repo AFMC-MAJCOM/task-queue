@@ -11,5 +11,5 @@ test_sql_engine = sqla.create_engine(sqla.engine.url.URL(
             database="postgres",
             query={},
             port=os.environ.get("SQL_PORT", 5432),
-            
+
         ), echo=True)

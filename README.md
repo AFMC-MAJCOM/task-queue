@@ -21,6 +21,8 @@ For each queue implementation, there are the following methods:
     - How many items are in some stage of the queue (PROCESSING, FAIL, etc)
 - lookup_status :: queue_item_id -> queue_item_stage
     - Lookup which stage a queue item is currently in
+- lookup_item :: item_id -> (item_id, status, item_body)
+    - Lookup an item in the queue
 - description :: () -> dict
     - Provides a brief description of the queue.
 - requeue :: ([item_id]) -> [Requed_Ids]
@@ -72,6 +74,15 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 1. `POST` a new workflow to a template when a job is submitted. Add a label for the queue item ID and the name of this queue.
 2. `GET` the status of the workflows by filtering on the label with the name of the interface, checking the label for the queue item ID, and looking at the status in the JSON response.
     - Workflow status is in `labels: workflows.argoproj.io/phase`
+
+# Work Queue Api Client
+
+There is a work queue api client designed to allow users to access the api endpoints easily in their python code. It wraps all of the api endpoints into callable methods.
+To use the client simply construct it with the url to the api. For example if your api is hosted locally on port 8080.
+
+```
+client = ApiClient("localhost:8080")
+```
 
 # Work Queue Service
 
