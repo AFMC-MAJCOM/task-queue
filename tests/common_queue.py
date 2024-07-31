@@ -285,8 +285,8 @@ def test_lookup_state(queue: qb.QueueBase):
 
     # Waiting test
     wait_id_list = [x for x in default_items]
-    assert wait_id_list.sort() == \
-    queue.lookup_state(qb.QueueItemStage.WAITING).sort()
+    assert sorted(wait_id_list) == \
+    sorted(queue.lookup_state(qb.QueueItemStage.WAITING))
 
     # Processing tests
     proc = queue.get(3)
@@ -304,12 +304,12 @@ def test_lookup_state(queue: qb.QueueBase):
     for i in fail:
         queue.fail(i[0])
 
-    assert proc_id_list.sort() == \
-    queue.lookup_state(qb.QueueItemStage.PROCESSING).sort()
-    assert succ_id_list.sort() == \
-    queue.lookup_state(qb.QueueItemStage.SUCCESS).sort()
-    assert fail_id_list.sort() == \
-    queue.lookup_state(qb.QueueItemStage.FAIL).sort()
+    assert sorted(proc_id_list) == \
+    sorted(queue.lookup_state(qb.QueueItemStage.PROCESSING))
+    assert sorted(succ_id_list) == \
+    sorted(queue.lookup_state(qb.QueueItemStage.SUCCESS))
+    assert sorted(fail_id_list) == \
+    sorted(queue.lookup_state(qb.QueueItemStage.FAIL))
 
 def test_lookup_state_fail(queue: qb.QueueBase):
     """Test that proper error is thrown when lookup_state fails.
