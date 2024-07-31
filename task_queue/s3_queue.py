@@ -2,6 +2,7 @@
 """
 import json
 import os
+import warnings
 from functools import reduce
 
 import s3fs
@@ -12,7 +13,7 @@ from . import queue_base
 
 INDEX_NAME = "index.txt"
 
-fs = s3fs.S3FileSystem(default_cache_type="none")
+fs = s3fs.S3FileSystem()
 
 
 class JsonS3Queue(QueueBase):
@@ -20,6 +21,7 @@ class JsonS3Queue(QueueBase):
     """
     def __init__(self, queue_base_s3_path):
         self.queue_base_path = queue_base_s3_path
+        fs.mkdir(self.queue_base_path)
         self.queue_path = os.path.join(
             queue_base_s3_path,
             queue_base.QueueItemStage.WAITING.name
@@ -287,12 +289,17 @@ class JsonS3Queue(QueueBase):
         item_ids: [str]
             ID of Queue Item
         """
-        item_ids = self._requeue(item_ids)
+        if isinstance(item_ids, str):
+            item_ids = [item_ids]
+
         for item in item_ids:
-            s3_move(
-                os.path.join(self.fail_path, id_to_fname(item)),
-                self.queue_path
-            )
+            try:
+                s3_move(
+                    os.path.join(self.fail_path, id_to_fname(item)),
+                    self.queue_path
+                )
+            except FileNotFoundError:
+                warnings.warn(f"Item {item} not in a FAIL state. Skipping.")
 
 
 def ensure_s3_prefix(path:str):

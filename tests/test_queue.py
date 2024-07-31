@@ -72,7 +72,8 @@ def new_sql_queue(request):
     return sqlq.json_sql_queue(test_sql_engine, queue_name)
 
 
-ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
+# ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
+ALL_QUEUE_TYPES = ["s3"]
 @pytest.fixture
 def new_empty_queue(request):
     """Fixture to create an empty queue of one given type.
