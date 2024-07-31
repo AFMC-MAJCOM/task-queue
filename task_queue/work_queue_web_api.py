@@ -11,6 +11,7 @@ from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 
+from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
 
@@ -128,8 +129,9 @@ def queue_settings_from_env(env_dict):
         return SqlQueueSettings.from_env(env_dict)
     return None
 
-queue_settings = queue_settings_from_env(os.environ)
-queue = queue_settings.make_queue()
+# queue_settings = queue_settings_from_env(os.environ)
+# queue = queue_settings.make_queue()
+queue = in_memory_queue()
 
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes():
@@ -182,6 +184,9 @@ async def put(items:dict):
         Dictionary of Queue Items to add Queue, where Item is a key:value
         pair, where key is the item ID and value is the queue item body.
     """
-    queue.put(items)
+    try:
+        queue.put(items)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Item not found")
 
 

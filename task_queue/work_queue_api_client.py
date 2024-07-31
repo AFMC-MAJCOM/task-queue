@@ -3,6 +3,8 @@
 
 from .queue_base import QueueBase
 import requests
+from requests.exceptions import RequestException
+import json
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -24,7 +26,18 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-        requests.post(self.api_base_url, data=items)
+
+        if type(items) != dict:
+            try:
+                items = json.loads(items)
+            except Exception:
+                raise ValueError(f"The passed items are invalid")
+        try:
+            r = requests.post(f"{self.api_base_url}put", json=items)
+            if r.status_code >= 300:
+                raise RequestException("There was an error")
+        except RequestException as e:
+            raise RequestException(e)
 
     def get(self, n_items=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.

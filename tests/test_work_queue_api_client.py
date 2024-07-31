@@ -1,9 +1,48 @@
 """Tests for validating the work queue api client
 """
 
+import pytest
+import unittest
+from unittest import mock
+
 from task_queue.work_queue_api_client import ApiClient
 
-def test_constructor():
-    client = ApiClient("localhost:8080")
+url = "http://localhost:8000"
+put_valid_body = {
+    1: [1, 2, 3],
+    2: [4, 5, 6]
+}
+put_valid_body_as_str = '{"1": [1, 2, 3], "2": [4, 5, 6]}'
+put_invalid_body = "THIS_IS_INVALID"
+test_client = ApiClient(url)
 
-    assert client.api_base_url == "localhost:8080/api/v1/queue/"
+def mocked_requests_put(*args, **kwargs):
+    class MockResponse:
+        def __init__(self, json_data, status_code):
+            self.json_data = json_data
+            self.status_code = status_code
+
+        def json(self):
+            return self.json_data
+
+    if args[0] == "http://localhost:8000/api/v1/queue/put":
+        return MockResponse("", 200)
+
+    return MockResponse("", 400)
+
+def test_constructor():
+    assert test_client.api_base_url == f"{url}/api/v1/queue/"
+
+@mock.patch('requests.post', side_effect=mocked_requests_put)
+def test_put_valid_body(mock_post):
+    response = test_client.put(put_valid_body)
+    assert response == None
+
+@mock.patch('requests.post', side_effect=mocked_requests_put)
+def test_put_valid_body_as_str(mock_post):
+    response = test_client.put(put_valid_body_as_str)
+    assert response == None
+
+def test_put_invalid_body():
+    with pytest.raises(ValueError):
+        test_client.put(put_invalid_body)
