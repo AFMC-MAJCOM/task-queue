@@ -13,4 +13,3 @@ permissions:
 jobs:
   generic-workflow:
     uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
-
