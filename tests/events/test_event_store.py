@@ -102,6 +102,23 @@ def test_add_events(new_empty_store, random_events):
     """
     new_empty_store.add(random_events)
 
+@pytest.mark.parametrize("new_empty_store",
+                         ALL_EVENT_STORE_TYPES,
+                         indirect=True)
+def test_add_events_no_duplicates(new_empty_store, random_events):
+    """Tests that adding events to empty store does not throw error.
+    """
+    new_empty_store.add(random_events)
+
+    event_name = test_event_names[0]
+
+    events_before = new_empty_store.get(event_name)
+
+    new_empty_store.add(random_events)
+
+    events_after = new_empty_store.get(event_name)
+
+    assert len(events_before) == len(events_after)
 
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
