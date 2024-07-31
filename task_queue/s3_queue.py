@@ -2,7 +2,6 @@
 """
 import json
 import os
-import warnings
 from functools import reduce
 
 import s3fs
