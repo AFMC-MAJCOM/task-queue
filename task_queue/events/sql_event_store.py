@@ -72,7 +72,6 @@ class SqlEventStore(EventStoreInterface):
         sql_query = sql_query & \
                     (str(event['json_data']) == SqlEventStoreModel.json_data)
 
-        print(sql_query)
         with Session(self.engine) as session:
             statement = (
                 select(SqlEventStoreModel)
@@ -80,7 +79,7 @@ class SqlEventStore(EventStoreInterface):
             )
 
             items = session.exec(statement).all()
-            if len(items) > 0:
+            if items:
                 return True
             return False
 
