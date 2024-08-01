@@ -47,7 +47,7 @@ def test_client_lookup_status(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status_invalid(mock_get):
     with pytest.raises(RequestException):
-        response = test_client.lookup_status(123)
+        test_client.lookup_status(123)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status_fail(mock_get):
