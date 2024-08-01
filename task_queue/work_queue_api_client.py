@@ -1,7 +1,8 @@
 """Wherein is contained the ApiClient class.
 """
+import requests
 
-from .queue_base import QueueBase
+from .queue_base import QueueBase, QueueItemStage
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -74,7 +75,7 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def lookup_status(self, queue_item_id):
+    def lookup_status(self, queue_item_id:str) -> QueueItemStage:
         """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
@@ -87,7 +88,9 @@ class ApiClient(QueueBase):
         Returns the current stage of the Item as a QueueItemStage object, will
         raise an error if Item is not in Queue.
         """
-        return None
+        response = requests.get(f"{self.api_base_url}status/{queue_item_id}")
+        response.raise_for_status()
+        return response.json()
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
@@ -104,11 +107,22 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def description(self):
+    def description(self) -> dict:
         """A brief description of the Queue.
 
         Returns:
         ------------
         Returns a dictionary with relevant information about the Queue.
         """
-        return None
+        response = requests.get(f"{self.api_base_url}describe")
+        return response.json()
+
+    def get_queue_sizes(self) -> dict:
+        """Gets the number of Items in each Stage of the Queue.
+
+        Returns:
+        Returns a dictionary where the key is the name of the stage and the
+        value is the number of Items currently in that Stage.
+        """
+        response = requests.get(f"{self.api_base_url}sizes")
+        return response.json()
