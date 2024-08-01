@@ -1,10 +1,8 @@
 """Tests for validating the Work Queue API Client
 """
 import pytest
-import unittest
 from unittest import mock
 from requests.exceptions import RequestException
-import json
 
 from task_queue.work_queue_api_client import ApiClient
 from task_queue.queue_base import QueueItemStage
@@ -49,12 +47,12 @@ def test_client_lookup_status(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status_invalid(mock_get):
     with pytest.raises(RequestException):
-        response = test_client.lookup_status(123)
+        test_client.lookup_status(123)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status_fail(mock_get):
     with pytest.raises(KeyError):
-        response = test_client.lookup_status('bad-item-id')
+        test_client.lookup_status('bad-item-id')
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
