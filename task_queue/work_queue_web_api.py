@@ -182,8 +182,9 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
     """
     try:
         return queue.lookup_status(item_id)
-    except KeyError:
-        raise HTTPException(status_code=400, detail=f"{item_id} not in Queue")
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> dict:
