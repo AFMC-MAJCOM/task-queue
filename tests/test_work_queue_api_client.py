@@ -8,11 +8,7 @@ from requests.exceptions import RequestException
 from task_queue.work_queue_api_client import ApiClient
 
 url = "http://localhost:8000"
-put_valid_body = {
-    1: [1, 2, 3],
-    2: [4, 5, 6]
-}
-put_invalid_body = "THIS_IS_INVALID"
+
 test_client = ApiClient(url)
 
 def mocked_requests_put(*args, **kwargs):
@@ -39,10 +35,15 @@ def test_constructor():
 
 @mock.patch('requests.post', side_effect=mocked_requests_put)
 def test_put_valid_body(mock_post):
+    put_valid_body = {
+        1: [1, 2, 3],
+        2: [4, 5, 6]
+    }
     response = test_client.put(put_valid_body)
     assert response is None
 
 @mock.patch('requests.post', side_effect=mocked_requests_put)
 def test_put_invalid_body(mock_post):
+    put_invalid_body = "THIS_IS_INVALID"
     with pytest.raises(RequestException):
         test_client.put(put_invalid_body)
