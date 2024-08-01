@@ -31,6 +31,7 @@ class InMemoryEventStore(EventStoreInterface):
             else:
                 for e in self.events[event.name]:
                     if e.name == event.name and e.data == event.data:
+                        print('duplicate caught')
                         duplicate = True
             if not duplicate:
                 event.id = len(self.events[event.name])
