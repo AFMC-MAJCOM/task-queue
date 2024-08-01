@@ -228,17 +228,11 @@ class JsonS3Queue(QueueBase):
         Returns a list of all item ids in the current queue stage.
         """
         item_ids = []
-        status_path_map = {
-            queue_base.QueueItemStage.WAITING: self.queue_path,
-            queue_base.QueueItemStage.SUCCESS: self.success_path,
-            queue_base.QueueItemStage.FAIL: self.fail_path,
-            queue_base.QueueItemStage.PROCESSING: self.processing_path,
-        }
+        for item_id in get_queue_index_items(self.queue_index_path):
+            if queue_item_stage == self.lookup_status(item_id):
+                item_ids.append(item_id)
+        return item_ids
 
-        item_ids = map(
-            fname_to_id, safe_s3fs_ls(fs, status_path_map[queue_item_stage])
-        )
-        return list(item_ids)
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
