@@ -98,6 +98,10 @@ def test_add_events(new_empty_store, events):
     """
     new_empty_store.add(events)
 
+    for name in test_event_names:
+        entries = new_empty_store.get(name)
+        assert len(entries) == n_events_per_type
+
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
