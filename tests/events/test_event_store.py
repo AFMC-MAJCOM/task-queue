@@ -11,13 +11,10 @@ from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.events.event import Event
 from ..utils import test_sql_engine
 
-
-random_number = random.randint(0, 999999999)
-
 test_event_names = [
-    f"test-event-store-{random_number}-1",
-    f"test-event-store-{random_number}-2",
-    f"test-event-store-{random_number}-3",
+    f"test-event-store-1",
+    f"test-event-store-2",
+    f"test-event-store-3",
 ]
 n_event_types = len(test_event_names)
 
@@ -32,7 +29,7 @@ class TestEventData(BaseModel):
     some_string : str
     some_dict : dict
 
-def random_event(event_name, time=True, time_offset_sec=0):
+def single_event(event_name, time=True, time_offset_sec=0, increment = 0):
     """Creates a random event with the test event data.
 
     Parameters:
@@ -48,10 +45,10 @@ def random_event(event_name, time=True, time_offset_sec=0):
     Event object with random data.
     """
     data = TestEventData(
-        some_number=random.randint(0, 1000000),
-        some_string=chr(random.randint(ord('a'), ord('z'))),
+        some_number=increment,
+        some_string='string',
         some_dict = {
-            "a_float": random.random(),
+            "a_float": increment,
             "a_const": 6443
         }
     )
@@ -67,7 +64,7 @@ n_events_per_type = 20
 n_events = n_events_per_type*n_event_types
 
 @pytest.fixture
-def random_events():
+def events():
     """Fixture to create events for testing.
 
     `n_events_per_type` of each event type, with each event of that type
@@ -78,7 +75,7 @@ def random_events():
     List of events.
     """ 
     return [
-        random_event(test_event_names[i%n_event_types], (i // n_event_types))
+        single_event(test_event_names[i%n_event_types], (i // n_event_types), i)
         for i in range(0, n_events)
     ]
 
@@ -97,27 +94,27 @@ def new_empty_store(request):
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
-def test_add_events(new_empty_store, random_events):
+def test_add_events(new_empty_store, events):
     """Tests that adding events to empty store does not throw error.
     """
-    new_empty_store.add(random_events)
+    new_empty_store.add(events)
 
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
-def test_add_events_no_duplicates(new_empty_store, random_events):
+def test_add_events_no_duplicates(new_empty_store, events):
     """Tests that trying to add duplicate events to a store 
         does not add events.
     """
-    print(f'{len(random_events)} events')
-    new_empty_store.add(random_events)
+    print(f'{len(events)} events')
+    new_empty_store.add(events)
 
     event_name = test_event_names[0]
 
     events_before = new_empty_store.get(event_name)
 
     #Adding the same events again should be blocked
-    new_empty_store.add(random_events)
+    new_empty_store.add(events)
 
     events_after = new_empty_store.get(event_name)
 
@@ -126,7 +123,7 @@ def test_add_events_no_duplicates(new_empty_store, random_events):
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
-def test_get_events(new_empty_store, random_events):
+def test_get_events(new_empty_store, events):
     """Tests get_events functions as expected.
     """
     event_name = test_event_names[0]
@@ -134,7 +131,7 @@ def test_get_events(new_empty_store, random_events):
     # Compare before/after in case tests are run out of order
     events_before = new_empty_store.get(event_name)
 
-    new_empty_store.add(random_events)
+    new_empty_store.add(events)
 
     events_after = new_empty_store.get(event_name)
 
@@ -145,20 +142,20 @@ def test_get_events(new_empty_store, random_events):
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
-def test_get_events_time_since(new_empty_store, random_events):
+def test_get_events_time_since(new_empty_store, events):
     """Tests get_events with time_since param functions as expected.
     """
-    new_empty_store.add(random_events)
+    new_empty_store.add(events)
 
     event_name = test_event_names[0]
 
     seconds_added = 5
     time_since = start_time + datetime.timedelta(seconds=seconds_added)
 
-    events = new_empty_store.get(event_name, time_since=time_since)
+    events_with_name = new_empty_store.get(event_name, time_since=time_since)
 
-    assert all( e.time > time_since for e in events )
-    assert all( e.name == event_name for e in events )
+    assert all( e.time > time_since for e in events_with_name )
+    assert all( e.name == event_name for e in events_with_name )
 
 
 @pytest.mark.parametrize("new_empty_store",
