@@ -106,6 +106,8 @@ class SqlEventStore(EventStoreInterface):
             if self._check_for_duplicates(db_evt):
                 db_events.remove(db_evt)
                 print('duplicate caught')
+            else:
+                print(db_evt)
 
         with Session(self.engine) as session:
             statement = insert(SqlEventStoreModel).values(db_events)

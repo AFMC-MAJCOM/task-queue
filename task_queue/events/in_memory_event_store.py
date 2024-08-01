@@ -33,9 +33,9 @@ class InMemoryEventStore(EventStoreInterface):
                     if e.name == event.name and e.data == event.data:
                         print('duplicate caught')
                         duplicate = True
-            if not duplicate:
-                event.id = len(self.events[event.name])
-                self.events[event.name].append(event)
+                if not duplicate:
+                    event.id = len(self.events[event.name])
+                    self.events[event.name].append(event)
 
     def get(self, event_name, time_since=None):
         """Returns list of events that have happened since a specific time.

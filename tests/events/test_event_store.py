@@ -1,6 +1,5 @@
 """Pytest for event store functionality.
 """
-import random
 import datetime
 
 import pytest
@@ -12,9 +11,9 @@ from task_queue.events.event import Event
 from ..utils import test_sql_engine
 
 test_event_names = [
-    f"test-event-store-1",
-    f"test-event-store-2",
-    f"test-event-store-3",
+    "test-event-store-1",
+    "test-event-store-2",
+    "test-event-store-3",
 ]
 n_event_types = len(test_event_names)
 
@@ -29,7 +28,7 @@ class TestEventData(BaseModel):
     some_string : str
     some_dict : dict
 
-def single_event(event_name, time=True, time_offset_sec=0, increment = 0):
+def single_event(event_name, increment, time=True, time_offset_sec=0):
     """Creates a random event with the test event data.
 
     Parameters:
@@ -75,7 +74,7 @@ def events():
     List of events.
     """ 
     return [
-        single_event(test_event_names[i%n_event_types], (i // n_event_types), i)
+        single_event(test_event_names[i%n_event_types], i,(i // n_event_types))
         for i in range(0, n_events)
     ]
 
@@ -128,15 +127,13 @@ def test_get_events(new_empty_store, events):
     """
     event_name = test_event_names[0]
 
-    # Compare before/after in case tests are run out of order
-    events_before = new_empty_store.get(event_name)
-
+    # Try adding events in case this test runs first
     new_empty_store.add(events)
 
-    events_after = new_empty_store.get(event_name)
+    events_with_name = new_empty_store.get(event_name)
 
-    assert len(events_after) - len(events_before) == n_events_per_type
-    assert all( e.name == event_name for e in events_after )
+    assert len(events_with_name) == n_events_per_type
+    assert all( e.name == event_name for e in events_with_name )
 
 
 @pytest.mark.parametrize("new_empty_store",
