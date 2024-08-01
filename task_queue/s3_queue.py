@@ -19,6 +19,7 @@ class JsonS3Queue(QueueBase):
     """Class for the JsonS3Queue.
     """
     def __init__(self, queue_base_s3_path):
+        # self._index_name = 
         self.queue_base_path = queue_base_s3_path
         self.queue_path = os.path.join(
             queue_base_s3_path,

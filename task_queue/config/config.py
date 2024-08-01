@@ -20,3 +20,6 @@ class TaskQueueSettings(BaseSettings):
     SQL_PORT: int
     SQL_USERNAME: str
     FSSPEC_S3_ENDPOINT_URL: str
+
+    JSON_INDEX_FILE_NAME: str
+    event_schema_version: str
