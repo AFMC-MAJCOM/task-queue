@@ -106,7 +106,8 @@ def test_add_events(new_empty_store, random_events):
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
 def test_add_events_no_duplicates(new_empty_store, random_events):
-    """Tests that adding events to empty store does not throw error.
+    """Tests that trying to add duplicate events to a store 
+        does not add events.
     """
     print(f'{len(random_events)} events')
     new_empty_store.add(random_events)

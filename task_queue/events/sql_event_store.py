@@ -70,7 +70,7 @@ class SqlEventStore(EventStoreInterface):
         sql_query = event['name'] == SqlEventStoreModel.name
 
         sql_query = sql_query & \
-                    (str(event['data']) == SqlEventStoreModel.json_data)
+                    (str(event['json_data']) == SqlEventStoreModel.json_data)
 
         print(sql_query)
         with Session(self.engine) as session:
