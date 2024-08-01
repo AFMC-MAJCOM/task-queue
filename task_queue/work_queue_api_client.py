@@ -12,8 +12,9 @@ class ApiClient(QueueBase):
     api_base_url: str
         The base url for all api endpoints.
     """
-    def __init__(self, api_base_url: str):
+    def __init__(self, api_base_url: str, timeout: float = 5):
         self.api_base_url = api_base_url + "/api/v1/queue/"
+        self.timeout = timeout
 
     def put(self, items):
         """Adds a new Item to the Queue in the WAITING stage.
@@ -88,7 +89,8 @@ class ApiClient(QueueBase):
         Returns the current stage of the Item as a QueueItemStage object, will
         raise an error if Item is not in Queue.
         """
-        response = requests.get(f"{self.api_base_url}status/{queue_item_id}")
+        response = requests.get(f"{self.api_base_url}status/{queue_item_id}",
+                               timeout=self.timeout)
         response.raise_for_status()
         return response.json()
 
@@ -114,7 +116,8 @@ class ApiClient(QueueBase):
         ------------
         Returns a dictionary with relevant information about the Queue.
         """
-        response = requests.get(f"{self.api_base_url}describe")
+        response = requests.get(f"{self.api_base_url}describe",
+                                timeout=self.timeout)
         return response.json()
 
     def get_queue_sizes(self) -> dict:
@@ -124,5 +127,6 @@ class ApiClient(QueueBase):
         Returns a dictionary where the key is the name of the stage and the
         value is the number of Items currently in that Stage.
         """
-        response = requests.get(f"{self.api_base_url}sizes")
+        response = requests.get(f"{self.api_base_url}sizes",
+                               timeout=self.timeout)
         return response.json()
