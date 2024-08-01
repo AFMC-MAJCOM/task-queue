@@ -72,6 +72,7 @@ class SqlEventStore(EventStoreInterface):
         sql_query = sql_query & \
                     (event['json_data'] == SqlEventStoreModel.json_data)
 
+        print(sql_query)
         with Session(self.engine) as session:
             statement = (
                 select(SqlEventStoreModel)
@@ -79,7 +80,7 @@ class SqlEventStore(EventStoreInterface):
             )
 
             items = session.exec(statement).all()
-
+            print(items)
             if len(items) > 0:
                 return True
             return False
@@ -104,8 +105,7 @@ class SqlEventStore(EventStoreInterface):
         for db_evt in db_events:
             if self._check_for_duplicates(db_evt):
                 db_events.remove(db_evt)
-            else:
-                print(db_evt)
+                print('duplicate caught')
 
         with Session(self.engine) as session:
             statement = insert(SqlEventStoreModel).values(db_events)

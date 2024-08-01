@@ -5,9 +5,7 @@ import random
 import pytest
 
 from task_queue.events.in_memory_event_store import InMemoryEventStore
-from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.in_memory_queue import in_memory_queue
-from task_queue.sql_queue import json_sql_queue
 from task_queue.queue_with_events import queue_with_events
 from task_queue.queue_with_events import QueueAddEventData
 from task_queue.queue_with_events import QueueMoveEventData
@@ -21,7 +19,7 @@ ADD_EVENT_NAME = f"TEST_QUEUE_ADD_EVENT_{random_number}"
 MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 
 @pytest.fixture
-def in_memory_queue_with_events_fixture():
+def queue_with_events_fixture():
     """Fixture to create queue with events for testing.
     """
     q = in_memory_queue()
@@ -52,6 +50,7 @@ def test_event_queue_add(queue_with_events_fixture):
 
     # Make sure every item has an event
     assert len(add_events) == len(default_items)  
+
 
 def test_event_queue_lifecycle(queue_with_events_fixture):
     """Test event queue lifestyle works as expected.
