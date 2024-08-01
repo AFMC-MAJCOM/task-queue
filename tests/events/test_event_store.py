@@ -116,6 +116,7 @@ def test_add_events_no_duplicates(new_empty_store, random_events):
 
     events_before = new_empty_store.get(event_name)
 
+    #Adding the same events again should be blocked
     new_empty_store.add(random_events)
 
     events_after = new_empty_store.get(event_name)
