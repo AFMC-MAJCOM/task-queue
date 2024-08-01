@@ -4,6 +4,7 @@
 import pytest
 import unittest
 from unittest import mock
+from requests.exceptions import RequestException
 
 from task_queue.work_queue_api_client import ApiClient
 
@@ -12,7 +13,6 @@ put_valid_body = {
     1: [1, 2, 3],
     2: [4, 5, 6]
 }
-put_valid_body_as_str = '{"1": [1, 2, 3], "2": [4, 5, 6]}'
 put_invalid_body = "THIS_IS_INVALID"
 test_client = ApiClient(url)
 
@@ -25,8 +25,13 @@ def mocked_requests_put(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    if args[0] == "http://localhost:8000/api/v1/queue/put":
-        return MockResponse("", 200)
+        def raise_for_status(self):
+            if self.status_code >= 400:
+                raise RequestException("ERROR!")
+
+    if args[0] == f"{url}/api/v1/queue/put":
+        if 'json' in kwargs and type(kwargs['json']) == dict:
+            return MockResponse("", 200)
 
     return MockResponse("", 400)
 
@@ -39,10 +44,6 @@ def test_put_valid_body(mock_post):
     assert response == None
 
 @mock.patch('requests.post', side_effect=mocked_requests_put)
-def test_put_valid_body_as_str(mock_post):
-    response = test_client.put(put_valid_body_as_str)
-    assert response == None
-
-def test_put_invalid_body():
-    with pytest.raises(ValueError):
+def test_put_invalid_body(mock_post):
+    with pytest.raises(RequestException):
         test_client.put(put_invalid_body)

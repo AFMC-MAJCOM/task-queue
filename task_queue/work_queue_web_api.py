@@ -5,11 +5,13 @@ from dataclasses import dataclass, asdict
 import os
 
 from fastapi import FastAPI
+from fastapi import HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
+from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
 
@@ -107,6 +109,27 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
+@dataclass
+class InMemoryQueueSettings(QueueSettings):
+    """Class concerning the In Memory Queue settings.
+
+    The only implementation of this class so far is for testing.
+    """
+    @staticmethod
+    def from_env(env_dict):
+        """Returns instance of QueueSettings
+
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+        """
+        return InMemoryQueueSettings()
+
+    def make_queue(self):
+        """Returns QueueBase object.
+        """
+        return in_memory_queue()
 
 def queue_settings_from_env(env_dict):
     """Creates an instance of QueueSettings from an environment dictionary.
@@ -125,6 +148,8 @@ def queue_settings_from_env(env_dict):
         return S3QueueSettings.from_env(env_dict)
     if impl == "sql-json":
         return SqlQueueSettings.from_env(env_dict)
+    if impl == "in-memory":
+        return InMemoryQueueSettings.from_env(env_dict)
     return None
 
 queue_settings = queue_settings_from_env(os.environ)
@@ -181,9 +206,6 @@ async def put(items:dict):
         Dictionary of Queue Items to add Queue, where Item is a key:value
         pair, where key is the item ID and value is the queue item body.
     """
-    try:
-        queue.put(items)
-    except Exception as e:
-        raise HTTPException(status_code=404, detail="Item not found")
+    queue.put(items)
 
 

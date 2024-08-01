@@ -26,18 +26,8 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-
-        if type(items) != dict:
-            try:
-                items = json.loads(items)
-            except Exception:
-                raise ValueError("The passed items are invalid")
-        try:
-            r = requests.post(f"{self.api_base_url}put", json=items)
-            if r.status_code >= 300:
-                raise RequestException("There was an error")
-        except RequestException as e:
-            raise RequestException(e)
+        response = requests.post(f"{self.api_base_url}put", json=items)
+        response.raise_for_status()
 
     def get(self, n_items=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.
