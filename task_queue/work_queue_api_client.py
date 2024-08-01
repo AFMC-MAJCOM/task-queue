@@ -1,10 +1,8 @@
 """Wherein is contained the ApiClient class.
 """
+import requests
 
 from .queue_base import QueueBase
-import requests
-from requests.exceptions import RequestException
-import json
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -14,8 +12,9 @@ class ApiClient(QueueBase):
     api_base_url: str
         The base url for all api endpoints.
     """
-    def __init__(self, api_base_url: str):
+    def __init__(self, api_base_url: str, timeout: float = 5):
         self.api_base_url = api_base_url + "/api/v1/queue/"
+        self.timeout = timeout
 
     def put(self, items):
         """Adds a new Item to the Queue in the WAITING stage.
@@ -26,7 +25,8 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-        response = requests.post(f"{self.api_base_url}put", json=items)
+        response = requests.post(f"{self.api_base_url}put", json=items, \
+                                 timeout=self.timeout)
         response.raise_for_status()
 
     def get(self, n_items=1):

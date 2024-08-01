@@ -2,10 +2,8 @@
 """
 
 import os
-import pytest
 
 from fastapi.testclient import TestClient
-from fastapi import HTTPException
 
 import tests.common_queue as qtest
 from task_queue.queue_base import QueueItemStage

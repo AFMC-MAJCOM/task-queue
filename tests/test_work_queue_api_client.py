@@ -2,7 +2,6 @@
 """
 
 import pytest
-import unittest
 from unittest import mock
 from requests.exceptions import RequestException
 
@@ -30,7 +29,7 @@ def mocked_requests_put(*args, **kwargs):
                 raise RequestException("ERROR!")
 
     if args[0] == f"{url}/api/v1/queue/put":
-        if 'json' in kwargs and type(kwargs['json']) == dict:
+        if 'json' in kwargs and isinstance(kwargs['json'], dict):
             return MockResponse("", 200)
 
     return MockResponse("", 400)
@@ -41,7 +40,7 @@ def test_constructor():
 @mock.patch('requests.post', side_effect=mocked_requests_put)
 def test_put_valid_body(mock_post):
     response = test_client.put(put_valid_body)
-    assert response == None
+    assert response is None
 
 @mock.patch('requests.post', side_effect=mocked_requests_put)
 def test_put_invalid_body(mock_post):

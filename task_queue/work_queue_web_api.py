@@ -5,7 +5,6 @@ from dataclasses import dataclass, asdict
 import os
 
 from fastapi import FastAPI
-from fastapi import HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
@@ -207,5 +206,3 @@ async def put(items:dict):
         pair, where key is the item ID and value is the queue item body.
     """
     queue.put(items)
-
-
