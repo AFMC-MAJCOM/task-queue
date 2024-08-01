@@ -80,7 +80,6 @@ class SqlEventStore(EventStoreInterface):
             )
 
             items = session.exec(statement).all()
-            print(items)
             if len(items) > 0:
                 return True
             return False
@@ -108,6 +107,10 @@ class SqlEventStore(EventStoreInterface):
                 print('duplicate caught')
             else:
                 print(db_evt)
+
+        if not db_events:
+            print('list is all duplicates')
+            return
 
         with Session(self.engine) as session:
             statement = insert(SqlEventStoreModel).values(db_events)

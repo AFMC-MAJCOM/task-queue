@@ -105,14 +105,13 @@ def test_add_events_no_duplicates(new_empty_store, events):
     """Tests that trying to add duplicate events to a store 
         does not add events.
     """
-    print(f'{len(events)} events')
     new_empty_store.add(events)
 
     event_name = test_event_names[0]
 
     events_before = new_empty_store.get(event_name)
 
-    #Adding the same events again should be blocked
+    #Adding the same events again should not insert
     new_empty_store.add(events)
 
     events_after = new_empty_store.get(event_name)

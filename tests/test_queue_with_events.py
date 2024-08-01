@@ -49,7 +49,7 @@ def test_event_queue_add(queue_with_events_fixture):
         assert queue_add_event.queue_index_key in default_items
 
     # Make sure every item has an event
-    assert len(add_events) == len(default_items)  
+    assert len(add_events) == len(default_items)
 
 
 def test_event_queue_lifecycle(queue_with_events_fixture):
