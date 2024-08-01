@@ -4,7 +4,7 @@ API.
 from dataclasses import dataclass, asdict
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
@@ -180,7 +180,10 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
     -----------
     Returns the status of Item passed in.
     """
-    return queue.lookup_status(item_id)
+    try:
+        return queue.lookup_status(item_id)
+    except KeyError:
+        raise HTTPException(status_code=400, detail=f"{item_id} not in Queue")
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> dict:

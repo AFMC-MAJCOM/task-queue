@@ -19,15 +19,11 @@ def mocked_requests(*args, **kwargs):
         def json(self):
             return self.json_data
 
-        def raise_for_status(self):
-            if self.status_code >= 400:
-                raise RequestException("ERROR ", self.status_code)
-
     # Mock response for lookup_status
     if args[0] == f"{url}/api/v1/queue/status/good-item-id":
         return MockResponse(QueueItemStage.WAITING,200)
     elif args[0] == f"{url}/api/v1/queue/status/bad-item-id":
-        raise KeyError('bad-item-id')
+        return MockResponse("bad-item-id not in Queue", 400)
     # Mock response for description
     elif args[0] == f"{url}/api/v1/queue/describe":
         return MockResponse({"good":"description"},200)
@@ -51,8 +47,8 @@ def test_client_lookup_status_invalid(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status_fail(mock_get):
-    with pytest.raises(KeyError):
-        test_client.lookup_status('bad-item-id')
+    response = test_client.lookup_status('bad-item-id')
+    assert response == "bad-item-id not in Queue"
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):

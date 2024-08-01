@@ -2,7 +2,6 @@
 """
 
 import os
-import pytest
 
 from fastapi.testclient import TestClient
 
@@ -60,8 +59,9 @@ def test_v1_queue_status():
     response = client.get(f"/api/v1/queue/status/{fail[0]}")
     assert response.status_code == 200
     assert response.json() == QueueItemStage.FAIL.value
-    with pytest.raises(KeyError):
-        response = client.get(f"/api/v1/queue/status/{'bad-item-id'}")
+    response = client.get(f"/api/v1/queue/status/{'bad-item-id'}")
+    assert response.status_code == 400
+    assert response.json() == {"detail":"bad-item-id not in Queue"}
 
 def test_v1_queue_describe():
     """Tests the describe endpoint.
