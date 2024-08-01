@@ -35,7 +35,7 @@ def test_put_get(queue):
     queue.put(default_items)
     get = queue.get(len(default_items))
 
-    print(len(default_items))
+    print(get)
 
     for k, v1 in get:
         assert any([

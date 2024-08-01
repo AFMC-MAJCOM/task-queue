@@ -64,6 +64,7 @@ class SQLQueue(QueueBase):
 
         db_items = []
         for k, v in items.items():
+            print("\n++++++++", k, "++++++++++++++++++++++++")
             try:
                 db_items.append(
                     SqlQueue(
@@ -221,8 +222,7 @@ class SQLQueue(QueueBase):
             )
 
             result = session.exec(statement).all()
-            item_ids = [item[0] for item in result]
-            return item_ids
+            return result
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.

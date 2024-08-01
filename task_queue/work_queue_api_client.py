@@ -91,6 +91,7 @@ class ApiClient(QueueBase):
         """
         response = requests.get(f"{self.api_base_url}status/{queue_item_id}",
                                timeout=self.timeout)
+        response.raise_for_status()
         return response.json()
 
     def lookup_state(self, queue_item_stage):
