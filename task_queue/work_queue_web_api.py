@@ -3,7 +3,6 @@ API.
 """
 from dataclasses import dataclass, asdict
 import os
-import json
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
