@@ -93,6 +93,19 @@ class ApiClient(QueueBase):
         """
         return None
 
+    def lookup_state(self, queue_item_stage):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
 
@@ -105,6 +118,20 @@ class ApiClient(QueueBase):
         ------------
         Returns the Queue Item ID, the status of that Item, and the body, or it
         will raise an error if Item is not in Queue.
+        """
+        return None
+
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that were moved from FAIL to WAITING
         """
         return None
 

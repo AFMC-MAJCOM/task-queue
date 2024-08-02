@@ -179,6 +179,25 @@ class InMemoryQueue(QueueBase):
 
         raise KeyError(queue_item_id)
 
+    def lookup_state(self, queue_item_stage):
+        """Lookup which item ids are in the current Queue stage.
+
+        Parameters:
+        -----------
+        queue_item_stage: QueueItemStage
+            stage of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of all item ids in the current queue stage.
+        """
+        item_ids = []
+        if queue_item_stage in QueueItemStage:
+            dict_for_stage = self.memory_queue.get_for_stage(queue_item_stage)
+            item_ids = list(dict_for_stage.keys())
+            return item_ids
+        return item_ids
+
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
 
@@ -209,6 +228,22 @@ class InMemoryQueue(QueueBase):
         """
         desc = {"implementation": "memory"}
         return desc
+
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        item_ids = self._requeue(item_ids)
+        for item in item_ids:
+            move_dict_item(
+                self.memory_queue.fail,
+                self.memory_queue.waiting,
+                item
+            )
 
 
 # Pylint is disabled because the goal is to just have
