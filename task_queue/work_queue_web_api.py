@@ -2,7 +2,9 @@
 API.
 """
 from dataclasses import dataclass, asdict
+from typing import Dict, Any
 import os
+from enum import Enum
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
@@ -155,7 +157,7 @@ queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes() -> dict:
+async def get_queue_sizes() -> Dict[str, int]:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -187,7 +189,7 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue() -> dict:
+async def describe_queue() -> Dict[str,Any]:
     """API endpoint to descibe the Queue.
 
     Returns:

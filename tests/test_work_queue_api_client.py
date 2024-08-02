@@ -33,7 +33,7 @@ def mocked_requests(*args, **kwargs):
         route = re.sub('good-item-id','{item_id}',route)
 
     if route in api_routes:
-        return MockResponse({"good":"dictionary"},200)
+        return MockResponse({12:"dictionary"},200)
 
     return MockResponse("Bad URL", 404)
 
