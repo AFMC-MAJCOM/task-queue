@@ -127,15 +127,13 @@ def test_get_events(new_empty_store, events):
     """
     event_name = test_event_names[0]
 
-    # Compare before/after in case tests are run out of order
-    events_before = new_empty_store.get(event_name)
-
+    #Add to store if this test gets run first
     new_empty_store.add(events)
 
-    events_after = new_empty_store.get(event_name)
+    events_with_name = new_empty_store.get(event_name)
 
-    assert len(events_after) - len(events_before) == n_events_per_type
-    assert all( e.name == event_name for e in events_after )
+    assert len(events_with_name) == n_events_per_type
+    assert all( e.name == event_name for e in events_with_name )
 
 
 @pytest.mark.parametrize("new_empty_store",
