@@ -14,8 +14,6 @@ test_client = ApiClient(url)
 
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
-print("\n-----------------------------------------")
-print(api_routes)
 
 def mocked_requests(*args, **kwargs):
     class MockResponse:
@@ -26,22 +24,25 @@ def mocked_requests(*args, **kwargs):
         def raise_for_status(self):
             if self.status_code >= 400:
                 raise RequestException("ERROR ", self.status_code)
-    ## Redo this to be the opposite - look for api_route in my string and regex out the {---}
-    # if args[0] not in api_routes:
-    #     print(args[0])
-    #     return MockResponse("Invalid URL", 404)
+
     # Mock response for lookup_status
     if args[0] == f"{url}/api/v1/queue/status/good-item-id":
-        return MockResponse(QueueItemStage.WAITING,200)
+        route = re.sub('good-item-id','{item_id}',args[0])
+        if route in api_routes:
+            return MockResponse(QueueItemStage.WAITING,200)
     elif args[0] == f"{url}/api/v1/queue/status/bad-item-id":
-        return MockResponse("bad-item-id not in Queue", 400)
+        route = re.sub('bad-item-id','{item_id}',args[0])
+        if route in api_routes:
+            return MockResponse("bad-item-id not in Queue", 400)
     # Mock response for description
     elif args[0] == f"{url}/api/v1/queue/describe":
-        return MockResponse({"good":"description"},200)
+        if args[0] in api_routes:
+            return MockResponse({"good":"description"},200)
     # Mock response for get_queue_sizes
     elif args[0] == f"{url}/api/v1/queue/sizes":
-        return MockResponse({"good":"sizes"},200)
-    return MockResponse("", 400)
+        if args[0] in api_routes:
+            return MockResponse({"good":"sizes"},200)
+    return MockResponse("Bad URL", 404)
 
 def test_constructor():
     assert test_client.api_base_url == f"{url}/api/v1/queue/"
