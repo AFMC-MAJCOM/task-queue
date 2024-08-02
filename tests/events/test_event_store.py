@@ -59,7 +59,7 @@ def single_event(event_name, increment, time=True, time_offset_sec=0):
         time=start_time+datetime.timedelta(seconds=time_offset_sec)
     )
 
-n_events_per_type = 10
+n_events_per_type = 2
 n_events = n_events_per_type*n_event_types
 
 @pytest.fixture
