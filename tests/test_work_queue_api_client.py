@@ -6,7 +6,6 @@ from unittest import mock
 from requests.exceptions import RequestException
 
 from task_queue.work_queue_api_client import ApiClient
-from task_queue.queue_base import QueueItemStage
 from task_queue.work_queue_web_api import app
 
 url = "http://localhost:8000"
