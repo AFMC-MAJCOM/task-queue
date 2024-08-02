@@ -198,7 +198,7 @@ async def lookup_queue_item(item_id:str) -> dict:
     the body, or it will raise an error if Item is not in Queue.
     """
     try:
-        response = (queue.lookup_item(item_id))
+        response = queue.lookup_item(item_id)
         return {
             "item_id":response[0],
             "status":response[1],
