@@ -3,16 +3,18 @@ API.
 """
 from dataclasses import dataclass, asdict
 import os
+import json
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
-
+from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
+
 
 @dataclass
 class QueueSettings():
@@ -109,6 +111,27 @@ class SqlQueueSettings(QueueSettings):
         )
 
 
+@dataclass
+class InMemoryQueueSettings(QueueSettings):
+    """Class concerning the In Memory Queue settings.
+    The only implementation of this class so far is for testing.
+    """
+    @staticmethod
+    def from_env(env_dict):
+        """Returns instance of QueueSettings
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+        """
+        return InMemoryQueueSettings()
+
+    def make_queue(self):
+        """Returns QueueBase object.
+        """
+        return in_memory_queue()
+
+
 def queue_settings_from_env(env_dict):
     """Creates an instance of QueueSettings from an environment dictionary.
 
@@ -126,6 +149,8 @@ def queue_settings_from_env(env_dict):
         return S3QueueSettings.from_env(env_dict)
     if impl == "sql-json":
         return SqlQueueSettings.from_env(env_dict)
+    if impl == "in-memory":
+        return InMemoryQueueSettings.from_env(env_dict)
     return None
 
 queue_settings = queue_settings_from_env(os.environ)
@@ -158,6 +183,31 @@ async def lookup_queue_item_status(item_id:str):
     Returns the status of Item passed in.
     """
     return queue.lookup_status(item_id)
+
+@app.get("/api/v1/queue/lookup_item/{item_id}")
+async def lookup_queue_item(item_id:str) -> dict:
+    """API endpoint to lookup an Item currently in the Queue.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Queue Item
+
+    Returns:
+    ------------
+    Returns a dictionary with the Queue Item ID, the status of that Item, and
+    the body, or it will raise an error if Item is not in Queue.
+    """
+    try:
+        response = (queue.lookup_item(item_id))
+        return {
+            "item_id":response[0],
+            "status":response[1],
+            "item_body":response[2],
+        }
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue():

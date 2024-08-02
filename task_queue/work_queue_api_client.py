@@ -1,7 +1,8 @@
 """Wherein is contained the ApiClient class.
 """
+import requests
 
-from .queue_base import QueueBase
+from .queue_base import QueueBase, QueueItemStage
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -11,8 +12,9 @@ class ApiClient(QueueBase):
     api_base_url: str
         The base url for all api endpoints.
     """
-    def __init__(self, api_base_url: str):
+    def __init__(self, api_base_url: str, timeout: float = 5):
         self.api_base_url = api_base_url + "/api/v1/queue/"
+        self.timeout = timeout
 
     def put(self, items):
         """Adds a new Item to the Queue in the WAITING stage.
@@ -102,7 +104,7 @@ class ApiClient(QueueBase):
         Returns a list of all item ids in the current queue stage.
         """
 
-    def lookup_item(self, queue_item_id):
+    def lookup_item(self, queue_item_id:str) -> dict:
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -112,10 +114,14 @@ class ApiClient(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body, or it
-        will raise an error if Item is not in Queue.
+        Returns a dictionary with the Queue Item ID, the status of that Item,
+        and the body, or it will raise an error if Item is not in Queue.
         """
-        return None
+        response = requests.get(
+            f"{self.api_base_url}lookup_item/{queue_item_id}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def description(self):
         """A brief description of the Queue.
