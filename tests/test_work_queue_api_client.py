@@ -27,9 +27,10 @@ def mocked_requests(*args, **kwargs):
             if self.status_code >= 400:
                 raise RequestException("ERROR ", self.status_code)
 
+    route = args[0]
     # Replace item_id passed into url
-    if 'good-item-id' in args[0]:
-        route = re.sub('good-item-id','{item_id}',args[0])
+    if 'good-item-id' in route:
+        route = re.sub('good-item-id','{item_id}',route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
