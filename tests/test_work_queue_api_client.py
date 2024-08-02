@@ -28,19 +28,12 @@ def mocked_requests(*args, **kwargs):
             if self.status_code >= 400:
                 raise RequestException("ERROR ", self.status_code)
 
-    # Mock response for lookup_status
-    if args[0] == f"{url}/api/v1/queue/status/good-item-id":
+    # Replace item_id passed into url
+    if 'good-item-id' in args[0]:
         route = re.sub('good-item-id','{item_id}',args[0])
-        if route in api_routes:
-            return MockResponse(QueueItemStage.WAITING,200)
-    # Mock response for description
-    elif args[0] == f"{url}/api/v1/queue/describe":
-        if args[0] in api_routes:
-            return MockResponse({"good":"description"},200)
-    # Mock response for get_queue_sizes
-    elif args[0] == f"{url}/api/v1/queue/sizes":
-        if args[0] in api_routes:
-            return MockResponse({"good":"sizes"},200)
+
+    if route in api_routes:
+        return MockResponse({"good":"dictionary"},200)
 
     return MockResponse("Bad URL", 404)
 
@@ -57,7 +50,7 @@ def test_bad_url(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
     response = test_client.lookup_status('good-item-id')
-    assert isinstance(response, QueueItemStage)
+    assert isinstance(response, dict)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
