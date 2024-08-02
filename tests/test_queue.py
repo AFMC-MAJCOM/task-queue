@@ -11,14 +11,12 @@ from task_queue.in_memory_queue import in_memory_queue
 import task_queue.sql_queue as sqlq
 import task_queue.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
+from task_queue import TaskQueueSettings
 import tests.common_queue as qtest
 from .utils import test_sql_engine
 
 
-AWS_UNIT_TEST_QUEUE_BASE = \
-    "s3://data-dev-998806663306/unit-test-space/s3_queue_"
-LOCAL_UNIT_TEST_QUEUE_BASE = "s3://unit-tests/queue/queue_"
-UNIT_TEST_QUEUE_BASE = LOCAL_UNIT_TEST_QUEUE_BASE
+UNIT_TEST_QUEUE_BASE = TaskQueueSettings().UNIT_TEST_QUEUE_BASE
 
 
 

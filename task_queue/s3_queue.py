@@ -7,10 +7,9 @@ from functools import reduce
 import s3fs
 
 from task_queue.queue_base import QueueBase
+from task_queue import TaskQueueSettings
 from . import s5fs
 from . import queue_base
-
-INDEX_NAME = "index.txt"
 
 fs = s3fs.S3FileSystem(default_cache_type="none")
 
@@ -19,7 +18,6 @@ class JsonS3Queue(QueueBase):
     """Class for the JsonS3Queue.
     """
     def __init__(self, queue_base_s3_path):
-        # self._index_name = 
         self.queue_base_path = queue_base_s3_path
         self.queue_path = os.path.join(
             queue_base_s3_path,
@@ -29,7 +27,7 @@ class JsonS3Queue(QueueBase):
             queue_base_s3_path,
             queue_base.QueueItemStage.PROCESSING.name
         )
-        self.queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
+        self.queue_index_path = os.path.join(queue_base_s3_path, "index.txt")
         self.success_path = os.path.join(
             queue_base_s3_path,
             queue_base.QueueItemStage.SUCCESS.name

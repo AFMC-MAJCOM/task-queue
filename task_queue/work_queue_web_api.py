@@ -10,8 +10,10 @@ from sqlalchemy import create_engine
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
+from task_queue import TaskQueueSettings
 
 
+settings = TaskQueueSettings()
 app = FastAPI()
 
 @dataclass
@@ -53,9 +55,7 @@ class S3QueueSettings(QueueSettings):
         env_dict: dict
             Dictionary of environment variables.
         """
-        return S3QueueSettings(
-            env_dict['S3_QUEUE_BASE_PATH']
-        )
+        return S3QueueSettings(settings.S3_QUEUE_BASE_PATH)
 
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
@@ -84,20 +84,20 @@ class SqlQueueSettings(QueueSettings):
         -----------
         Returns an instance of SQLQueueSettings.
         """
-        if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
+        if settings.SQL_QUEUE_CONNECTION_STRING is not None:
             conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
         else:
-            user = env_dict['SQL_QUEUE_POSTGRES_USER']
-            password = env_dict['SQL_QUEUE_POSTGRES_PASSWORD']
-            host = env_dict['SQL_QUEUE_POSTGRES_HOSTNAME']
-            database = env_dict['SQL_QUEUE_POSTGRES_DATABASE']
+            user = settings.SQL_QUEUE_POSTGRES_USER
+            password = settings.SQL_QUEUE_POSTGRES_PASSWORD
+            host = settings.SQL_QUEUE_POSTGRES_HOSTNAME
+            database = settings.SQL_QUEUE_POSTGRES_DATABASE
 
             conn_str = \
                 f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
 
         return SqlQueueSettings(
             conn_str,
-            env_dict['SQL_QUEUE_NAME'],
+            settings.SQL_QUEUE_NAME,
         )
 
     def make_queue(self):
@@ -107,7 +107,6 @@ class SqlQueueSettings(QueueSettings):
             create_engine(self.connection_string),
             self.queue_name
         )
-
 
 def queue_settings_from_env(env_dict):
     """Creates an instance of QueueSettings from an environment dictionary.
@@ -121,7 +120,7 @@ def queue_settings_from_env(env_dict):
     -----------
     Returns QueueSettings.
     """
-    impl = env_dict['QUEUE_IMPLEMENTATION']
+    impl = settings.QUEUE_IMPLEMENTATION.value
     if impl == "s3-json":
         return S3QueueSettings.from_env(env_dict)
     if impl == "sql-json":

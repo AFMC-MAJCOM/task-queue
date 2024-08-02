@@ -89,8 +89,7 @@ class QueueWithEvents(QueueBase):
         self.add_event_name = add_event_name
         self.move_event_name = move_event_name
 
-        settings = TaskQueueSettings()
-        self.event_schema_version = settings.event_schema_version
+        self.event_schema_version = "0.0.1"
 
     # Pylint disabled because BaseException is used to set exc
     # pylint: disable=broad-exception-caught
