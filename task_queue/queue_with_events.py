@@ -280,6 +280,23 @@ class QueueWithEvents(QueueBase):
         }
         return desc
 
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        item_ids = self._requeue(item_ids)
+        self.queue.requeue(item_ids)
+        for item in item_ids:
+            self.record_queue_move_event(
+                item,
+                QueueItemStage.FAIL,
+                QueueItemStage.WAITING
+            )
+
 
     def record_queue_move_event(
         self,
