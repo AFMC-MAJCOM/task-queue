@@ -181,7 +181,11 @@ async def lookup_queue_item_status(item_id:str):
     -----------
     Returns the status of Item passed in.
     """
-    return queue.lookup_status(item_id)
+    try:
+        return queue.lookup_status(item_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_item/{item_id}")
 async def lookup_queue_item(item_id:str) -> dict:
