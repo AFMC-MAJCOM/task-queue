@@ -1,12 +1,15 @@
 """Tests for validating the work queue api client
 """
 import os
-import pytest
 from unittest import mock
 from requests.exceptions import RequestException
 
 from task_queue.work_queue_api_client import ApiClient
 
+# Disable the wrong import position warning because we only want to import
+# work_queue_web_api after setting the environment variable for testing.
+# pylint: disable=wrong-import-position
+# ruff: noqa: E402
 os.environ['QUEUE_IMPLEMENTATION'] = "in-memory"
 from task_queue.work_queue_web_api import app
 

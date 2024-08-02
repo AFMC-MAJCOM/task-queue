@@ -16,7 +16,7 @@ class ApiClient(QueueBase):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
-    def put(self, items):
+    def put(self, items: dict) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
