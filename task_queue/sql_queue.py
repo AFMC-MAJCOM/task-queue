@@ -64,7 +64,6 @@ class SQLQueue(QueueBase):
 
         db_items = []
         for k, v in items.items():
-            print("\n++++++++", k, "++++++++++++++++++++++++")
             try:
                 db_items.append(
                     SqlQueue(

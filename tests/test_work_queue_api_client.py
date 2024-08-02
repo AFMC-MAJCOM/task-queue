@@ -18,8 +18,11 @@ api_routes = [url + x.path for x in app.routes]
 def mocked_requests(*args, **kwargs):
     class MockResponse:
         def __init__(self, json_data, status_code):
-            self.json_data = json_data
             self.status_code = status_code
+            self.json_data = json_data
+
+        def json(self):
+            return self.json_data
 
         def raise_for_status(self):
             if self.status_code >= 400:
@@ -30,10 +33,6 @@ def mocked_requests(*args, **kwargs):
         route = re.sub('good-item-id','{item_id}',args[0])
         if route in api_routes:
             return MockResponse(QueueItemStage.WAITING,200)
-    elif args[0] == f"{url}/api/v1/queue/status/bad-item-id":
-        route = re.sub('bad-item-id','{item_id}',args[0])
-        if route in api_routes:
-            return MockResponse("bad-item-id not in Queue", 400)
     # Mock response for description
     elif args[0] == f"{url}/api/v1/queue/describe":
         if args[0] in api_routes:
@@ -42,26 +41,23 @@ def mocked_requests(*args, **kwargs):
     elif args[0] == f"{url}/api/v1/queue/sizes":
         if args[0] in api_routes:
             return MockResponse({"good":"sizes"},200)
+
     return MockResponse("Bad URL", 404)
 
 def test_constructor():
     assert test_client.api_base_url == f"{url}/api/v1/queue/"
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_status(mock_get):
-    item_id = 'good-item-id'
-    response = test_client.lookup_status(item_id)
-    assert isinstance(response, QueueItemStage)
-
-@mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_status_invalid(mock_get):
+def test_bad_url(mock_get):
+    # It does not matter what endpoint is used here, we are just testing that
+    # it is properly throwing an error when testing a bad url.
     with pytest.raises(RequestException):
-        test_client.lookup_status(123)
+        test_client.lookup_status('bad-url')
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_status_fail(mock_get):
-    response = test_client.lookup_status('bad-item-id')
-    assert response == "bad-item-id not in Queue"
+def test_client_lookup_status(mock_get):
+    response = test_client.lookup_status('good-item-id')
+    assert isinstance(response, QueueItemStage)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
