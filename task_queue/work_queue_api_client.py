@@ -145,6 +145,7 @@ class ApiClient(QueueBase):
         """
         response = requests.get(f"{self.api_base_url}describe",
                                 timeout=self.timeout)
+        response.raise_for_status()
         return response.json()
 
     def get_queue_sizes(self) -> dict:
@@ -156,4 +157,5 @@ class ApiClient(QueueBase):
         """
         response = requests.get(f"{self.api_base_url}sizes",
                                timeout=self.timeout)
+        response.raise_for_status()
         return response.json()

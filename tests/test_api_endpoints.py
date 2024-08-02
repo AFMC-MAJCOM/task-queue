@@ -53,12 +53,15 @@ def test_v1_queue_status():
     response = client.get(f"/api/v1/queue/status/{proc[0]}")
     assert response.status_code == 200
     assert response.json() == QueueItemStage.PROCESSING.value
+
     response = client.get(f"/api/v1/queue/status/{succ[0]}")
     assert response.status_code == 200
     assert response.json() == QueueItemStage.SUCCESS.value
+
     response = client.get(f"/api/v1/queue/status/{fail[0]}")
     assert response.status_code == 200
     assert response.json() == QueueItemStage.FAIL.value
+
     response = client.get(f"/api/v1/queue/status/{'bad-item-id'}")
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
