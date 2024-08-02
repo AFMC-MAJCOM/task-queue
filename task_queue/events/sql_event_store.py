@@ -99,9 +99,8 @@ class SqlEventStore(EventStoreInterface):
             from_event(evt).model_dump(exclude_unset=True)
             for evt in events
         ]
-        db_events_copy = db_events
 
-        for db_evt in db_events_copy:
+        for db_evt in db_events[:]:
             if self._check_for_duplicates(db_evt):
                 db_events.remove(db_evt)
                 print('duplicate caught')
