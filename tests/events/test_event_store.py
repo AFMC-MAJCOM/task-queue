@@ -28,7 +28,7 @@ class TestEventData(BaseModel):
     some_string : str
     some_dict : dict
 
-def single_event(event_name, increment, time=True, time_offset_sec=0):
+def single_event(event_name, increment, time_offset_sec=0):
     """Creates a random event with the test event data.
 
     Parameters:
@@ -73,10 +73,10 @@ def events():
     -----------
     List of events.
     """ 
-    return [
-        single_event(test_event_names[i%n_event_types], i,(i // n_event_types))
-        for i in range(0, n_events)
-    ]
+    events = []
+    for i in range(0, n_events):
+        events.append(single_event(test_event_names[i%n_event_types],i,i))
+    return events
 
 ALL_EVENT_STORE_TYPES = ["memory", "sql"]
 
@@ -110,6 +110,7 @@ def test_add_events_no_duplicates(new_empty_store, events):
         does not add events.
     """
     #In case this test gets run first
+    assert len(events) == n_events
     new_empty_store.add(events)
 
     event_name = test_event_names[0]
