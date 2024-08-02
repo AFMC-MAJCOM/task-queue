@@ -265,6 +265,20 @@ class SQLQueue(QueueBase):
         }
         return desc
 
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        for item in self._requeue(item_ids):
+            update_stage(self.engine,
+                         self.queue_name,
+                         QueueItemStage.WAITING,
+                         item)
+
 
 def update_stage(engine, queue_name, new_stage, item_key):
     """Updates the stage of an Item.

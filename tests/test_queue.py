@@ -167,6 +167,30 @@ def test_put_empty(new_empty_queue):
     new_empty_queue.put({})
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_requeue_empty(new_empty_queue):
+    """Tests requeue with no FAILED items does not raise error.
+    """
+    qtest.test_requeue_empty(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_requeue_list_input(new_empty_queue):
+    """Tests requeue with an input list of strings.
+    """
+    qtest.test_requeue_list_input(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_requeue_string_input(new_empty_queue):
+    """Tests requeue with an input string.
+    """
+    qtest.test_requeue_string_input(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_requeue_invalid_ids(new_empty_queue):
+    """Tests requeue with an an invalid id.
+    """
+    qtest.test_requeue_invalid_ids(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_lookup_state(new_empty_queue):
     """Tests that lookup_state works as expected.
     """
