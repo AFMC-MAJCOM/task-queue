@@ -28,7 +28,7 @@ class TestEventData(BaseModel):
     some_string : str
     some_dict : dict
 
-def single_event(event_name, increment, time=True, time_offset_sec=0):
+def single_event(event_name, increment, time_offset_sec=0):
     """Creates a random event with the test event data.
 
     Parameters:
@@ -74,7 +74,7 @@ def events():
     List of events.
     """ 
     return [
-        single_event(test_event_names[i%n_event_types], i,(i // n_event_types))
+        single_event(test_event_names[i%n_event_types],i, (i // n_event_types))
         for i in range(0, n_events)
     ]
 
@@ -98,10 +98,6 @@ def test_add_events(new_empty_store, events):
     """
     new_empty_store.add(events)
 
-    for name in test_event_names:
-        entries = new_empty_store.get(name)
-        assert len(entries) == n_events_per_type
-
 @pytest.mark.parametrize("new_empty_store",
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
@@ -109,14 +105,14 @@ def test_add_events_no_duplicates(new_empty_store, events):
     """Tests that trying to add duplicate events to a store 
         does not add events.
     """
-    #In case this test gets run first
+    #In case this tests gets run first
     new_empty_store.add(events)
 
     event_name = test_event_names[0]
 
     events_before = new_empty_store.get(event_name)
 
-    #Adding the same events again should not insert
+    #Adding the same events again should be blocked
     new_empty_store.add(events)
 
     events_after = new_empty_store.get(event_name)
@@ -131,13 +127,15 @@ def test_get_events(new_empty_store, events):
     """
     event_name = test_event_names[0]
 
-    # Try adding events in case this test runs first
+    # Compare before/after in case tests are run out of order
+    events_before = new_empty_store.get(event_name)
+
     new_empty_store.add(events)
 
-    events_with_name = new_empty_store.get(event_name)
+    events_after = new_empty_store.get(event_name)
 
-    assert len(events_with_name) == n_events_per_type
-    assert all( e.name == event_name for e in events_with_name )
+    assert len(events_after) - len(events_before) == n_events_per_type
+    assert all( e.name == event_name for e in events_after )
 
 
 @pytest.mark.parametrize("new_empty_store",

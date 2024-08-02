@@ -103,12 +103,8 @@ class SqlEventStore(EventStoreInterface):
         for db_evt in db_events[:]:
             if self._check_for_duplicates(db_evt):
                 db_events.remove(db_evt)
-                print('duplicate caught')
-            else:
-                print(db_evt)
 
         if not db_events:
-            print('list is all duplicates')
             return
 
         with Session(self.engine) as session:
