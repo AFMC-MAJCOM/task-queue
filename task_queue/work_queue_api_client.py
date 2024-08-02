@@ -122,6 +122,20 @@ class ApiClient(QueueBase):
         """
         return None
 
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+
+        Returns:
+        ------------
+        Returns a list of IDs that were moved from FAIL to WAITING
+        """
+        return None
+
     def description(self) -> dict:
         """A brief description of the Queue.
 

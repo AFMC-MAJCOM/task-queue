@@ -27,6 +27,8 @@ For each queue implementation, there are the following methods:
     - Lookup an item in the queue
 - description :: () -> dict
     - Provides a brief description of the queue.
+- requeue :: ([item_id]) -> [Requed_Ids]
+    - requeue move an item from FAIL to WAITING
 
 ## Implementations
 
