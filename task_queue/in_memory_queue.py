@@ -229,6 +229,22 @@ class InMemoryQueue(QueueBase):
         desc = {"implementation": "memory"}
         return desc
 
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        item_ids = self._requeue(item_ids)
+        for item in item_ids:
+            move_dict_item(
+                self.memory_queue.fail,
+                self.memory_queue.waiting,
+                item
+            )
+
 
 # Pylint is disabled because the goal is to just have
 # the function return False and not fail
