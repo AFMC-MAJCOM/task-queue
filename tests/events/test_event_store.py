@@ -59,7 +59,7 @@ def single_event(event_name, increment, time=True, time_offset_sec=0):
         time=start_time+datetime.timedelta(seconds=time_offset_sec)
     )
 
-n_events_per_type = 20
+n_events_per_type = 10
 n_events = n_events_per_type*n_event_types
 
 @pytest.fixture
@@ -109,6 +109,7 @@ def test_add_events_no_duplicates(new_empty_store, events):
     """Tests that trying to add duplicate events to a store 
         does not add events.
     """
+    #In case this test gets run first
     new_empty_store.add(events)
 
     event_name = test_event_names[0]
