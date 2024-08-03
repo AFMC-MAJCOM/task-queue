@@ -6,7 +6,6 @@ import pydantic
 
 from task_queue.queue_base import QueueBase, QueueItemStage
 from task_queue.events.event import Event
-from task_queue import TaskQueueSettings
 
 
 class QueueAddEventData(pydantic.BaseModel):

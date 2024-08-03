@@ -1,11 +1,10 @@
 """Created SQL engine for pytests.
 """
 import sqlalchemy as sqla
-import os
 
-from task_queue import TaskQueueSettings
+import task_queue.config.config as config
 
-settings = TaskQueueSettings()
+settings = config.TaskQueueSqlSettings()
 
 test_sql_engine = sqla.create_engine(sqla.engine.url.URL(
             drivername="postgresql",

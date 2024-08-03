@@ -3,6 +3,7 @@ API.
 """
 from dataclasses import dataclass, asdict
 import os
+import logging
 
 from fastapi import FastAPI
 from sqlalchemy import create_engine
@@ -10,27 +11,27 @@ from sqlalchemy import create_engine
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
-from task_queue import TaskQueueSettings
+from task_queue import config
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-settings = TaskQueueSettings()
+api_settings = config.TaskQueueApiSettings()
+api_settings.log_settings()
 app = FastAPI()
 
 @dataclass
 class QueueSettings():
     """Class concerning the Queue Settings.
     """
-    # Disabled because this method is inherited
-    # and uses env_dict as a param later
-    # pylint: disable=unused-argument
+
     @staticmethod
-    def from_env(env_dict):
+    def from_env():
         """Returns instance of QueueSettings
 
-        Parameters:
+        Returns:
         -----------
-        env_dict: dict
-            Dictionary of environment variables.
+        A QueueSettings object.
         """
         return QueueSettings()
 
@@ -47,15 +48,18 @@ class S3QueueSettings(QueueSettings):
     s3_base_path : str
 
     @staticmethod
-    def from_env(env_dict):
+    def from_env():
         """Returns an S3QueueSettings object given an s3 Queue Base path.
 
-        Parameters:
+        Returns:
         -----------
-        env_dict: dict
-            Dictionary of environment variables.
+        S3 Queue instance.
         """
-        return S3QueueSettings(settings.S3_QUEUE_BASE_PATH)
+        s3_settings = config.get_task_queue_settings(
+            setting_class = config.TaskQueueS3Settings
+        )
+        s3_settings.log_settings()
+        return S3QueueSettings(s3_settings.S3_QUEUE_BASE_PATH)
 
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
@@ -71,33 +75,31 @@ class SqlQueueSettings(QueueSettings):
     queue_name : str
 
     @staticmethod
-    def from_env(env_dict):
-        """Creates and returns an instance of SqlQueueSettings based on the
-        given env_dict.
-
-        Parameters:
-        -----------
-        env_dict: dict
-            Dictionary of environment variables.
+    def from_env():
+        """Creates and returns an instance of SqlQueueSettings.
 
         Returns:
         -----------
         Returns an instance of SQLQueueSettings.
         """
-        if settings.SQL_QUEUE_CONNECTION_STRING is not None:
-            conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
+        sql_settings = config.get_task_queue_settings(
+            setting_class = config.TaskQueueSqlSettings
+        )
+        sql_settings.log_settings()
+        if sql_settings.SQL_QUEUE_CONNECTION_STRING is not None:
+            conn_str = sql_settings.SQL_QUEUE_CONNECTION_STRING
         else:
-            user = settings.SQL_QUEUE_POSTGRES_USER
-            password = settings.SQL_QUEUE_POSTGRES_PASSWORD
-            host = settings.SQL_QUEUE_POSTGRES_HOSTNAME
-            database = settings.SQL_QUEUE_POSTGRES_DATABASE
+            user = sql_settings.SQL_QUEUE_POSTGRES_USER
+            password = sql_settings.SQL_QUEUE_POSTGRES_PASSWORD
+            host = sql_settings.SQL_QUEUE_POSTGRES_HOSTNAME
+            database = sql_settings.SQL_QUEUE_POSTGRES_DATABASE
 
             conn_str = \
                 f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
 
         return SqlQueueSettings(
             conn_str,
-            settings.SQL_QUEUE_NAME,
+            sql_settings.SQL_QUEUE_NAME,
         )
 
     def make_queue(self):
@@ -108,26 +110,20 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
-def queue_settings_from_env(env_dict):
+def queue_settings_from_env():
     """Creates an instance of QueueSettings from an environment dictionary.
-
-    Parameters:
-    -----------
-    env_dict: dict
-        Dictionary of environment variables.
 
     Returns:
     -----------
     Returns QueueSettings.
     """
-    impl = settings.QUEUE_IMPLEMENTATION.value
-    if impl == "s3-json":
-        return S3QueueSettings.from_env(env_dict)
-    if impl == "sql-json":
-        return SqlQueueSettings.from_env(env_dict)
+    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.S3_JSON:
+        return S3QueueSettings.from_env()
+    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.SQL_JSON:
+        return SqlQueueSettings.from_env()
     return None
 
-queue_settings = queue_settings_from_env(os.environ)
+queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")

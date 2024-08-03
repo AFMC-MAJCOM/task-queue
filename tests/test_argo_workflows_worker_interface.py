@@ -2,15 +2,14 @@
 """
 import random
 import time
-import os
 
 import pytest
 
 from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from task_queue.queue_base import QueueItemStage
-from task_queue import TaskQueueSettings
+from task_queue.config.config import TaskQueueTestSettings
 
-run_argo_tests = TaskQueueSettings().run_argo_tests
+run_argo_tests = TaskQueueTestSettings().run_argo_tests
 
 if not run_argo_tests:
     pytest.skip(allow_module_level=True)
