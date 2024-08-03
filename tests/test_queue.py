@@ -11,12 +11,12 @@ from task_queue.in_memory_queue import in_memory_queue
 import task_queue.sql_queue as sqlq
 import task_queue.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
-from task_queue.config.config import TaskQueueTestSettings
+from task_queue import config
 import tests.common_queue as qtest
 from .utils import test_sql_engine
 
 
-UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
+UNIT_TEST_QUEUE_BASE = config.TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
 
 
 

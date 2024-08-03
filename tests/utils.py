@@ -2,7 +2,7 @@
 """
 import sqlalchemy as sqla
 
-import task_queue.config.config as config
+from task_queue import config
 
 settings = config.TaskQueueSqlSettings()
 
