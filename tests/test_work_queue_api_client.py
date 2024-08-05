@@ -61,3 +61,8 @@ def test_client_description(mock_get):
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
     assert isinstance(response, dict)
+
+@mock.patch('requests.get', side_effect=mocked_requests)
+def test_client_lookup_item(mock_get):
+    response = test_client.lookup_item('good-item-id')
+    assert isinstance(response, dict)
