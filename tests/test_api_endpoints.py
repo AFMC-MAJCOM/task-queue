@@ -2,6 +2,7 @@
 """
 
 import os
+import pytest
 
 from fastapi.testclient import TestClient
 
@@ -18,6 +19,11 @@ client = TestClient(app)
 
 n_items = 20
 default_items = dict([qtest.random_item() for _ in range(n_items)])
+
+@pytest.fixture(autouse=True)
+def clean_queue():
+    # Moves all queue items to WAITING stage before each pytest.
+    queue.wait()
 
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
@@ -75,3 +81,48 @@ def test_v1_queue_describe():
     response = client.get("/api/v1/queue/describe")
     assert response.status_code == 200
     assert response.json() == desc
+
+def test_v1_queue_lookup_state():
+    """Tests the lookup_state endpoint.
+    """
+    queue.put(default_items)
+
+    # Waiting test
+    waiting_id_list = [x for x in default_items]
+    queue_item_stage = QueueItemStage.WAITING.value
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(waiting_id_list)
+
+    # Processing tests
+    proc = queue.get(2)
+    proc_id_list = [x for x,_ in proc]
+    queue_item_stage = QueueItemStage.PROCESSING.value
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(proc_id_list)
+
+    # Success test
+    succ = queue.get(2)
+    succ_id_list = [x for x,_ in succ]
+    for i in succ:
+        queue.success(i[0])
+    queue_item_stage = QueueItemStage.SUCCESS.value
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(succ_id_list)
+
+    # Fail test
+    fail = queue.get(2)
+    fail_id_list = [x for x,_ in fail]
+    for i in fail:
+        queue.fail(i[0])
+    queue_item_stage = QueueItemStage.FAIL.value
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(fail_id_list)
+
+    response = client.get(f"/api/v1/queue/lookup_state/{5}")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Invalid value for QueueItemStage"}
+

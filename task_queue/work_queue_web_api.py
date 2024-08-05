@@ -187,6 +187,30 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+@app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
+async def lookup_queue_item_state(queue_item_stage: int):
+    """API endpoint to look up all item ids from a specific stage.
+
+    Parameters:
+    -----------
+    queue_item_stage: int
+        Desired Queue Item Stage.
+
+    Returns:
+    -----------
+    Returns a list of item ids.
+    """
+    try:
+        queue_item_stage_enum = QueueItemStage(queue_item_stage)
+        result = queue.lookup_state(queue_item_stage_enum)
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400,
+                            detail="Invalid value for QueueItemStage") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=400,
+              detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> Dict[str,Any]:
     """API endpoint to descibe the Queue.
