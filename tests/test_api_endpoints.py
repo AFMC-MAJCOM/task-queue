@@ -82,6 +82,28 @@ def test_v1_queue_describe():
     assert response.status_code == 200
     assert response.json() == desc
 
+def test_v1_queue_lookup_item():
+    """Tests the lookup_item endpoint.
+    """
+    queue.put(default_items)
+
+    get = queue.get(1)
+
+    response_dict = {
+        "item_id":get[0][0],
+        "status":QueueItemStage.PROCESSING.value,
+        "item_body":get[0][1],
+    }
+    # Check correct response when item_id is valid
+    response = client.get(f"/api/v1/queue/lookup_item/{get[0][0]}")
+    assert response.status_code == 200
+    assert response.json() == response_dict
+
+    # Check correct response when item_id is invalid
+    response = client.get(f"/api/v1/queue/lookup_item/{'bad-item-id'}")
+    assert response.status_code == 400
+    assert response.json() == {"detail":"bad-item-id not in Queue"}
+
 def test_get_success():
     """Test getting n_items successfully
     """
@@ -91,3 +113,4 @@ def test_get_success():
     processing = queue.size(QueueItemStage.PROCESSING)
     assert len(items) == n
     assert n == processing
+    
