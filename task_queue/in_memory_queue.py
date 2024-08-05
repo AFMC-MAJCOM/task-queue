@@ -145,6 +145,32 @@ class InMemoryQueue(QueueBase):
             self.memory_queue.fail,
             queue_item_id)
 
+    def wait(self):
+        """Moves all items into the WAITING stage. Primarily used for the API
+        test.
+        """
+        proc_ids = self.lookup_state(QueueItemStage.PROCESSING)
+        for item in proc_ids:
+            move_dict_item(
+                self.memory_queue.processing,
+                self.memory_queue.waiting,
+                item
+            )
+        succ_ids = self.lookup_state(QueueItemStage.SUCCESS)
+        for item in succ_ids:
+            move_dict_item(
+                self.memory_queue.success,
+                self.memory_queue.waiting,
+                item
+            )
+        fail_ids = self.lookup_state(QueueItemStage.FAIL)
+        for item in fail_ids:
+            move_dict_item(
+                self.memory_queue.fail,
+                self.memory_queue.waiting,
+                item
+            )
+
     def size(self, queue_item_stage):
         """Determines how many items are in some stage of the queue.
 

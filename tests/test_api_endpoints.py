@@ -19,6 +19,11 @@ client = TestClient(app)
 n_items = 20
 default_items = dict([qtest.random_item() for _ in range(n_items)])
 
+@pytest.fixture(autouse=True)
+def clean_queue():
+    # Moves all queue items to WAITING stage before each pytest.
+    queue.wait()
+
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
     """
@@ -87,7 +92,6 @@ def test_v1_queue_requeue():
 
     # Check correct response when items are valid list
     response = client.post("/api/v1/queue/requeue", json=fail_ids[1:])
-    print(client.get("/api/v1/queue/sizes").json())
     assert response.status_code == 200
     assert queue.size(QueueItemStage.FAIL) == 1
     assert queue.size(QueueItemStage.WAITING) == len(default_items) - 1
