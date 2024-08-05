@@ -71,3 +71,6 @@ def test_client_lookup_state(mock_get):
     response = test_client.lookup_state(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
+def test_client_lookup_item(mock_get):
+    response = test_client.lookup_item('good-item-id')
+    assert isinstance(response, dict)

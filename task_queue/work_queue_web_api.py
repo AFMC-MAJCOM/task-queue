@@ -15,6 +15,7 @@ from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
 
+
 @dataclass
 class QueueSettings():
     """Class concerning the Queue Settings.
@@ -109,16 +110,15 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
+
 @dataclass
 class InMemoryQueueSettings(QueueSettings):
     """Class concerning the In Memory Queue settings.
-
     The only implementation of this class so far is for testing.
     """
     @staticmethod
     def from_env(env_dict):
         """Returns instance of QueueSettings
-
         Parameters:
         -----------
         env_dict: dict
@@ -130,6 +130,7 @@ class InMemoryQueueSettings(QueueSettings):
         """Returns QueueBase object.
         """
         return in_memory_queue()
+
 
 def queue_settings_from_env(env_dict):
     """Creates an instance of QueueSettings from an environment dictionary.
@@ -211,6 +212,31 @@ async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
     except Exception as exc:
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
+@app.get("/api/v1/queue/lookup_item/{item_id}")
+async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+    """API endpoint to lookup an Item currently in the Queue.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Queue Item
+
+    Returns:
+    ------------
+    Returns a dictionary with the Queue Item ID, the status of that Item, and
+    the body, or it will raise an error if Item is not in Queue.
+    """
+    try:
+        response = queue.lookup_item(item_id)
+        return {
+            "item_id":response[0],
+            "status":response[1],
+            "item_body":response[2],
+        }
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> Dict[str,Any]:
