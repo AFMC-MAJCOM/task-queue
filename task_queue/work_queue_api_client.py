@@ -129,12 +129,12 @@ class ApiClient(QueueBase):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING
         """
-        return None
+        response = requests.post(f"{self.api_base_url}requeue",
+                               timeout=self.timeout,
+                               json=item_ids
+                              )
+        response.raise_for_status()
 
     def description(self):
         """A brief description of the Queue.

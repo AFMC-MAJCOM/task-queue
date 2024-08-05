@@ -1,17 +1,11 @@
 """Test the API endpoints.
 """
-
-import os
+import pytest
 
 from fastapi.testclient import TestClient
 
 import tests.common_queue as qtest
 from task_queue.queue_base import QueueItemStage
-# Disable the wrong import position warning because we only want to import
-# work_queue_web_api after setting the environment variable for testing.
-# pylint: disable=wrong-import-position
-# ruff: noqa: E402
-os.environ['QUEUE_IMPLEMENTATION'] = "in-memory"
 from task_queue.work_queue_web_api import app, queue
 
 client = TestClient(app)
@@ -75,3 +69,31 @@ def test_v1_queue_describe():
     response = client.get("/api/v1/queue/describe")
     assert response.status_code == 200
     assert response.json() == desc
+
+def test_v1_queue_requeue():
+    """Tests the requeue endpoint works.
+    """
+    queue.put(default_items)
+
+    fail_ids = [fail_id for fail_id, _ in queue.get(3)]
+    for fail_id in fail_ids:
+        queue.fail(fail_id)
+
+    waiting_size_before =  queue.size(QueueItemStage.WAITING)
+
+    # Check correct response when items are valid list
+    response = client.post("/api/v1/queue/requeue", json=fail_ids[1:])
+    assert response.status_code == 200
+    assert queue.size(QueueItemStage.FAIL) == 1
+    assert queue.size(QueueItemStage.WAITING) == waiting_size_before + 2
+
+    # Check correct response when item is only a string
+    response = client.post("/api/v1/queue/requeue", json=fail_ids[0])
+    assert response.status_code == 200
+    assert queue.size(QueueItemStage.FAIL) == 0
+    assert queue.size(QueueItemStage.WAITING) == waiting_size_before + 3
+
+    # Check that it does not fail when input is invalid
+    with pytest.warns(UserWarning):
+        response = client.post("/api/v1/queue/requeue", json='bad-item-id')
+        assert response.status_code == 200

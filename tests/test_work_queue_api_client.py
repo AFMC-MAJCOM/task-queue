@@ -61,3 +61,8 @@ def test_client_description(mock_get):
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
     assert isinstance(response, dict)
+
+@mock.patch('requests.post', side_effect=mocked_requests)
+def test_client_requeue(mock_get):
+    response = test_client.requeue('good-item-id')
+    assert response is None
