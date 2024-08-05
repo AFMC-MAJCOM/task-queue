@@ -110,27 +110,6 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
-@dataclass
-class InMemoryQueueSettings(QueueSettings):
-    """Class concerning the In Memory Queue settings.
-
-    The only implementation of this class so far is for testing.
-    """
-    @staticmethod
-    def from_env(env_dict):
-        """Returns instance of QueueSettings
-
-        Parameters:
-        -----------
-        env_dict: dict
-            Dictionary of environment variables.
-        """
-        return InMemoryQueueSettings()
-
-    def make_queue(self):
-        """Returns QueueBase object.
-        """
-        return in_memory_queue()
 
 @dataclass
 class InMemoryQueueSettings(QueueSettings):

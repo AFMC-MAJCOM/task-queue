@@ -2,7 +2,6 @@
 """
 import random
 import warnings
-import uuid
 
 import pytest
 import uuid
