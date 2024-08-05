@@ -31,6 +31,8 @@ def mocked_requests(*args, **kwargs):
     # Replace item_id passed into url
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
+    if '1' in route:
+        route = re.sub('888', '{n_items}', route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -60,4 +62,9 @@ def test_client_description(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
+    assert isinstance(response, dict)
+
+@mock.patch('requests.get', side_effect=mocked_requests)
+def test_client_get(mock_get):
+    response = test_client.get(888)
     assert isinstance(response, dict)

@@ -2,6 +2,7 @@
 """
 
 import os
+import pytest
 
 from fastapi.testclient import TestClient
 
@@ -18,6 +19,11 @@ client = TestClient(app)
 
 n_items = 20
 default_items = dict([qtest.random_item() for _ in range(n_items)])
+
+@pytest.fixture(autouse=True)
+def clean_queue():
+    # Moves all queue items to WAITING stage before each pytest.
+    queue.wait()
 
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
@@ -75,3 +81,13 @@ def test_v1_queue_describe():
     response = client.get("/api/v1/queue/describe")
     assert response.status_code == 200
     assert response.json() == desc
+
+def test_get_success():
+    """Test getting n_items successfully
+    """
+    queue.put(default_items)
+    n = round(n_items / 2)
+    items = client.get(f"/api/v1/queue/get/{n}").json()
+    processing = queue.size(QueueItemStage.PROCESSING)
+    assert len(items) == n
+    assert n == processing

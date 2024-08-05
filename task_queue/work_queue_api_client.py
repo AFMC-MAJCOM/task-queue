@@ -27,7 +27,7 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def get(self, n_items=1):
+    def get(self, n_items:int=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.
 
         Parameters:
@@ -40,7 +40,10 @@ class ApiClient(QueueBase):
         Returns a list of n_items from the Queue, as
         List[(queue_item_id, queue_item_body)]
         """
-        return None
+        response = requests.get(f"{self.api_base_url}get/{n_items}",
+                               timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
