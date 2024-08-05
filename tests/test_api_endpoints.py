@@ -1,6 +1,7 @@
 """Test the API endpoints.
 """
 import pytest
+import os
 
 from fastapi.testclient import TestClient
 
