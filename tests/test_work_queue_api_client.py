@@ -1,5 +1,6 @@
 """Tests for validating the Work Queue API Client
 """
+import os
 import pytest
 import re
 from unittest import mock
@@ -61,3 +62,9 @@ def test_client_description(mock_get):
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
     assert isinstance(response, dict)
+
+@mock.patch('requests.post', side_effect=mocked_requests)
+def test_put_route_exists(mock_post):
+    # This method is just asserting that no exception is raised
+    response = test_client.put({})
+    assert response is None

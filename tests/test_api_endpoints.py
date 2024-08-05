@@ -75,3 +75,16 @@ def test_v1_queue_describe():
     response = client.get("/api/v1/queue/describe")
     assert response.status_code == 200
     assert response.json() == desc
+
+def test_put_valid_items():
+    client.post("/api/v1/queue/put", json=default_items)
+    assert queue.size(QueueItemStage.WAITING) == len(default_items)
+
+def test_put_invalid_items():
+    total_items_before = queue.size(QueueItemStage.WAITING)
+
+    response = client.post("/api/v1/queue/put", json="bad-items")
+    assert response.status_code == 422
+
+    total_items_after = queue.size(QueueItemStage.WAITING)
+    assert total_items_before == total_items_after
