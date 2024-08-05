@@ -2,9 +2,10 @@
 API.
 """
 from dataclasses import dataclass, asdict
+from typing import Dict, Any
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
@@ -155,7 +156,7 @@ queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes():
+async def get_queue_sizes() -> Dict[str, int]:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -168,7 +169,7 @@ async def get_queue_sizes():
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str):
+async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -180,10 +181,14 @@ async def lookup_queue_item_status(item_id:str):
     -----------
     Returns the status of Item passed in.
     """
-    return queue.lookup_status(item_id)
+    try:
+        return queue.lookup_status(item_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue():
+async def describe_queue() -> Dict[str,Any]:
     """API endpoint to descibe the Queue.
 
     Returns:
