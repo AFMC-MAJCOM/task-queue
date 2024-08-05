@@ -5,6 +5,7 @@ import warnings
 import uuid
 
 import pytest
+import uuid
 
 import task_queue.queue_base as qb
 
