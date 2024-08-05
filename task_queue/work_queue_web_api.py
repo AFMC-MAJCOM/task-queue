@@ -194,7 +194,7 @@ async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
 
     Parameters:
     -----------
-    queue_item_stage: int
+    queue_item_stage: str
         Desired Queue Item Stage.
 
     Returns:

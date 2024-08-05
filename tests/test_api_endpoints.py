@@ -90,9 +90,7 @@ def test_v1_queue_lookup_state():
     # Waiting test
     waiting_id_list = [x for x in default_items]
     queue_item_stage = QueueItemStage.WAITING.name
-    print(queue_item_stage)
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
-    print(response.json())
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(waiting_id_list)
 
@@ -101,9 +99,6 @@ def test_v1_queue_lookup_state():
     proc_id_list = [x for x,_ in proc]
     queue_item_stage = QueueItemStage.PROCESSING.name
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
-    print(sorted(proc_id_list))
-    print()
-    print(sorted(response.json()))
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(proc_id_list)
 
@@ -128,6 +123,8 @@ def test_v1_queue_lookup_state():
     assert sorted(response.json()) == sorted(fail_id_list)
 
 def test_v1_queue_lookup_state_fail():
+    """Tests the lookup_state endpoint failure.
+    """
     response = client.get("/api/v1/queue/lookup_state/bad-stage")
     assert response.status_code == 400
     assert response.json() == {"detail": "bad-stage not a Queue Item Stage"}
