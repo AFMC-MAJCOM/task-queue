@@ -107,7 +107,7 @@ class ApiClient(QueueBase):
         Returns a list of all item ids in the current queue stage.
         """
 
-    def lookup_item(self, queue_item_id:str) -> dict:
+    def lookup_item(self, queue_item_id:str):
         """Lookup an Item currently in the Queue.
 
         Parameters:

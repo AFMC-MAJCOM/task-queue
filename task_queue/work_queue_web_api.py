@@ -189,7 +189,7 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_item/{item_id}")
-async def lookup_queue_item(item_id:str) -> dict:
+async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
     """API endpoint to lookup an Item currently in the Queue.
 
     Parameters:
