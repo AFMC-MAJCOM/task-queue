@@ -6,6 +6,11 @@ from fastapi.testclient import TestClient
 
 import tests.common_queue as qtest
 from task_queue.queue_base import QueueItemStage
+# Disable the wrong import position warning because we only want to import
+# work_queue_web_api after setting the environment variable for testing.
+# pylint: disable=wrong-import-position
+# ruff: noqa: E402
+os.environ['QUEUE_IMPLEMENTATION'] = "in-memory"
 from task_queue.work_queue_web_api import app, queue
 
 client = TestClient(app)
