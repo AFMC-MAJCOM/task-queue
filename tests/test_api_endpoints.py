@@ -87,6 +87,7 @@ def test_v1_queue_requeue():
 
     # Check correct response when items are valid list
     response = client.post("/api/v1/queue/requeue", json=fail_ids[1:])
+    print(client.get("/api/v1/queue/sizes").json())
     assert response.status_code == 200
     assert queue.size(QueueItemStage.FAIL) == 1
     assert queue.size(QueueItemStage.WAITING) == len(default_items) - 1
