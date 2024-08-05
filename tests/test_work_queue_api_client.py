@@ -1,6 +1,5 @@
 """Tests for validating the Work Queue API Client
 """
-import os
 import pytest
 import re
 from unittest import mock

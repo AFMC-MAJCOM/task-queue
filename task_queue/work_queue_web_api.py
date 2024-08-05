@@ -201,7 +201,7 @@ async def describe_queue() -> Dict[str,Any]:
     }
 
 @app.post("/api/v1/queue/put")
-async def put(items:dict) -> None:
+async def put(items:Dict[str,Any]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
