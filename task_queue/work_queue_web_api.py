@@ -188,7 +188,7 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
-async def lookup_queue_item_state(queue_item_stage: int) -> list[str]:
+async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
     """API endpoint to look up all item ids from a specific stage.
 
     Parameters:
@@ -201,7 +201,8 @@ async def lookup_queue_item_state(queue_item_stage: int) -> list[str]:
     Returns a list of item ids.
     """
     try:
-        queue_item_stage_enum = QueueItemStage(queue_item_stage)
+        queue_item_stage_enum = QueueItemStage[queue_item_stage]
+        print(queue_item_stage_enum)
         result = queue.lookup_state(queue_item_stage_enum)
         return result
     except ValueError as exc:

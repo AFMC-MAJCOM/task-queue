@@ -106,7 +106,7 @@ class ApiClient(QueueBase):
         ------------
         Returns a list of all item ids in the current queue stage.
         """
-        stage = queue_item_stage.value
+        stage = queue_item_stage.name
         response = requests.get(
             f"{self.api_base_url}lookup_state/{stage}",
             timeout=self.timeout)

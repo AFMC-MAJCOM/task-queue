@@ -89,16 +89,21 @@ def test_v1_queue_lookup_state():
 
     # Waiting test
     waiting_id_list = [x for x in default_items]
-    queue_item_stage = QueueItemStage.WAITING.value
+    queue_item_stage = QueueItemStage.WAITING.name
+    print(queue_item_stage)
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    print(response.json())
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(waiting_id_list)
 
     # Processing tests
     proc = queue.get(2)
     proc_id_list = [x for x,_ in proc]
-    queue_item_stage = QueueItemStage.PROCESSING.value
+    queue_item_stage = QueueItemStage.PROCESSING.name
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    print(sorted(proc_id_list))
+    print()
+    print(sorted(response.json()))
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(proc_id_list)
 
@@ -107,7 +112,7 @@ def test_v1_queue_lookup_state():
     succ_id_list = [x for x,_ in succ]
     for i in succ:
         queue.success(i[0])
-    queue_item_stage = QueueItemStage.SUCCESS.value
+    queue_item_stage = QueueItemStage.SUCCESS.name
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(succ_id_list)
@@ -117,12 +122,12 @@ def test_v1_queue_lookup_state():
     fail_id_list = [x for x,_ in fail]
     for i in fail:
         queue.fail(i[0])
-    queue_item_stage = QueueItemStage.FAIL.value
+    queue_item_stage = QueueItemStage.FAIL.name
     response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(fail_id_list)
 
-    response = client.get(f"/api/v1/queue/lookup_state/{5}")
+def test_v1_queue_lookup_state_fail():
+    response = client.get("/api/v1/queue/lookup_state/bad-stage")
     assert response.status_code == 400
-    assert response.json() == {"detail": "Invalid value for QueueItemStage"}
-
+    assert response.json() == {"detail": "bad-stage not a Queue Item Stage"}

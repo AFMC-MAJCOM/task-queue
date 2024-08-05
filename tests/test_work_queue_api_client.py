@@ -33,9 +33,8 @@ def mocked_requests(*args, **kwargs):
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
 
-    if "/0" in route:
-        route = re.sub('/0','/{queue_item_stage}',route)
-        print(route)
+    if "WAITING" in route:
+        route = re.sub('WAITING','{queue_item_stage}',route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
