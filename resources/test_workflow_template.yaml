@@ -5,7 +5,7 @@ metadata:
 spec:
   entrypoint: run-a-test
   ttlStrategy:
-    secondsAfterCompletion: 60
+    secondsAfterCompletion: 0
   templates:
   - inputs:
       parameters:
