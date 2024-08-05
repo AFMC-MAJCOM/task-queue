@@ -2,6 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
+from typing import Dict, Union
 import os
 
 from fastapi import FastAPI, HTTPException

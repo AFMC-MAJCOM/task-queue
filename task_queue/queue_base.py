@@ -139,10 +139,6 @@ class QueueBase(ABC):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING
         """
 
     def _requeue(self, item_ids):
