@@ -245,32 +245,6 @@ class InMemoryQueue(QueueBase):
                 item
             )
 
-    def wait(self):
-        """Moves all items into the WAITING stage. Primarily used for the API
-        test.
-        """
-        proc_ids = self.lookup_state(QueueItemStage.PROCESSING)
-        for item in proc_ids:
-            move_dict_item(
-                self.memory_queue.processing,
-                self.memory_queue.waiting,
-                item
-            )
-        succ_ids = self.lookup_state(QueueItemStage.SUCCESS)
-        for item in succ_ids:
-            move_dict_item(
-                self.memory_queue.success,
-                self.memory_queue.waiting,
-                item
-            )
-        fail_ids = self.lookup_state(QueueItemStage.FAIL)
-        for item in fail_ids:
-            move_dict_item(
-                self.memory_queue.fail,
-                self.memory_queue.waiting,
-                item
-            )
-
 # Pylint is disabled because the goal is to just have
 # the function return False and not fail
 # pylint: disable=broad-exception-caught
