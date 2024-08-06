@@ -14,7 +14,8 @@ test_client = ApiClient(url)
 
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
-get_test_value = 2
+
+get_test_value = 3276478
 good_item_id = 'good-item-id'
 
 class MockResponse:
@@ -53,7 +54,7 @@ def test_constructor():
 def test_client_lookup_status(mock_get):
     test_client.lookup_status(good_item_id)
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}status/good-item-id"
+    assert route == f"{test_client.api_base_url}status/{good_item_id}"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_status_fail(mock_get):
@@ -90,7 +91,7 @@ def test_client_get_queue_sizes_fail(mock_get):
 def test_client_lookup_item(mock_get):
     test_client.lookup_item(good_item_id)
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
+    assert route == f"{test_client.api_base_url}lookup_item/{good_item_id}"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_item_fail(mock_get):
@@ -105,7 +106,7 @@ def test_client_lookup_item_invalid_parameter():
 def test_client_get(mock_get):
     test_client.get(get_test_value)
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}get/2"
+    assert route == f"{test_client.api_base_url}get/{get_test_value}"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_get_fail(mock_get):
