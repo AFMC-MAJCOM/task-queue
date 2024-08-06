@@ -150,3 +150,17 @@ def test_v1_queue_lookup_item():
     response = client.get(f"/api/v1/queue/lookup_item/{'bad-item-id'}")
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
+
+def test_put_valid_items():
+    response = client.post("/api/v1/queue/put", json=default_items)
+    assert queue.size(QueueItemStage.WAITING) == len(default_items)
+    assert response.status_code == 200
+
+def test_put_invalid_items():
+    total_items_before = queue.size(QueueItemStage.WAITING)
+
+    response = client.post("/api/v1/queue/put", json="bad-items")
+    assert response.status_code == 422
+
+    total_items_after = queue.size(QueueItemStage.WAITING)
+    assert total_items_before == total_items_after
