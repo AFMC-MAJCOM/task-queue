@@ -107,7 +107,7 @@ class ApiClient(QueueBase):
         Returns a list of all item ids in the current queue stage.
         """
 
-    def lookup_item(self, queue_item_id):
+    def lookup_item(self, queue_item_id:str):
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -117,10 +117,14 @@ class ApiClient(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body, or it
-        will raise an error if Item is not in Queue.
+        Returns a dictionary with the Queue Item ID, the status of that Item,
+        and the body, or it will raise an error if Item is not in Queue.
         """
-        return None
+        response = requests.get(
+            f"{self.api_base_url}lookup_item/{queue_item_id}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
