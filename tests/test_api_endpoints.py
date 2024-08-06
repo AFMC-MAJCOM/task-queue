@@ -98,7 +98,7 @@ def test_v1_queue_lookup_item():
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
 
-    def test_put_valid_items():
+def test_put_valid_items():
     client.post("/api/v1/queue/put", json=default_items)
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
 
