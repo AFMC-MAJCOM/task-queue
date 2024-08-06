@@ -6,6 +6,7 @@ import os
 from fastapi.testclient import TestClient
 
 import tests.common_queue as qtest
+import task_queue.in_memory_queue as imq
 from task_queue.queue_base import QueueItemStage
 # Disable the wrong import position warning because we only want to import
 # work_queue_web_api after setting the environment variable for testing.
@@ -22,7 +23,27 @@ default_items = dict([qtest.random_item() for _ in range(n_items)])
 @pytest.fixture(autouse=True)
 def clean_queue():
     # Moves all queue items to WAITING stage before each pytest.
-    queue.wait()
+    proc_ids = queue.lookup_state(QueueItemStage.PROCESSING)
+    for item in proc_ids:
+        imq.move_dict_item(
+            queue.memory_queue.processing,
+            queue.memory_queue.waiting,
+            item
+        )
+    succ_ids = queue.lookup_state(QueueItemStage.SUCCESS)
+    for item in succ_ids:
+        imq.move_dict_item(
+            queue.memory_queue.success,
+            queue.memory_queue.waiting,
+            item
+        )
+    fail_ids = queue.lookup_state(QueueItemStage.FAIL)
+    for item in fail_ids:
+        imq.move_dict_item(
+            queue.memory_queue.fail,
+            queue.memory_queue.waiting,
+            item
+        )
 
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
@@ -96,7 +117,6 @@ def test_v1_queue_requeue_list():
     assert queue.size(QueueItemStage.FAIL) == 0
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
 
-
 def test_v1_queue_requeue_not_list():
     """Tests the requeue endpoint works when given a string or invalid input.
     """
@@ -123,7 +143,7 @@ def test_v1_queue_lookup_item():
     queue.put(default_items)
 
     get = queue.get(1)
-    
+
     response_dict = {
         "item_id":get[0][0],
         "status":QueueItemStage.PROCESSING.value,
@@ -138,4 +158,3 @@ def test_v1_queue_lookup_item():
     response = client.get(f"/api/v1/queue/lookup_item/{'bad-item-id'}")
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
-
