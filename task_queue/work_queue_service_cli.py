@@ -1,12 +1,11 @@
 """Wherein is contained the functions concerning the Work Queue Service CLI.
 """
-import argparse
 import logging
 import time
 
 from sqlalchemy import create_engine
 
-import task_queue.config as config
+from task_queue.config import config
 from task_queue.work_queue import WorkQueue
 from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from task_queue.s3_queue import json_s3_queue
@@ -81,7 +80,7 @@ def validate_args(cli_args):
 
     return validation_success, errors_found
 
-def handle_worker_interface_choice(settings):
+def handle_worker_interface_choice(cli_settings):
     """Handles the worker interface choice.
 
     Parameters:
@@ -94,15 +93,15 @@ def handle_worker_interface_choice(settings):
     Selects the worker interface from the arguments. Currently only the
     ArgoWorkflowsQueueWorker is implemented.
     """
-    if settings.worker_interface == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
+    if cli_settings.worker_interface == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         return ArgoWorkflowsQueueWorker(
-            settings.worker_interface_id,
-            settings.endpoint,
-            settings.namespace
+            cli_settings.worker_interface_id,
+            cli_settings.endpoint,
+            cli_settings.namespace
         )
     return None
 
-def handle_queue_implementation_choice(settings):
+def handle_queue_implementation_choice(cli_settings):
     """Handles the queue implementation choice.
 
     Parameters:
@@ -114,34 +113,34 @@ def handle_queue_implementation_choice(settings):
     -----------
     Constructs the queue implementation from the arguments.
     """
-    if settings.queue_implementation == config.QueueImplementations.S3_JSON:
+    if cli_settings.queue_implementation == config.QueueImplementations.S3_JSON:
         s3_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueS3Settings
         )
         s3_settings.log_settings()
-        queue = json_s3_queue(settings.s3_base_path)
-    elif settings.queue_implementation == config.QueueImplementations.SQL_JSON:
+        queue = json_s3_queue(cli_settings.s3_base_path)
+    elif cli_settings.queue_implementation == config.QueueImplementations.SQL_JSON:
         sql_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueSqlSettings
         )
         sql_settings.log_settings()
         queue = json_sql_queue(
-            create_engine(settings.connection_string),
-            settings.queue_name
+            create_engine(cli_settings.connection_string),
+            cli_settings.queue_name
         )
 
-    if settings.with_queue_events:
+    if cli_settings.with_queue_events:
         store = None
-        if settings.event_store_implementation == config.EventStoreChoices.SQL_JSON:
+        if cli_settings.event_store_implementation == config.EventStoreChoices.SQL_JSON:
             store = SqlEventStore(
-                create_engine(settings.connection_string)
+                create_engine(cli_settings.connection_string)
             )
 
         queue = queue_with_events(
             queue,
             store,
-            add_event_name=settings.add_to_queue_event_name,
-            move_event_name=settings.move_queue_event_name
+            add_event_name=cli_settings.add_to_queue_event_name,
+            move_event_name=cli_settings.move_queue_event_name
         )
     return queue
 

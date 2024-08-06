@@ -5,15 +5,10 @@ import logging
 import os
 from enum import StrEnum
 from typing import Optional
-from typing_extensions import Annotated
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
     Field,
-    BaseModel,
-    ValidationError,
-    ValidationInfo,
-    BeforeValidator,
     field_validator,
 )
 
@@ -55,8 +50,8 @@ class WorkerInterfaceChoices(StrEnum):
     ARGO_WORKFLOWS = 'argo-workflows'
 
 
-
 class TaskQueueBaseSetting(BaseSettings):
+    """Core setttings logic to add config_path and logging."""
     model_config = SettingsConfigDict(
         env_file=get_config_file_path(),
         env_file_encoding='utf-8',
@@ -64,10 +59,11 @@ class TaskQueueBaseSetting(BaseSettings):
     )
 
     def log_settings(self):
-        class_name = type(self).__name__.split('.')[-1]
-        logger.info(f"Loaded {class_name} parameters:")
+        """Log configuration parameters"""
+        class_name = type(self).__name__.rsplit('.',maxsplit=1)[-1]
+        logger.info("Loaded %s parameters:", class_name)
         for k, v in self.model_dump().items():
-            logger.info(f"{k}: {v}")
+            logger.info("%s: %s", str(k), str(v))
 
 
 
@@ -89,7 +85,8 @@ class TaskQueueS3Settings(TaskQueueBaseSetting):
 
     @field_validator('S3_QUEUE_BASE_PATH')
     @classmethod
-    def name_must_contain_space(cls, v: str) -> str:
+    def validate_s3_path(cls, v: str) -> str:
+        """Validate the s3 path begins with s3://"""
         if not v.startswith("s3://"):
             raise ValueError("S3_QUEUE_BASE_PATH must start with s3://")
         return v

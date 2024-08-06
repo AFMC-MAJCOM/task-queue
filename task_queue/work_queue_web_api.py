@@ -3,7 +3,6 @@ API.
 """
 from dataclasses import dataclass, asdict
 from typing import Dict, Any
-import os
 import logging
 
 from fastapi import FastAPI, HTTPException
