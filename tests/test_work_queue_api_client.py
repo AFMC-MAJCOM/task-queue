@@ -48,7 +48,7 @@ def test_constructor():
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
-    response = test_client.lookup_status('good-item-id')
+    test_client.lookup_status('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}status/good-item-id"
 
@@ -59,7 +59,7 @@ def test_client_lookup_status_fail(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
-    response = test_client.description()
+    test_client.description()
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}describe"
 
@@ -70,7 +70,7 @@ def test_client_description_fail(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
-    response = test_client.get_queue_sizes()
+    test_client.get_queue_sizes()
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}sizes"
 
@@ -81,7 +81,7 @@ def test_client_get_queue_sizes_fail(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
-    response = test_client.lookup_item('good-item-id')
+    test_client.lookup_item('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
 
@@ -92,7 +92,7 @@ def test_client_lookup_item_fail(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
-    response = test_client.get(2)
+    test_client.get(2)
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}get/2"
 
@@ -103,8 +103,7 @@ def test_client_get_fail(mock_get):
 
 @mock.patch('requests.post', side_effect=mocked_requests)
 def test_client_put(mock_post):
-    # This method is just asserting that no exception is raised
-    response = test_client.put({})
+    test_client.put({})
     route = mock_post.call_args[0][0]
     assert route == f"{test_client.api_base_url}put"
 
