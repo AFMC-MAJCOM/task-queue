@@ -31,8 +31,8 @@ def mocked_requests(*args, **kwargs):
     # Replace item_id passed into url
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
-    if '8888' in route:
-        route = re.sub('8888', '{n_items}', route)
+    if '1' in route:
+        route = re.sub('1', '{n_items}', route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -71,5 +71,5 @@ def test_client_lookup_item(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
-    response = test_client.get(8888)
+    response = test_client.get(1)
     assert isinstance(response, dict)

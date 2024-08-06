@@ -109,9 +109,9 @@ def test_get_success():
     """
     queue.put(default_items)
     n = round(n_items / 2)
-    items = client.get(f"/api/v1/queue/get/{n}").json()
+    response = client.get(f"/api/v1/queue/get/{n}")
     processing = queue.size(QueueItemStage.PROCESSING)
 
-    assert items.status_code == 200
-    assert len(items) == n
+    assert response.status_code == 200
+    assert len(response.json()) == n
     assert n == processing
