@@ -28,11 +28,12 @@ def mocked_requests(*args, **kwargs):
                 raise RequestException("ERROR ", self.status_code)
 
     route = args[0]
+    print(route)
     # Replace item_id passed into url
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
-    if '1' in route:
-        route = re.sub('1', '{n_items}', route)
+    if '2' in route:
+        route = re.sub('2', '{n_items}', route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -71,5 +72,5 @@ def test_client_lookup_item(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
-    response = test_client.get(1)
+    response = test_client.get(2)
     assert isinstance(response, dict)
