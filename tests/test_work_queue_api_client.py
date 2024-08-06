@@ -14,21 +14,24 @@ test_client = ApiClient(url)
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
 
+class MockResponse:
+    def __init__(self, json_data, status_code):
+        self.status_code = status_code
+        self.json_data = json_data
+
+    def json(self):
+        return self.json_data
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RequestException("ERROR ", self.status_code)
+
+def mocked_requests_fail(*args, **kwargs):
+    return MockResponse("Bad Response", 400)
+
 def mocked_requests(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.status_code = status_code
-            self.json_data = json_data
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self):
-            if self.status_code >= 400:
-                raise RequestException("ERROR ", self.status_code)
-
     route = args[0]
-    print(route)
+
     # Replace item_id passed into url
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
@@ -44,39 +47,68 @@ def test_constructor():
     assert test_client.api_base_url == f"{url}/api/v1/queue/"
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_bad_url(mock_get):
-    # It does not matter what endpoint is used here, we are just testing that
-    # it is properly throwing an error when testing a bad url.
+def test_client_lookup_status(mock_get):
+    response = test_client.lookup_status('good-item-id')
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}status/good-item-id"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_lookup_status_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.lookup_status('bad-url')
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_status(mock_get):
-    response = test_client.lookup_status('good-item-id')
-    assert isinstance(response, dict)
-
-@mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
     response = test_client.description()
-    assert isinstance(response, dict)
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}describe"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_description_fail(mock_get):
+    with pytest.raises(RequestException):
+        test_client.description()
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
-    assert isinstance(response, dict)
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}sizes"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_get_queue_sizes_fail(mock_get):
+    with pytest.raises(RequestException):
+        test_client.get_queue_sizes()
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
     response = test_client.lookup_item('good-item-id')
-    assert isinstance(response, dict)
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_lookup_item_fail(mock_get):
+    with pytest.raises(RequestException):
+        test_client.lookup_item('bad-url')
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
     response = test_client.get(2)
-    assert isinstance(response, dict)
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}get/2"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_get_fail(mock_get):
+    with pytest.raises(RequestException):
+        test_client.get(2)
 
 @mock.patch('requests.post', side_effect=mocked_requests)
-def test_put_route_exists(mock_post):
+def test_client_put(mock_post):
     # This method is just asserting that no exception is raised
     response = test_client.put({})
-    assert response is None
+    route = mock_post.call_args[0][0]
+    assert route == f"{test_client.api_base_url}put"
+
+@mock.patch('requests.post', side_effect=mocked_requests_fail)
+def test_client_put_fail(mock_post):
+    with pytest.raises(RequestException):
+        test_client.put({})
