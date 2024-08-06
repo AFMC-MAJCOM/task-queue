@@ -166,7 +166,7 @@ This step is necessary for testing or if you want a local postgres server runnin
 
 ```
 docker pull postgres
-docker run --name my-postgres -e POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
+docker run --name my-postgres -e SQL_QUEUE_POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
 ```
 
 You can modify the ports, passwords, and name to what you would like them to be but make sure the next steps reflect those changes.
@@ -211,10 +211,10 @@ An external MinIO or S3 service is required for the tests to run and the followi
 
 ### SQL Connection
 An external postgreSQL service is required for the tests to run and the following environment variables must be set.
-- `SQL_HOST`
-- `SQL_PASSWORD`
-- `SQL_PORT`
-- `SQL_USERNAME`
+- `SQL_QUEUE_POSTGRES_HOSTNAME`
+- `SQL_QUEUE_POSTGRES_PASSWORD`
+- `SQL_QUEUE_POSTGRES_PORT`
+- `SQL_QUEUE_POSTGRES_USER`
 
 All pytests other than tests that use Argo Workflows can be run without any additional setup. Running argo tests with AWS or minikube is detailed below. A python virtual enviroment may be needed to use pip and pytest depending on your local setup.
 
