@@ -58,7 +58,6 @@ def test_config_file_rerouting():
 def test_setting_class():
     """Test the setting_class argument returns the indicated class."""
 
-    setting_default = get_task_queue_settings()
     assert isinstance(get_task_queue_settings(), config.TaskQueueApiSettings)
 
     setting_test = get_task_queue_settings(

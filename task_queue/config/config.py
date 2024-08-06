@@ -3,7 +3,7 @@
 
 import logging
 import os
-from enum import StrEnum
+from enum import Enum
 from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -34,18 +34,18 @@ def get_config_file_path() -> str:
     return os.path.join(os.path.dirname(__file__),'config.env')
 
 
-class QueueImplementations(StrEnum):
+class QueueImplementations(str, Enum):
     """Enum options for the available Queue Implementations."""
     S3_JSON = 's3-json'
     SQL_JSON = 'sql-json'
     IN_MEMORY = 'in-memory'
 
-class EventStoreChoices(StrEnum):
+class EventStoreChoices(str, Enum):
     """Enum options for the available event logging."""
     NO_EVENTS = 'none'
     SQL_JSON = 'sql-json'
 
-class WorkerInterfaceChoices(StrEnum):
+class WorkerInterfaceChoices(str, Enum):
     """Enum options for the available worker interfaces choices."""
     ARGO_WORKFLOWS = 'argo-workflows'
 

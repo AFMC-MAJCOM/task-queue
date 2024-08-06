@@ -37,15 +37,18 @@ def validate_args(cli_args):
     """
     errors_found = ""
     validation_success = True
-    if cli_args['worker_interface'] == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
+    if cli_args['worker_interface'] \
+        == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         required_args = ['worker_interface_id', 'endpoint', 'namespace']
         if not all(cli_args[i] is not None for i in required_args):
+            value = config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
             errors_found += f"{required_args} arguments required when " \
                              "worker-interface is set to " \
-                            f"{config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value}\n"
+                            f"{value}\n"
             validation_success = False
 
-    if cli_args['queue_implementation'] == config.QueueImplementations.SQL_JSON:
+    if cli_args['queue_implementation'] \
+        == config.QueueImplementations.SQL_JSON:
         required_args = ['connection_string', 'queue_name']
         if not all(cli_args[i] is not None for i in required_args):
             errors_found += f"{required_args} arguments required when " \
@@ -53,7 +56,8 @@ def validate_args(cli_args):
                             f"{config.QueueImplementations.SQL_JSON.value}\n"
             validation_success = False
 
-    elif cli_args['queue_implementation'] == config.QueueImplementations.S3_JSON:
+    elif cli_args['queue_implementation'] \
+        == config.QueueImplementations.S3_JSON:
         required_args = ['s3_base_path']
         if not all(cli_args[i] is not None for i in required_args):
             errors_found += f"{required_args} arguments required when " \
@@ -61,7 +65,8 @@ def validate_args(cli_args):
                             f"{config.QueueImplementations.S3_JSON.value}\n"
             validation_success = False
 
-    if cli_args['event_store_implementation'] != config.EventStoreChoices.NO_EVENTS:
+    if cli_args['event_store_implementation'] \
+        != config.EventStoreChoices.NO_EVENTS:
         required_args = ['add_to_queue_event_name', 'move_queue_event_name']
         if not all(cli_args[i] is not None for i in required_args):
             errors_found += f"{required_args} arguments required when " \
@@ -75,7 +80,7 @@ def validate_args(cli_args):
 
             errors_found += f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
-                            f"{config.EventStoreChoices.SQL_JSON}"
+                            f"{config.EventStoreChoices.SQL_JSON.value}"
             validation_success = False
 
     return validation_success, errors_found
@@ -93,7 +98,8 @@ def handle_worker_interface_choice(cli_settings):
     Selects the worker interface from the arguments. Currently only the
     ArgoWorkflowsQueueWorker is implemented.
     """
-    if cli_settings.worker_interface == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
+    if cli_settings.worker_interface \
+        == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         return ArgoWorkflowsQueueWorker(
             cli_settings.worker_interface_id,
             cli_settings.endpoint,
@@ -113,13 +119,15 @@ def handle_queue_implementation_choice(cli_settings):
     -----------
     Constructs the queue implementation from the arguments.
     """
-    if cli_settings.queue_implementation == config.QueueImplementations.S3_JSON:
+    if cli_settings.queue_implementation \
+        == config.QueueImplementations.S3_JSON:
         s3_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueS3Settings
         )
         s3_settings.log_settings()
         queue = json_s3_queue(cli_settings.s3_base_path)
-    elif cli_settings.queue_implementation == config.QueueImplementations.SQL_JSON:
+    elif cli_settings.queue_implementation \
+        == config.QueueImplementations.SQL_JSON:
         sql_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueSqlSettings
         )
@@ -131,7 +139,8 @@ def handle_queue_implementation_choice(cli_settings):
 
     if cli_settings.with_queue_events:
         store = None
-        if cli_settings.event_store_implementation == config.EventStoreChoices.SQL_JSON:
+        if cli_settings.event_store_implementation \
+            == config.EventStoreChoices.SQL_JSON:
             store = SqlEventStore(
                 create_engine(cli_settings.connection_string)
             )

@@ -141,11 +141,14 @@ def queue_settings_from_env():
     -----------
     Returns QueueSettings.
     """
-    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.S3_JSON:
+    if api_settings.QUEUE_IMPLEMENTATION  \
+        == config.QueueImplementations.S3_JSON:
         return S3QueueSettings.from_env()
-    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.SQL_JSON:
+    if api_settings.QUEUE_IMPLEMENTATION \
+        == config.QueueImplementations.SQL_JSON:
         return SqlQueueSettings.from_env()
-    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.IN_MEMORY:
+    if api_settings.QUEUE_IMPLEMENTATION \
+        == config.QueueImplementations.IN_MEMORY:
         return InMemoryQueueSettings.from_env()
     return None
 
