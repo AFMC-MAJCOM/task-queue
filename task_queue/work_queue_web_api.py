@@ -2,16 +2,18 @@
 API.
 """
 from dataclasses import dataclass, asdict
+from typing import Dict, Any
 import os
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 from task_queue import config
+from task_queue.in_memory_queue import in_memory_queue
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +21,7 @@ logging.basicConfig(level=logging.INFO)
 api_settings = config.TaskQueueApiSettings()
 api_settings.log_settings()
 app = FastAPI()
+
 
 @dataclass
 class QueueSettings():
@@ -110,6 +113,28 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
+
+@dataclass
+class InMemoryQueueSettings(QueueSettings):
+    """Class concerning the In Memory Queue settings.
+    The only implementation of this class so far is for testing.
+    """
+    @staticmethod
+    def from_env():
+        """Returns instance of QueueSettings
+        Parameters:
+        -----------
+        env_dict: dict
+            Dictionary of environment variables.
+        """
+        return InMemoryQueueSettings()
+
+    def make_queue(self):
+        """Returns QueueBase object.
+        """
+        return in_memory_queue()
+
+
 def queue_settings_from_env():
     """Creates an instance of QueueSettings from an environment dictionary.
 
@@ -121,13 +146,15 @@ def queue_settings_from_env():
         return S3QueueSettings.from_env()
     if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.SQL_JSON:
         return SqlQueueSettings.from_env()
+    if api_settings.QUEUE_IMPLEMENTATION == config.QueueImplementations.IN_MEMORY:
+        return InMemoryQueueSettings.from_env()
     return None
 
 queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes():
+async def get_queue_sizes() -> Dict[str, int]:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -140,7 +167,7 @@ async def get_queue_sizes():
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str):
+async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -152,10 +179,39 @@ async def lookup_queue_item_status(item_id:str):
     -----------
     Returns the status of Item passed in.
     """
-    return queue.lookup_status(item_id)
+    try:
+        return queue.lookup_status(item_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
+
+@app.get("/api/v1/queue/lookup_item/{item_id}")
+async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+    """API endpoint to lookup an Item currently in the Queue.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Queue Item
+
+    Returns:
+    ------------
+    Returns a dictionary with the Queue Item ID, the status of that Item, and
+    the body, or it will raise an error if Item is not in Queue.
+    """
+    try:
+        response = queue.lookup_item(item_id)
+        return {
+            "item_id":response[0],
+            "status":response[1],
+            "item_body":response[2],
+        }
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue():
+async def describe_queue() -> Dict[str,Any]:
     """API endpoint to descibe the Queue.
 
     Returns:

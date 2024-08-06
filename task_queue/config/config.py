@@ -42,6 +42,17 @@ class QueueImplementations(StrEnum):
     """Enum options for the available Queue Implementations."""
     S3_JSON = 's3-json'
     SQL_JSON = 'sql-json'
+    IN_MEMORY = 'in-memory'
+
+class EventStoreChoices(StrEnum):
+    """Enum options for the available event logging."""
+    NO_EVENTS = 'none'
+    SQL_JSON = 'sql-json'
+
+class ArgoInterfaceChoices(StrEnum):
+    """Enum options for the available argo choices."""
+    ARGO_WORKFLOWS = 'argo-workflows'
+
 
 
 class TaskQueueBaseSetting(BaseSettings):
@@ -62,11 +73,11 @@ class TaskQueueBaseSetting(BaseSettings):
 class TaskQueueSqlSettings(TaskQueueBaseSetting):
     """SQL Settings for the Task Queue."""
     SQL_QUEUE_NAME: str
-    SQL_QUEUE_POSTGRES_DATABASE: Optional[str] = "postgres"
-    SQL_QUEUE_POSTGRES_HOSTNAME: Optional[str] = "postgres"
-    SQL_QUEUE_POSTGRES_PASSWORD: Optional[str] = "postgres"
-    SQL_QUEUE_POSTGRES_USER: Optional[str] = "postgres"
-    SQL_QUEUE_POSTGRES_PORT: Optional[int] = 5432
+    SQL_QUEUE_POSTGRES_DATABASE: str = "postgres"
+    SQL_QUEUE_POSTGRES_HOSTNAME: str = "postgres"
+    SQL_QUEUE_POSTGRES_PASSWORD: str = "postgres"
+    SQL_QUEUE_POSTGRES_USER: str = "postgres"
+    SQL_QUEUE_POSTGRES_PORT: int = 5432
     SQL_QUEUE_CONNECTION_STRING: Optional[str] = None
 
 

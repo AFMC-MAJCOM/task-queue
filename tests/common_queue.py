@@ -4,6 +4,7 @@ import random
 import warnings
 
 import pytest
+import uuid
 
 import task_queue.queue_base as qb
 
@@ -18,7 +19,7 @@ def random_item():
     Random key and value.
 
     """
-    key = chr(random.randint(ord('a'), ord('z')))
+    key = str(uuid.uuid4())
     val = [
         random.randint(0, 100)
         for _ in range(random.randint(0, 10))
