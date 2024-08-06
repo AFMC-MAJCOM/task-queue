@@ -16,7 +16,7 @@ class ApiClient(QueueBase):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
-    def put(self, items):
+    def put(self, items: dict) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
@@ -25,7 +25,9 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-        return None
+        response = requests.post(f"{self.api_base_url}put", json=items, \
+                                 timeout=self.timeout)
+        response.raise_for_status()
 
     def get(self, n_items:int=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.

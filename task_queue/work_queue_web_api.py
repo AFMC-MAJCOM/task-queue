@@ -242,3 +242,15 @@ async def get(n_items:int) ->  List[Tuple[Any, Any]]:
     List[(queue_item_id, queue_item_body)]
     """
     return queue.get(n_items)
+
+@app.post("/api/v1/queue/put")
+async def put(items:Dict[str,Any]) -> None:
+    """API endpoint to add items to the Queue.
+
+    Parameters:
+    -----------
+    items: dict
+        Dictionary of Queue Items to add Queue, where Item is a key:value
+        pair, where key is the item ID and value is the queue item body.
+    """
+    queue.put(items)
