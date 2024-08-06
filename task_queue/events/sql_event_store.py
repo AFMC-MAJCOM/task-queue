@@ -67,6 +67,9 @@ class SqlEventStore(EventStoreInterface):
         self.engine = engine
 
     def _check_for_duplicates(self, event: Event):
+        """Queries sql event store for event
+        returns True if duplicate exists
+        """
         sql_query = str(event['name']) == SqlEventStoreModel.name
 
         sql_query = sql_query & \

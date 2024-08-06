@@ -28,14 +28,14 @@ def validate_args(cli_args):
     Parameters:
     -----------
     cli_args: dict
-        Python dictionary representing the arguments passed to the CLI. 
+        Python dictionary representing the arguments passed to the CLI.
         (parser.parse_args().__dict__)
-        
+
     Returns:
     -----------
     validation_success: bool
         True if the arguments met the requirements, False otherwise.
-    errors_found: str 
+    errors_found: str
         Error/s found if any. Empty string if validation_success = True.
     """
     errors_found = ""

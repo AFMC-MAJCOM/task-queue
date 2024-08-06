@@ -221,8 +221,7 @@ class SQLQueue(QueueBase):
             )
 
             result = session.exec(statement).all()
-            item_ids = [item[0] for item in result]
-            return item_ids
+            return result
 
     def lookup_item(self, queue_item_id):
         """Lookup an Item currently in the Queue.
@@ -264,6 +263,20 @@ class SQLQueue(QueueBase):
             "engine_url": str(self.engine.url)
         }
         return desc
+
+    def requeue(self, item_ids):
+        """Move input queue items from FAILED to WAITING.
+
+        Parameters:
+        -----------
+        item_ids: [str]
+            ID of Queue Item
+        """
+        for item in self._requeue(item_ids):
+            update_stage(self.engine,
+                         self.queue_name,
+                         QueueItemStage.WAITING,
+                         item)
 
 
 def update_stage(engine, queue_name, new_stage, item_key):
