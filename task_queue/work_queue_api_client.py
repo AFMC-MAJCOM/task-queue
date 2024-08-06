@@ -1,8 +1,8 @@
 """Wherein is contained the ApiClient class.
 """
-import requests
 from typing import Dict, Any, Union, List, Tuple
 from pydantic import BaseModel, validate_call, PositiveInt
+import requests
 
 from .queue_base import QueueBase, QueueItemStage
 
