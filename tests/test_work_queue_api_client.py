@@ -97,7 +97,7 @@ def test_client_lookup_item_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.lookup_item('bad-item-id')
 
-def test_client_lookup_status_invalid_parameter():
+def test_client_lookup_item_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.lookup_status(1)
 
