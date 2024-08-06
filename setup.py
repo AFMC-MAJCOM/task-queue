@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 def read(rel_path: str) -> str:
     here = os.path.abspath(os.path.dirname(__file__))
@@ -18,7 +18,9 @@ def get_version(rel_path: str) -> str:
 setup(
     name="task_queue",
     version=get_version("task_queue/__init__.py"),
-    packages = ["task_queue", "task_queue.events"],
+    include_package_data=True,
+    package_data={"task_queue/config": ["config.env"]},
+    packages = find_packages(),
     install_requires = [
         "pendulum >= 2.1.2",
         "s3fs >= 2023.6.0",

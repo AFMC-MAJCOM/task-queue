@@ -18,17 +18,16 @@ class TaskQueueTestSettings(config.TaskQueueApiSettings):
 def test_config_parameter_order():
     """Test parameter preference order"""
     environ = os.environ.copy()
-    env_var = "Test environment variable"
-    os.environ["UNIT_TEST_QUEUE_BASE"] = env_var
+    os.environ["run_argo_tests"] = "True"
     settings = get_task_queue_settings(
         setting_class=TaskQueueTestSettings
     )
     os.environ = environ
 
     # 1) Environment variables, 2) Config.json, 3) A default value
-    assert settings.UNIT_TEST_QUEUE_BASE == env_var
+    assert settings.run_argo_tests
     assert settings.TASK_QUEUE_ENV_TEST # ENV File
-    assert not settings.run_argo_tests
+    assert settings.UNIT_TEST_QUEUE_BASE == "s3://unit-tests/queue/queue_"
 
 
 def test_config_file_rerouting():
