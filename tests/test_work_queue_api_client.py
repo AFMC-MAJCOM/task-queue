@@ -4,6 +4,7 @@ import pytest
 import re
 from unittest import mock
 from requests.exceptions import RequestException
+from pydantic import ValidationError
 
 from task_queue.work_queue_api_client import ApiClient
 from task_queue.work_queue_web_api import app
@@ -13,6 +14,8 @@ test_client = ApiClient(url)
 
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
+get_test_value = 2
+good_item_id = 'good-item-id'
 
 class MockResponse:
     def __init__(self, json_data, status_code):
@@ -33,10 +36,10 @@ def mocked_requests(*args, **kwargs):
     route = args[0]
 
     # Replace item_id passed into url
-    if 'good-item-id' in route:
-        route = re.sub('good-item-id','{item_id}',route)
-    if '2' in route:
-        route = re.sub('2', '{n_items}', route)
+    if good_item_id in route:
+        route = re.sub(good_item_id,'{item_id}',route)
+    if str(get_test_value) in route:
+        route = re.sub(str(get_test_value), '{n_items}', route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -48,14 +51,18 @@ def test_constructor():
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
-    test_client.lookup_status('good-item-id')
+    test_client.lookup_status(good_item_id)
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}status/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_status_fail(mock_get):
     with pytest.raises(RequestException):
-        test_client.lookup_status('bad-url')
+        test_client.lookup_status('bad-item-id')
+
+def test_client_lookup_status_invalid_parameter():
+    with pytest.raises(ValidationError):
+        test_client.lookup_status(1)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
@@ -81,25 +88,33 @@ def test_client_get_queue_sizes_fail(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
-    test_client.lookup_item('good-item-id')
+    test_client.lookup_item(good_item_id)
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_item_fail(mock_get):
     with pytest.raises(RequestException):
-        test_client.lookup_item('bad-url')
+        test_client.lookup_item('bad-item-id')
+
+def test_client_lookup_status_invalid_parameter():
+    with pytest.raises(ValidationError):
+        test_client.lookup_status(1)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
-    test_client.get(2)
+    test_client.get(get_test_value)
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}get/2"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_get_fail(mock_get):
     with pytest.raises(RequestException):
-        test_client.get(2)
+        test_client.get()
+
+def test_client_get_invalid_parameter():
+    with pytest.raises(ValidationError):
+        test_client.get(-1)
 
 @mock.patch('requests.post', side_effect=mocked_requests)
 def test_client_put(mock_post):
@@ -111,3 +126,7 @@ def test_client_put(mock_post):
 def test_client_put_fail(mock_post):
     with pytest.raises(RequestException):
         test_client.put({})
+
+def test_client_put_invalid_parameter():
+    with pytest.raises(ValidationError):
+        test_client.put("{}")

@@ -227,14 +227,14 @@ async def describe_queue() -> Dict[str,Any]:
     }
 
 @app.get("/api/v1/queue/get/{n_items}")
-async def get(n_items:int) ->  List[Tuple[Any, Any]]:
+async def get(n_items:int) ->  List[Tuple[str, Any]]:
     """API endpoint to get the next n Items from the Queue
     and move them to PROCESSING.
 
     Parameters:
     -----------
     n_items: int
-    Number of items to retrieve from Queue.
+        Number of items to retrieve from Queue.
 
     Returns:
     ----------
