@@ -77,6 +77,55 @@ Jobs are created as workflows via the submit API endpoint, and are monitored fro
 2. `GET` the status of the workflows by filtering on the label with the name of the interface, checking the label for the queue item ID, and looking at the status in the JSON response.
     - Workflow status is in `labels: workflows.argoproj.io/phase`
 
+# Configuring the Task Queue
+
+The Task Queue library uses [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) to handle configuration and parameterization. This library handles reading in parameters from disparate sources, validating inputs, and automatically casting values to the correct data types. The order of priority for parameters is as follows:
+
+1. If cli_parse_args is enabled, arguments passed in at the CLI.
+2. Arguments passed to the Settings class initialiser.
+3. Environment variables, e.g. my_prefix_special_function as described above.
+4. Variables loaded from a dotenv (.env) file.
+5. Variables loaded from the secrets directory.
+6. The default field values for the Settings model.
+
+A shown by priority (4), the library accepts a dotenv (.env) file for parameterization. The default location for this file is [config.env](.task_queue/config/config.env). However, this default path can be overridden using the `TASK_QUEUE_CONFIG_PATH` environment variable. If this feature is used when launching a Task Queue container, then the path must be mounted when the container is launched.
+
+The configuration models for the Task Queue are found in [config.py](.task_queue/config/config.py), and include:
+
+TaskQueueBaseSettings: No parameters, but gives shared logic for logging and loading in .env
+
+TaskQueueSqlSettings: SQL Parameters
+- SQL_QUEUE_NAME
+- SQL_QUEUE_POSTGRES_DATABASE
+- SQL_QUEUE_POSTGRES_HOSTNAME
+- SQL_QUEUE_POSTGRES_PASSWORD
+- SQL_QUEUE_POSTGRES_USER
+- SQL_QUEUE_POSTGRES_PORT
+- SQL_QUEUE_CONNECTION_STRING
+
+TaskQueueS3Settings: S3 Parameters
+- S3_QUEUE_BASE_PATH
+- FSSPEC_S3_ENDPOINT_URL
+
+TaskQueueApiSettings: Settings for launching the REST API
+- QUEUE_IMPLEMENTATION
+
+TaskQueueCliSettings: Settings for launching the CLI
+- worker_interface
+- queue_implementation
+- event_store_implementation
+- with_queue_events
+- processing_limit
+- periodic_seconds
+- worker_interface_id
+- endpoint
+- namespace
+- connection_string
+- queue_name
+- s3_base_path
+- add_to_queue_event_name
+- move_queue_event_name
+
 # Work Queue Api Client
 
 There is a work queue api client designed to allow users to access the api endpoints easily in their python code. It wraps all of the api endpoints into callable methods.
