@@ -236,3 +236,15 @@ def requeue(item_ids:Union[str,list[str]]):
         ID of Queue Item
     """
     queue.requeue(item_ids)
+
+@app.post("/api/v1/queue/put")
+async def put(items:Dict[str,Any]) -> None:
+    """API endpoint to add items to the Queue.
+
+    Parameters:
+    -----------
+    items: dict
+        Dictionary of Queue Items to add Queue, where Item is a key:value
+        pair, where key is the item ID and value is the queue item body.
+    """
+    queue.put(items)

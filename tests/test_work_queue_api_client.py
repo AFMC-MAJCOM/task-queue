@@ -71,3 +71,9 @@ def test_client_requeue(mock_get):
 def test_client_lookup_item(mock_get):
     response = test_client.lookup_item('good-item-id')
     assert isinstance(response, dict)
+
+@mock.patch('requests.post', side_effect=mocked_requests)
+def test_put_route_exists(mock_post):
+    # This method is just asserting that no exception is raised
+    response = test_client.put({})
+    assert response is None
