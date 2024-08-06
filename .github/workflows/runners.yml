@@ -12,6 +12,11 @@ permissions:
   contents: read
 
 jobs:
+  generic-workflow:
+    uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
+    with:
+      project_root: task_queue
+
   pytest-linux:
     runs-on: ubuntu-latest
     services:
@@ -72,33 +77,6 @@ jobs:
         export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
         pytest -vv
 
-  ruff:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: chartboost/ruff-action@v1
-      with:
-        version: 0.4.10
-        args: --extend-select=E
-
-  pylint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install pylint
-      run: python3.10 -m pip install pylint
-    - name: Install Dependencies
-      run: |
-        python3.10 -m pip install .
-        python3.10 -m pip install pytest
-    # If you do not install dependencies then it will fail PyLint due to import-errors
-    - name: Run pylint
-      run: pylint task_queue
-
   version_check:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
@@ -115,7 +93,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
       
   publish-docker-image:
-    needs: [pytest-linux, pylint, ruff]
+    needs: [pytest-linux, generic-workflow]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -139,7 +117,7 @@ jobs:
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
 
   create-git-tag:
-    needs: [pytest-linux, pylint, ruff]
+    needs: [pytest-linux, generic-workflow]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions: 
