@@ -7,7 +7,7 @@ import pytest
 
 from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from task_queue.queue_base import QueueItemStage
-from task_queue.config.config import TaskQueueTestSettings
+from .test_config import TaskQueueTestSettings
 
 run_argo_tests = TaskQueueTestSettings().run_argo_tests
 

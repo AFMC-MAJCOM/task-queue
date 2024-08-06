@@ -9,6 +9,7 @@ from typing_extensions import Annotated
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
+    Field,
     BaseModel,
     ValidationError,
     ValidationInfo,
@@ -49,8 +50,8 @@ class EventStoreChoices(StrEnum):
     NO_EVENTS = 'none'
     SQL_JSON = 'sql-json'
 
-class ArgoInterfaceChoices(StrEnum):
-    """Enum options for the available argo choices."""
+class WorkerInterfaceChoices(StrEnum):
+    """Enum options for the available worker interfaces choices."""
     ARGO_WORKFLOWS = 'argo-workflows'
 
 
@@ -95,28 +96,116 @@ class TaskQueueS3Settings(TaskQueueBaseSetting):
 
 
 class TaskQueueApiSettings(TaskQueueBaseSetting):
-    """Base settings for the task queue library.
+    """Base settings for the task queue library REST API.
 
     Parameters preference is as follows:
     1) Environment Vars
     2) Configuration file
     3) Defaults given here
-
-    The parameters include SQL connection information, queue selection, and
-    S3 connection Information
     """
     QUEUE_IMPLEMENTATION: QueueImplementations = QueueImplementations.SQL_JSON
 
 
-class TaskQueueTestSettings(TaskQueueApiSettings):
-    """Extra settings for testing the task queue library."""
-    # Testing configuration parameters
-    TASK_QUEUE_ENV_TEST: bool = False
-    run_argo_tests: bool = False
-    UNIT_TEST_QUEUE_BASE: str = "s3://unit-tests/queue/queue_"
+class TaskQueueCliSettings(TaskQueueBaseSetting,
+                           cli_parse_args=True,
+                           cli_hide_none_type=True):
+    """Base settings for the task queue library CLI.
+
+    Parameters preference is as follows:
+    1) Environment Vars
+    2) Configuration file
+    3) Defaults given here
+    """
+    worker_interface: WorkerInterfaceChoices = Field(
+        description = "worker-interface: Service used to run jobs."
+    )
+    queue_implementation: QueueImplementations = Field(
+        description="queue-implementation: Service used to store the queue."
+    )
+    event_store_implementation: EventStoreChoices = Field(
+        default=EventStoreChoices.NO_EVENTS,
+        description="event-store-implementation: "
+                    "Service used to store logs of queue state changes."
+    )
+    with_queue_events : bool = Field(
+        default=False,
+        alias='with-queue-events',
+        description="Flag to signify that logs should be stored on "
+                    "queue state changes. The 'event_store_implementation' "
+                    "argument should be set to 'sql-json' "
+                    "when including this flag."
+    )
+    processing_limit : int = Field(
+        default=10,
+        alias='processing-limit',
+        description="Number of jobs to be run concurrently."
+    )
+    periodic_seconds : int = Field(
+        default=10,
+        alias='periodic-seconds',
+        description="Number of seconds to wait before checking if "
+                    "additional jobs can be submitted."
+    )
+    worker_interface_id : Optional[str] = Field(
+        default=None,
+        alias='worker-interface-id',
+        description="User defined ID for the worker interface "
+                    "used to submit jobs. Can be any unique "
+                    "string. Required when worker-interface is set "
+                    f" to {WorkerInterfaceChoices.ARGO_WORKFLOWS.value}"
+    )
+    endpoint : Optional[str] = Field(
+        default=None,
+        description="Endpoint URL used to point to the ARGO "
+                    "Workflows API. Required when worker-interface "
+                    f"is set to {WorkerInterfaceChoices.ARGO_WORKFLOWS.value}"
+    )
+    namespace : Optional[str] = Field(
+        default=None,
+        description="Kubernetes namespace where ARGO Workflows is "
+                    "running. Required when worker-interface is set "
+                    f"to {WorkerInterfaceChoices.ARGO_WORKFLOWS.value}"
+    )
+    connection_string : Optional[str] = Field(
+        default=None,
+        alias='connection-string',
+        description="Connection string associated with an external "
+                    "SQL server. Required when queue-implementation "
+                    f"is set to {QueueImplementations.SQL_JSON.value}"
+    )
+    queue_name : Optional[str] = Field(
+        default=None,
+        alias='queue-name',
+        description="User defined queue name. Can be any unique "
+                    "string. Required when queue-implementation "
+                    f"is set to {QueueImplementations.SQL_JSON.value}"
+    )
+    s3_base_path : Optional[str] = Field(
+        default=None,
+        alias='s3-base-path',
+        description="S3 path where the queue will be stored. "
+                    "Required when queue-implementation is set to "
+                    f"{QueueImplementations.S3_JSON.value}"
+    )
+    add_to_queue_event_name : Optional[str] = Field(
+        default=None,
+        alias='add-to-queue-event-name',
+        description="User defined event name used in the logs "
+                    "when queue items are added. Required when "
+                    "event-store-implementation is not set to "
+                    f"{EventStoreChoices.NO_EVENTS.value}"
+    )
+    move_queue_event_name : Optional[str] = Field(
+        default=None,
+        alias='move-queue-event-name',
+        description="User defined event name used in the logs "
+                    "when queue items are moved. Required when "
+                    "event-store-implementation is not set to "
+                    f"{EventStoreChoices.NO_EVENTS.value}"
+    )
 
 
-def get_task_queue_settings(path=None, test=False, setting_class=None):
+def get_task_queue_settings(path=None, setting_class=None):
     """Wrapper for returning the TaskQueueSettings object.
 
     This function enables dynamically setting the configuration path.
@@ -125,24 +214,15 @@ def get_task_queue_settings(path=None, test=False, setting_class=None):
     -----------
     path: str (optional)
         The path (relative or absolute) to a .env configuration file.
-    test: bool (default=False)
-        Flag to return the testing settings if desired.
 
     Returns:
     -----------
     A TaskQueueSettings object.
     """
-    if test:
-        setting_class = TaskQueueTestSettings
-    elif setting_class is None:
+    if setting_class is None:
         setting_class = TaskQueueApiSettings
 
     if path is None:
         path = get_config_file_path()
 
     return setting_class(_env_file=path)
-
-"""
-TODO:
-Verify container still works
-"""
