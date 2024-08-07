@@ -6,10 +6,10 @@ import os
 import pytest
 import s3fs
 
-import task_queue.s3_queue as s3q
-from task_queue.in_memory_queue import in_memory_queue
-import task_queue.sql_queue as sqlq
-import task_queue.queue_with_events as eq
+import task_queue.queues.s3_queue as s3q
+from task_queue.queues.in_memory_queue import in_memory_queue
+import task_queue.queues.sql_queue as sqlq
+import task_queue.queues.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
 from .utils import test_sql_engine

@@ -2,7 +2,7 @@
 """
 import requests
 
-from .queue_base import QueueBase
+from ..queues.queue_base import QueueBase
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
