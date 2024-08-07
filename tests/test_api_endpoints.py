@@ -117,8 +117,8 @@ def test_v1_queue_requeue_list():
     assert queue.size(QueueItemStage.FAIL) == 0
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
 
-def test_v1_queue_requeue_not_list():
-    """Tests the requeue endpoint works when given a string or invalid input.
+def test_v1_queue_requeue_str():
+    """Tests the requeue endpoint works when given a string.
     """
     queue.put(default_items)
 
@@ -131,6 +131,11 @@ def test_v1_queue_requeue_not_list():
     assert response.status_code == 200
     assert queue.size(QueueItemStage.FAIL) == 0
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
+
+def test_v1_queue_requeue_invalid():
+    """Tests the requeue endpoint works when given an invalid input.
+    """
+    queue.put(default_items)
 
     # Check that it does not fail when input is invalid
     with pytest.warns(UserWarning):
