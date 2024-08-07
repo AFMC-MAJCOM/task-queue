@@ -90,7 +90,7 @@ def handle_worker_interface_choice(cli_settings):
 
     Parameters:
     -----------
-    settings: TaskQueueCliSettings
+    cli_settings: TaskQueueCliSettings
         Configuration object for the CLI
 
     Returns:
@@ -112,7 +112,7 @@ def handle_queue_implementation_choice(cli_settings):
 
     Parameters:
     -----------
-    settings: TaskQueueCliSettings
+    cli_settings: TaskQueueCliSettings
         Configuration object for the CLI
 
     Returns:
