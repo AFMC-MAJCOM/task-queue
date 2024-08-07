@@ -38,7 +38,7 @@ def mocked_requests(*args, **kwargs):
     # Replace item_id passed into url
     if good_item_id in route:
         route = re.sub(good_item_id,'{item_id}', route)
-    if 'get' in route:
+    if '/get/' in route:
         split = route.split('/')
         split[len(split) - 1] = '{n_items}'
         route = '/'.join(split)
