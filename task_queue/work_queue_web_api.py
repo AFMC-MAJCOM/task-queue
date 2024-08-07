@@ -203,12 +203,8 @@ async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
     """
     try:
         queue_item_stage_enum = QueueItemStage[queue_item_stage]
-        print(queue_item_stage_enum)
         result = queue.lookup_state(queue_item_stage_enum)
         return result
-    except ValueError as exc:
-        raise HTTPException(status_code=400,
-                            detail="Invalid value for QueueItemStage") from exc
     except Exception as exc:
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
