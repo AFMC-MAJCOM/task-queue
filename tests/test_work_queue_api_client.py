@@ -15,7 +15,6 @@ test_client = ApiClient(url)
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
 
-get_test_value = 3276478
 good_item_id = 'good-item-id'
 
 class MockResponse:
@@ -39,8 +38,10 @@ def mocked_requests(*args, **kwargs):
     # Replace item_id passed into url
     if good_item_id in route:
         route = re.sub(good_item_id,'{item_id}', route)
-    if str(get_test_value) in route:
-        route = re.sub(str(get_test_value), '{n_items}', route)
+    if 'get' in route:
+        split = route.split('/')
+        split[len(split) - 1] = '{n_items}'
+        route = '/'.join(split)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -104,6 +105,7 @@ def test_client_lookup_item_invalid_parameter():
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
+    get_test_value = 165475
     test_client.get(get_test_value)
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}get/{get_test_value}"
