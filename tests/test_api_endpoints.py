@@ -243,5 +243,4 @@ def test_put_partial_invalid_items():
         return
 
     with pytest.raises(TypeError):
-        response = client.post("/api/v1/queue/put", json={'good_item': \
-                                                          bad_item})
+        client.post("/api/v1/queue/put", json={'good_item': bad_item})
