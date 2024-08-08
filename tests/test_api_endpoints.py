@@ -1,6 +1,6 @@
 """Test the API endpoints.
 """
-
+import pytest
 import os
 import pytest
 
@@ -149,6 +149,46 @@ def test_v1_queue_lookup_state_fail():
     response = client.get("/api/v1/queue/lookup_state/bad-stage")
     assert response.status_code == 400
     assert response.json() == {"detail": "bad-stage not a Queue Item Stage"}
+
+def test_v1_queue_requeue_list():
+    """Tests the requeue endpoint works when given a list.
+    """
+    queue.put(default_items)
+
+    fail_ids = [fail_id for fail_id, _ in queue.get(3)]
+    for fail_id in fail_ids:
+        queue.fail(fail_id)
+
+    # Check correct response when items are valid list
+    response = client.post("/api/v1/queue/requeue", json=fail_ids)
+    assert response.status_code == 200
+    assert queue.size(QueueItemStage.FAIL) == 0
+    assert queue.size(QueueItemStage.WAITING) == len(default_items)
+
+def test_v1_queue_requeue_str():
+    """Tests the requeue endpoint works when given a string.
+    """
+    queue.put(default_items)
+
+    get = queue.get(1)
+
+    queue.fail(get[0][0])
+
+    # Check correct response when item is only a string
+    response = client.post("/api/v1/queue/requeue", json=get[0][0])
+    assert response.status_code == 200
+    assert queue.size(QueueItemStage.FAIL) == 0
+    assert queue.size(QueueItemStage.WAITING) == len(default_items)
+
+def test_v1_queue_requeue_invalid():
+    """Tests the requeue endpoint works when given an invalid input.
+    """
+    queue.put(default_items)
+
+    # Check that it does not fail when input is invalid
+    with pytest.warns(UserWarning):
+        response = client.post("/api/v1/queue/requeue", json='bad-item-id')
+        assert response.status_code == 200
 
 def test_v1_queue_lookup_item():
     """Tests the lookup_item endpoint.
