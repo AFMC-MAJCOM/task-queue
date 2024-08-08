@@ -245,7 +245,6 @@ class InMemoryQueue(QueueBase):
                 item
             )
 
-
 # Pylint is disabled because the goal is to just have
 # the function return False and not fail
 # pylint: disable=broad-exception-caught
