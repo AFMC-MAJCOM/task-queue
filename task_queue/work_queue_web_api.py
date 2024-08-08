@@ -3,17 +3,51 @@ API.
 """
 from dataclasses import dataclass, asdict
 from typing import Dict, Any
+from typing_extensions import Annotated
 import os
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
+from pydantic import BaseModel, ValidationError, Field, field_validator
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
-from task_queue.in_memory_queue import in_memory_queue
+from task_queue.in_memory_queue import in_memory_queue, is_json_serializable
 
 app = FastAPI()
+
+
+class QueueItemBodyModel(BaseModel):
+    queue_item_body: Any # Field(validate_default=True)]
+
+    @field_validator('queue_item_body')
+    @classmethod
+    def serialize(cls, v):
+        print(v)
+        if not is_json_serializable(v):
+            raise ValueError(f"{v} is not serializable")
+        return json.dumps(v)
+
+        # try:
+        #     print(self.queue_item_body)
+        #     json.dumps(self.queue_item_body)
+        #     return
+        # except TypeError as e:
+        #     raise ValidationError(e)
+    
+    # def model_post_init(self, ctx):
+    #     print("here")
+    #     try:
+    #         json.dumps(self.queue_item_body)
+    #         return
+    #     except TypeError as e:
+    #         raise ValidationError(e)
+
+
+class QueueItemModel(BaseModel):
+    queue_item_id: str
+    queue_item_body: QueueItemBodyModel
 
 
 @dataclass
