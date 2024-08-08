@@ -2,7 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any, Annotated, Union
+from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le, MinLen
 from pydantic import BaseModel
 import os
@@ -272,6 +272,23 @@ async def describe_queue() -> QueueDescribeModel:
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)
     }
+
+@app.get("/api/v1/queue/get/{n_items}")
+async def get(n_items:int) ->  List[Tuple[str, Any]]:
+    """API endpoint to get the next n Items from the Queue
+    and move them to PROCESSING.
+
+    Parameters:
+    -----------
+    n_items: int
+        Number of items to retrieve from Queue.
+
+    Returns:
+    ----------
+    Returns a list of n_items from the Queue, as
+    List[(queue_item_id, queue_item_body)]
+    """
+    return queue.get(n_items)
 
 @app.post("/api/v1/queue/requeue")
 def requeue(item_ids:Union[str,list[str]]):

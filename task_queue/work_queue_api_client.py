@@ -1,5 +1,7 @@
 """Wherein is contained the ApiClient class.
 """
+from typing import Dict, Any, Union, List, Tuple
+from pydantic import validate_call, PositiveInt
 import requests
 from pydantic import validate_call, BaseModel, PositiveInt
 from typing import Dict, List, Tuple, Union, Any
@@ -17,12 +19,15 @@ class ApiClient(QueueBase):
     api_base_url: str
         The base url for all api endpoints.
     """
+    api_base_url: str
+    timeout: float = 5
+
     def __init__(self, api_base_url: str, timeout: float = 5):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
     @validate_call
-    def put(self, items: dict) -> None:
+    def put(self, items: Dict[str, Any]) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
@@ -36,7 +41,7 @@ class ApiClient(QueueBase):
         response.raise_for_status()
 
     @validate_call
-    def get(self, n_items:PositiveInt=1) -> List[Tuple[str,Any]]:
+    def get(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
         """Gets the next n Items from the Queue, moving them to PROCESSING.
 
         Parameters:
@@ -49,10 +54,13 @@ class ApiClient(QueueBase):
         Returns a list of n_items from the Queue, as
         List[(queue_item_id, queue_item_body)]
         """
-        return None
+        response = requests.get(f"{self.api_base_url}get/{n_items}",
+                               timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     @validate_call
-    def success(self, queue_item_id):
+    def success(self, queue_item_id:str) -> None:
         """Moves a Queue Item from PROCESSING to SUCCESS.
 
         Parameters:
@@ -63,7 +71,7 @@ class ApiClient(QueueBase):
         return None
 
     @validate_call
-    def fail(self, queue_item_id):
+    def fail(self, queue_item_id:str) -> None:
         """Moves a Queue Item from PROCESSING to FAIL.
 
         Parameters:
@@ -150,7 +158,7 @@ class ApiClient(QueueBase):
         return response
 
     @validate_call
-    def requeue(self, item_ids:Union[str,List[str]]) -> List[str]:
+    def requeue(self, item_ids:Union[str, List[str]]) -> None:
         """Move input queue items from FAILED to WAITING.
 
         Parameters:
