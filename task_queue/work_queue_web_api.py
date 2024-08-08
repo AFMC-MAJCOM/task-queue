@@ -2,7 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, Union, List, Tuple
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -242,6 +242,17 @@ async def get(n_items:int) ->  List[Tuple[str, Any]]:
     List[(queue_item_id, queue_item_body)]
     """
     return queue.get(n_items)
+
+@app.post("/api/v1/queue/requeue")
+def requeue(item_ids:Union[str,list[str]]):
+    """API endpoint to move input queue items from FAILED to WAITING.
+
+    Parameters:
+    -----------
+    item_ids: [str]
+        ID of Queue Item
+    """
+    queue.requeue(item_ids
 
 @app.post("/api/v1/queue/put")
 async def put(items:Dict[str,Any]) -> None:
