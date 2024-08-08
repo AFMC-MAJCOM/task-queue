@@ -2,52 +2,21 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any
+from typing import Dict, Any, List, Union, Tuple
 from typing_extensions import Annotated
 import os
+import json
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
-from pydantic import BaseModel, ValidationError, Field, field_validator
+from pydantic import BaseModel, AfterValidator, Field, field_validator
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
-from task_queue.in_memory_queue import in_memory_queue, is_json_serializable
+from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
-
-
-class QueueItemBodyModel(BaseModel):
-    queue_item_body: Any # Field(validate_default=True)]
-
-    @field_validator('queue_item_body')
-    @classmethod
-    def serialize(cls, v):
-        print(v)
-        if not is_json_serializable(v):
-            raise ValueError(f"{v} is not serializable")
-        return json.dumps(v)
-
-        # try:
-        #     print(self.queue_item_body)
-        #     json.dumps(self.queue_item_body)
-        #     return
-        # except TypeError as e:
-        #     raise ValidationError(e)
-    
-    # def model_post_init(self, ctx):
-    #     print("here")
-    #     try:
-    #         json.dumps(self.queue_item_body)
-    #         return
-    #     except TypeError as e:
-    #         raise ValidationError(e)
-
-
-class QueueItemModel(BaseModel):
-    queue_item_id: str
-    queue_item_body: QueueItemBodyModel
 
 
 @dataclass
@@ -190,6 +159,23 @@ def queue_settings_from_env(env_dict):
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
+
+def json_serializable_validator(o):
+    """Determines if the object passed in is JSON serializable.
+
+    Parameters:
+    -----------
+    o: JSON value
+        Queue Item data.
+
+    Returns:
+    -----------
+    Returns True or False if the object is JSON serializable.
+    """
+    json.dumps(o)
+    return o
+
+
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes() -> Dict[str, int]:
     """API endpoint to get the number of jobs in each stage.
@@ -260,14 +246,18 @@ async def describe_queue() -> Dict[str,Any]:
         "arguments": asdict(queue_settings)
     }
 
+QueueItemBodyType = Annotated[Any, \
+                    AfterValidator(json_serializable_validator)]
+
 @app.post("/api/v1/queue/put")
-async def put(items:Dict[str,Any]) -> None:
+async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
     -----------
     items: dict
         Dictionary of Queue Items to add Queue, where Item is a key:value
-        pair, where key is the item ID and value is the queue item body.
+        pair, where key is a the item ID and value is the queue item body.
+        The item ID must be a string and the item body must be serializable.
     """
     queue.put(items)
