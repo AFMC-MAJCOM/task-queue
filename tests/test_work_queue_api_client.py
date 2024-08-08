@@ -8,6 +8,7 @@ from pydantic import ValidationError
 
 from task_queue.work_queue_api_client import ApiClient
 from task_queue.work_queue_web_api import app
+from task_queue.queue_base import QueueItemStage
 
 url = "http://localhost:8000"
 test_client = ApiClient(url)
@@ -42,6 +43,9 @@ def mocked_requests(*args, **kwargs):
         split = route.split('/')
         split[len(split) - 1] = '{n_items}'
         route = '/'.join(split)
+
+    if "WAITING" in route:
+        route = re.sub('WAITING','{queue_item_stage}',route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -92,6 +96,11 @@ def test_client_get_queue_sizes_fail(mock_get):
 def test_client_requeue(mock_get):
     response = test_client.requeue('good-item-id')
     assert response is None
+
+@mock.patch('requests.get', side_effect=mocked_requests)
+def test_client_lookup_state(mock_get):
+    response = test_client.lookup_state(QueueItemStage.WAITING)
+    assert isinstance(response, dict)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
