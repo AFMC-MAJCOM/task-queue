@@ -101,7 +101,7 @@ def test_client_get_queue_sizes_fail(mock_get):
 def test_client_requeue(mock_get):
     test_client.requeue('good-item-id')
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}requeue/good-item-id"
+    assert route == f"{test_client.api_base_url}requeue"
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_state(mock_get):
@@ -110,7 +110,7 @@ def test_client_lookup_state(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
-    test_client.lookup_item('good_item_id')
+    test_client.lookup_item('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
 

@@ -5,7 +5,7 @@ from pydantic import validate_call, PositiveInt
 import requests
 
 from .queue_base import QueueBase, QueueItemStage
-from task_queue.work_queue_web_api import QueueGetSizesModel, \
+from task_queue.queue_pydantic_models import QueueGetSizesModel, \
 LookupQueueItemModel, QueueDescribeModel
 
 

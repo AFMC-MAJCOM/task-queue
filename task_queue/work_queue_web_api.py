@@ -4,7 +4,6 @@ API.
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le, MinLen
-from pydantic import BaseModel
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -14,6 +13,9 @@ from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 from task_queue.in_memory_queue import in_memory_queue
+from task_queue.queue_pydantic_models import QueueGetSizesModel, \
+LookupQueueItemModel, QueueDescribeModel
+
 
 app = FastAPI()
 
@@ -158,15 +160,6 @@ def queue_settings_from_env(env_dict):
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
-class QueueGetSizesModel(BaseModel):
-    """A Pydantic model representing the return dictionary for the /sizes
-    endpoint and get_queue_sizes() in client."""
-    WAITING : int
-    PROCESSING : int
-    SUCCESS : int
-    FAIL : int
-
-
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
@@ -220,14 +213,6 @@ async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
-class LookupQueueItemModel(BaseModel):
-    """A Pydantic model representing the return dictionary for the /lookup_item
-    endpoint and lookup_item() in client."""
-
-    item_id : str
-    status : QueueItemStage
-    item_body : Any
-
 @app.get("/api/v1/queue/lookup_item/{item_id}")
 async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     """API endpoint to lookup an Item currently in the Queue.
@@ -248,13 +233,6 @@ async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     except KeyError as exc:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
-
-class QueueDescribeModel(BaseModel):
-    """A Pydantic model representing the return dictionary for the /describe
-    endpoint and description() in client."""
-
-    implementation : str
-    arguments : Dict[str, Any]
 
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> QueueDescribeModel:
@@ -296,11 +274,6 @@ def requeue(item_ids:Union[str,list[str]]):
         ID of Queue Item
     """
     queue.requeue(item_ids)
-
-class QueuePutModel(BaseModel):
-    """A Pydantic model representing the input dictionary for the /put
-    endpoint and put() in client.
-    """
 
 @app.post("/api/v1/queue/put")
 async def put(items:Annotated[Dict[str,Any], MinLen(1)]) -> None:
