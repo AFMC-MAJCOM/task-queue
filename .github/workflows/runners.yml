@@ -133,7 +133,7 @@ jobs:
           version=$(python setup.py --version)
           echo "Task Queue Version = ${version}"
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
+          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest server --help 
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
           docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
