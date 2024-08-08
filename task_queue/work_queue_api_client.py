@@ -1,12 +1,12 @@
 """Wherein is contained the ApiClient class.
 """
 from typing import Dict, Any, Union, List, Tuple
-from pydantic import BaseModel, validate_call, PositiveInt
+from pydantic import validate_call, PositiveInt
 import requests
 
 from .queue_base import QueueBase, QueueItemStage
 
-class ApiClient(QueueBase, BaseModel):
+class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
 
     Parameters:
@@ -18,7 +18,6 @@ class ApiClient(QueueBase, BaseModel):
     timeout: float = 5
 
     def __init__(self, api_base_url: str, timeout: float = 5):
-        super().__init__(api_base_url=api_base_url, timeout=timeout)
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
