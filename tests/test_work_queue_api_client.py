@@ -16,8 +16,6 @@ test_client = ApiClient(url)
 # Get list of all possible endpoints
 api_routes = [url + x.path for x in app.routes]
 
-good_item_id = 'good-item-id'
-
 class MockResponse:
     def __init__(self, json_data, status_code):
         self.status_code = status_code
@@ -35,7 +33,6 @@ def mocked_requests_fail(*args, **kwargs):
 
 def mocked_requests(*args, **kwargs):
     route = args[0]
-<<<<<<< HEAD
     # Replace params passed into url, force expected return types for pydantic
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
@@ -46,16 +43,10 @@ def mocked_requests(*args, **kwargs):
                                 "status":QueueItemStage.WAITING,
                                 "item_body":"good-item-body"},
                                 200)
-=======
-
-    # Replace item_id passed into url
-    if good_item_id in route:
-        route = re.sub(good_item_id,'{item_id}', route)
     if '/get/' in route:
         split = route.split('/')
         split[len(split) - 1] = '{n_items}'
         route = '/'.join(split)
->>>>>>> a6ee40908971f1e2d2fa343278da020647ddd0a7
 
     if "WAITING" in route:
         route = re.sub('WAITING','{queue_item_stage}',route)
@@ -70,13 +61,10 @@ def test_constructor():
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
-<<<<<<< HEAD
-    response = test_client.lookup_status('good-item-id')
-    assert isinstance(response, QueueItemStage)
-=======
-    test_client.lookup_status(good_item_id)
+    test_client.lookup_status('good-item-id')
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}status/{good_item_id}"
+    print(route)
+    assert route == f"{test_client.api_base_url}status/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_status_fail(mock_get):
@@ -86,7 +74,6 @@ def test_client_lookup_status_fail(mock_get):
 def test_client_lookup_status_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.lookup_status(1)
->>>>>>> a6ee40908971f1e2d2fa343278da020647ddd0a7
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
@@ -112,8 +99,9 @@ def test_client_get_queue_sizes_fail(mock_get):
 
 @mock.patch('requests.post', side_effect=mocked_requests)
 def test_client_requeue(mock_get):
-    response = test_client.requeue('good-item-id')
-    assert response is None
+    test_client.requeue('good-item-id')
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}requeue/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_state(mock_get):
@@ -122,9 +110,9 @@ def test_client_lookup_state(mock_get):
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
-    test_client.lookup_item(good_item_id)
+    test_client.lookup_item('good_item_id')
     route = mock_get.call_args[0][0]
-    assert route == f"{test_client.api_base_url}lookup_item/{good_item_id}"
+    assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_item_fail(mock_get):

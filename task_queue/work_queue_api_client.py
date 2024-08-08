@@ -3,8 +3,6 @@
 from typing import Dict, Any, Union, List, Tuple
 from pydantic import validate_call, PositiveInt
 import requests
-from pydantic import validate_call, PositiveInt
-from typing import List, Tuple, Union, Any
 
 from .queue_base import QueueBase, QueueItemStage
 from task_queue.work_queue_web_api import QueueGetSizesModel, \

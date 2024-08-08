@@ -2,11 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-<<<<<<< HEAD
-from typing import Dict, Any, Annotated, Union, List
-=======
 from typing import Dict, Any, Annotated, Union, Tuple, List
->>>>>>> a6ee40908971f1e2d2fa343278da020647ddd0a7
 from annotated_types import Ge, Le, MinLen
 from pydantic import BaseModel
 import os
