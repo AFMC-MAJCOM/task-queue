@@ -4,7 +4,7 @@ from typing import Dict, Any, Union, List, Tuple
 from pydantic import validate_call, PositiveInt
 import requests
 
-from .queue_base import QueueBase, QueueItemStage
+from ..queues.queue_base import QueueBase, QueueItemStage
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.

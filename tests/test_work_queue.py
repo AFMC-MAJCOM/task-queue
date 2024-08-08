@@ -2,10 +2,10 @@
 """
 import pytest
 
-from task_queue import work_queue
-import task_queue.in_memory_queue as mq
-from task_queue.queue_worker_interface import DummyWorkerInterface
-from task_queue.queue_base import QueueItemStage
+from task_queue.workers import work_queue
+import task_queue.queues.in_memory_queue as mq
+from task_queue.workers.queue_worker_interface import DummyWorkerInterface
+from task_queue.queues.queue_base import QueueItemStage
 from tests.common_queue import default_items
 
 

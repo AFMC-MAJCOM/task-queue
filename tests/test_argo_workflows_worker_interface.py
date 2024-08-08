@@ -6,8 +6,9 @@ import os
 
 import pytest
 
-from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
-from task_queue.queue_base import QueueItemStage
+from task_queue.workers.argo_workflows_queue_worker import (
+                                                    ArgoWorkflowsQueueWorker)
+from task_queue.queues.queue_base import QueueItemStage
 
 
 run_argo_tests = os.environ.get('RUN_ARGO_TESTS', False)

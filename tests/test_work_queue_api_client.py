@@ -6,9 +6,9 @@ from unittest import mock
 from requests.exceptions import RequestException
 from pydantic import ValidationError
 
-from task_queue.work_queue_api_client import ApiClient
-from task_queue.work_queue_web_api import app
-from task_queue.queue_base import QueueItemStage
+from task_queue.api.work_queue_api_client import ApiClient
+from task_queue.api.work_queue_web_api import app
+from task_queue.queues.queue_base import QueueItemStage
 
 url = "http://localhost:8000"
 test_client = ApiClient(url)

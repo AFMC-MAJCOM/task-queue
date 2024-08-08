@@ -5,7 +5,7 @@ from typing import Dict, Any
 import itertools
 import json
 
-from task_queue.queue_base import QueueBase, QueueItemStage
+from .queue_base import QueueBase, QueueItemStage
 
 
 @dataclass

@@ -5,11 +5,11 @@ import random
 import pytest
 
 from task_queue.events.in_memory_event_store import InMemoryEventStore
-from task_queue.in_memory_queue import in_memory_queue
-from task_queue.queue_with_events import queue_with_events
-from task_queue.queue_with_events import QueueAddEventData
-from task_queue.queue_with_events import QueueMoveEventData
-from task_queue.queue_base import QueueItemStage
+from task_queue.queues.in_memory_queue import in_memory_queue
+from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.queues.queue_with_events import QueueAddEventData
+from task_queue.queues.queue_with_events import QueueMoveEventData
+from task_queue.queues.queue_base import QueueItemStage
 from .common_queue import default_items
 
 
