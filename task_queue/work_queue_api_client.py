@@ -2,7 +2,7 @@
 """
 import requests
 
-from .queue_base import QueueBase
+from .queue_base import QueueBase, QueueItemStage
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -96,8 +96,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def lookup_state(self, queue_item_stage):
-        """Lookup which item ids are in the current Queue stage.
+    def lookup_state(self, queue_item_stage:QueueItemStage):
+        """Lookup which item ids are in the current Queue Stage.
 
         Parameters:
         -----------
@@ -108,6 +108,12 @@ class ApiClient(QueueBase):
         ------------
         Returns a list of all item ids in the current queue stage.
         """
+        stage = queue_item_stage.name
+        response = requests.get(
+            f"{self.api_base_url}lookup_state/{stage}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def lookup_item(self, queue_item_id:str):
         """Lookup an Item currently in the Queue.

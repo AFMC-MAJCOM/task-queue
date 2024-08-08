@@ -102,6 +102,53 @@ def test_v1_queue_describe():
     assert response.status_code == 200
     assert response.json() == desc
 
+def test_v1_queue_lookup_state():
+    """Tests the lookup_state endpoint.
+    """
+    queue.put(default_items)
+
+    # Waiting test
+    waiting_id_list = [x for x in default_items]
+    queue_item_stage = QueueItemStage.WAITING.name
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(waiting_id_list)
+
+    # Processing tests
+    proc = queue.get(2)
+    proc_id_list = [x for x,_ in proc]
+    queue_item_stage = QueueItemStage.PROCESSING.name
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(proc_id_list)
+
+    # Success test
+    succ = queue.get(2)
+    succ_id_list = [x for x,_ in succ]
+    for i in succ:
+        queue.success(i[0])
+    queue_item_stage = QueueItemStage.SUCCESS.name
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(succ_id_list)
+
+    # Fail test
+    fail = queue.get(2)
+    fail_id_list = [x for x,_ in fail]
+    for i in fail:
+        queue.fail(i[0])
+    queue_item_stage = QueueItemStage.FAIL.name
+    response = client.get(f"/api/v1/queue/lookup_state/{queue_item_stage}")
+    assert response.status_code == 200
+    assert sorted(response.json()) == sorted(fail_id_list)
+
+def test_v1_queue_lookup_state_fail():
+    """Tests the lookup_state endpoint failure.
+    """
+    response = client.get("/api/v1/queue/lookup_state/bad-stage")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "bad-stage not a Queue Item Stage"}
+
 def test_v1_queue_requeue_list():
     """Tests the requeue endpoint works when given a list.
     """
