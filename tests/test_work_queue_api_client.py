@@ -29,9 +29,16 @@ def mocked_requests(*args, **kwargs):
                 raise RequestException("ERROR ", self.status_code)
 
     route = args[0]
-    # Replace item_id passed into url
+    # Replace params passed into url, force expected return types for pydantic
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
+        if '/status/' in route:
+            return MockResponse(QueueItemStage.WAITING,200)
+        elif '/lookup_item/' in route:
+            return MockResponse({"item_id":"good-item-id",
+                                "status":QueueItemStage.WAITING,
+                                "item_body":"good-item-body"},
+                                200)
 
     if "WAITING" in route:
         route = re.sub('WAITING','{queue_item_stage}',route)
@@ -54,7 +61,7 @@ def test_bad_url(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
     response = test_client.lookup_status('good-item-id')
-    assert isinstance(response, dict)
+    assert isinstance(response, QueueItemStage)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):

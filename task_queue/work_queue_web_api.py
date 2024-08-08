@@ -2,7 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any, Annotated, Union
+from typing import Dict, Any, Annotated, Union, List
 from annotated_types import Ge, Le, MinLen
 from pydantic import BaseModel
 import os
@@ -200,7 +200,7 @@ async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
-async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
     """API endpoint to look up all item ids from a specific stage.
 
     Parameters:
@@ -244,11 +244,7 @@ async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     """
     try:
         response = queue.lookup_item(item_id)
-        return {
-            "item_id":response[0],
-            "status":response[1],
-            "item_body":response[2],
-        }
+        return response
     except KeyError as exc:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc

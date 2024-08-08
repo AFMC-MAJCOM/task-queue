@@ -244,8 +244,8 @@ class JsonS3Queue(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body, or it
-        will raise an error if Item is not in Queue.
+        Returns a dictionary with the Queue Item ID, the status of that Item,
+        and the body, or it will raise an error if Item is not in Queue.
         """
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)
@@ -261,7 +261,11 @@ class JsonS3Queue(QueueBase):
                 with fs.open(fname) as f:
                     item_body = json.load(f)
 
-        return (queue_item_id, item_stage, item_body)
+        return {
+            'item_id':queue_item_id,
+            'status':item_stage,
+            'item_body':item_body
+        }
 
     def description(self):
         """A brief description of the Queue.
