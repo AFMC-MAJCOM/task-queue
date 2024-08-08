@@ -273,7 +273,7 @@ def requeue(item_ids:Union[str,list[str]]):
     item_ids: [str]
         ID of Queue Item
     """
-    queue.requeue(item_ids
+    queue.requeue(item_ids)
 
 @app.post("/api/v1/queue/put")
 async def put(items:Dict[str,Any]) -> None:

@@ -2,14 +2,12 @@
 """
 import pytest
 import os
-import pytest
 
 from fastapi.testclient import TestClient
 
 import tests.common_queue as qtest
 import task_queue.in_memory_queue as imq
 from task_queue.queue_base import QueueItemStage
-import task_queue.in_memory_queue as imq
 # Disable the wrong import position warning because we only want to import
 # work_queue_web_api after setting the environment variable for testing.
 # pylint: disable=wrong-import-position
