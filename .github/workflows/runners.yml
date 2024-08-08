@@ -67,6 +67,7 @@ jobs:
     - name: Test with pytest
       run: |
         export RUN_ARGO_TESTS=True
+        export SQL_QUEUE_NAME=test
         export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
         export SQL_QUEUE_POSTGRES_USER=postgres
         export SQL_QUEUE_POSTGRES_PASSWORD=postgres
