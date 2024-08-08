@@ -2,7 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any
+from typing import Dict, Any, Union
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -14,6 +14,7 @@ from task_queue.sql_queue import json_sql_queue
 from task_queue.in_memory_queue import in_memory_queue
 
 app = FastAPI()
+
 
 @dataclass
 class QueueSettings():
@@ -109,16 +110,15 @@ class SqlQueueSettings(QueueSettings):
             self.queue_name
         )
 
+
 @dataclass
 class InMemoryQueueSettings(QueueSettings):
     """Class concerning the In Memory Queue settings.
-
     The only implementation of this class so far is for testing.
     """
     @staticmethod
     def from_env(env_dict):
         """Returns instance of QueueSettings
-
         Parameters:
         -----------
         env_dict: dict
@@ -130,6 +130,7 @@ class InMemoryQueueSettings(QueueSettings):
         """Returns QueueBase object.
         """
         return in_memory_queue()
+
 
 def queue_settings_from_env(env_dict):
     """Creates an instance of QueueSettings from an environment dictionary.
@@ -187,6 +188,52 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+@app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
+async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+    """API endpoint to look up all item ids from a specific stage.
+
+    Parameters:
+    -----------
+    queue_item_stage: str
+        Desired Queue Item Stage.
+
+    Returns:
+    -----------
+    Returns a list of item ids.
+    """
+    try:
+        queue_item_stage_enum = QueueItemStage[queue_item_stage]
+        result = queue.lookup_state(queue_item_stage_enum)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400,
+              detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
+@app.get("/api/v1/queue/lookup_item/{item_id}")
+async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+    """API endpoint to lookup an Item currently in the Queue.
+
+    Parameters:
+    -----------
+    item_id: str
+        ID of Queue Item
+
+    Returns:
+    ------------
+    Returns a dictionary with the Queue Item ID, the status of that Item, and
+    the body, or it will raise an error if Item is not in Queue.
+    """
+    try:
+        response = queue.lookup_item(item_id)
+        return {
+            "item_id":response[0],
+            "status":response[1],
+            "item_body":response[2],
+        }
+    except KeyError as exc:
+        raise HTTPException(status_code=400,
+                            detail=f"{item_id} not in Queue") from exc
+
 @app.get("/api/v1/queue/describe")
 async def describe_queue() -> Dict[str,Any]:
     """API endpoint to descibe the Queue.
@@ -199,3 +246,26 @@ async def describe_queue() -> Dict[str,Any]:
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)
     }
+
+@app.post("/api/v1/queue/requeue")
+def requeue(item_ids:Union[str,list[str]]):
+    """API endpoint to move input queue items from FAILED to WAITING.
+
+    Parameters:
+    -----------
+    item_ids: [str]
+        ID of Queue Item
+    """
+    queue.requeue(item_ids)
+
+@app.post("/api/v1/queue/put")
+async def put(items:Dict[str,Any]) -> None:
+    """API endpoint to add items to the Queue.
+
+    Parameters:
+    -----------
+    items: dict
+        Dictionary of Queue Items to add Queue, where Item is a key:value
+        pair, where key is the item ID and value is the queue item body.
+    """
+    queue.put(items)

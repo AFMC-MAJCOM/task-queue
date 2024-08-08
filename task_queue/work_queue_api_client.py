@@ -2,7 +2,7 @@
 """
 import requests
 
-from .queue_base import QueueBase
+from .queue_base import QueueBase, QueueItemStage
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -16,7 +16,7 @@ class ApiClient(QueueBase):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
-    def put(self, items):
+    def put(self, items: dict) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
@@ -25,7 +25,9 @@ class ApiClient(QueueBase):
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
         """
-        return None
+        response = requests.post(f"{self.api_base_url}put", json=items, \
+                                 timeout=self.timeout)
+        response.raise_for_status()
 
     def get(self, n_items=1):
         """Gets the next n Items from the Queue, moving them to PROCESSING.
@@ -94,8 +96,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def lookup_state(self, queue_item_stage):
-        """Lookup which item ids are in the current Queue stage.
+    def lookup_state(self, queue_item_stage:QueueItemStage):
+        """Lookup which item ids are in the current Queue Stage.
 
         Parameters:
         -----------
@@ -106,8 +108,14 @@ class ApiClient(QueueBase):
         ------------
         Returns a list of all item ids in the current queue stage.
         """
+        stage = queue_item_stage.name
+        response = requests.get(
+            f"{self.api_base_url}lookup_state/{stage}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
-    def lookup_item(self, queue_item_id):
+    def lookup_item(self, queue_item_id:str):
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -117,10 +125,14 @@ class ApiClient(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body, or it
-        will raise an error if Item is not in Queue.
+        Returns a dictionary with the Queue Item ID, the status of that Item,
+        and the body, or it will raise an error if Item is not in Queue.
         """
-        return None
+        response = requests.get(
+            f"{self.api_base_url}lookup_item/{queue_item_id}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
@@ -129,12 +141,12 @@ class ApiClient(QueueBase):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING
         """
-        return None
+        response = requests.post(f"{self.api_base_url}requeue",
+                               timeout=self.timeout,
+                               json=item_ids
+                              )
+        response.raise_for_status()
 
     def description(self):
         """A brief description of the Queue.
