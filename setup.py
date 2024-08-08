@@ -18,8 +18,6 @@ def get_version(rel_path: str) -> str:
 setup(
     name="task_queue",
     version=get_version("task_queue/__init__.py"),
-    include_package_data=True,
-    package_data={"task_queue/config": ["config.env"]},
     packages = find_packages(),
     install_requires = [
         "pendulum >= 2.1.2",

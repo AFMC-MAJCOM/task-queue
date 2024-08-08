@@ -20,7 +20,6 @@ def get_config_file_path() -> str:
     """Form the configuration file path.
 
     Prefer the environment variable to "TASK_QUEUE_CONFIG_PATH".
-    If that does not exist, read the default .env in the local folder.
 
     Input file paths from the environment variables can be relative to the
     script, or absolute.
@@ -29,9 +28,7 @@ def get_config_file_path() -> str:
     -----------
     The .env configuration file path
     """
-    if "TASK_QUEUE_CONFIG_PATH" in os.environ:
-        return os.environ["TASK_QUEUE_CONFIG_PATH"]
-    return os.path.join(os.path.dirname(__file__),'config.env')
+    return os.environ.get("TASK_QUEUE_CONFIG_PATH",None)
 
 
 class QueueImplementations(str, Enum):
@@ -40,10 +37,12 @@ class QueueImplementations(str, Enum):
     SQL_JSON = 'sql-json'
     IN_MEMORY = 'in-memory'
 
+
 class EventStoreChoices(str, Enum):
     """Enum options for the available event logging."""
     NO_EVENTS = 'none'
     SQL_JSON = 'sql-json'
+
 
 class WorkerInterfaceChoices(str, Enum):
     """Enum options for the available worker interfaces choices."""
@@ -51,7 +50,7 @@ class WorkerInterfaceChoices(str, Enum):
 
 
 class TaskQueueBaseSetting(BaseSettings):
-    """Core setttings logic to add config_path and logging."""
+    """Core settings logic to add config_path and logging."""
     model_config = SettingsConfigDict(
         env_file=get_config_file_path(),
         env_file_encoding='utf-8',
@@ -70,17 +69,33 @@ class TaskQueueBaseSetting(BaseSettings):
 class TaskQueueSqlSettings(TaskQueueBaseSetting):
     """SQL Settings for the Task Queue."""
     SQL_QUEUE_NAME: str
-    SQL_QUEUE_POSTGRES_DATABASE: str = "postgres"
-    SQL_QUEUE_POSTGRES_HOSTNAME: str = "postgres"
-    SQL_QUEUE_POSTGRES_PASSWORD: str = "postgres"
-    SQL_QUEUE_POSTGRES_USER: str = "postgres"
+    SQL_QUEUE_POSTGRES_DATABASE: Optional[str] = None
+    SQL_QUEUE_POSTGRES_HOSTNAME: Optional[str] = None
+    SQL_QUEUE_POSTGRES_PASSWORD: Optional[str] = None
+    SQL_QUEUE_POSTGRES_USER: Optional[str] = None
     SQL_QUEUE_POSTGRES_PORT: int = 5432
     SQL_QUEUE_CONNECTION_STRING: Optional[str] = None
+
+    @field_validator('SQL_QUEUE_CONNECTION_STRING')
+    @classmethod
+    def validate_s3_path(cls, v: str, values) -> str:
+        """Verify either the connection string is present"""
+        if v is not None:
+            return v
+        for key, value in values.data.items():
+            if value is None:
+                raise ValueError(
+                    f"SQL Queue parameter {key} must be supplied when "
+                    "SQL_QUEUE_CONNECTION_STRING is None."
+                )
+        return v
 
 
 class TaskQueueS3Settings(TaskQueueBaseSetting):
     """S3 Settings for the Task Queue."""
     S3_QUEUE_BASE_PATH: str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
     FSSPEC_S3_ENDPOINT_URL: Optional[str] = None
 
     @field_validator('S3_QUEUE_BASE_PATH')
@@ -202,24 +217,23 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
     )
 
 
-def get_task_queue_settings(path=None, setting_class=None):
+def get_task_queue_settings(setting_class, config_path=None):
     """Wrapper for returning the TaskQueueSettings object.
 
     This function enables dynamically setting the configuration path.
 
     Parameters:
     -----------
-    path: str (optional)
+    setting_class: TaskQueueSettings (option)
+        The setting class to instantiate.
+    config_path: str (optional)
         The path (relative or absolute) to a .env configuration file.
 
     Returns:
     -----------
     A TaskQueueSettings object.
     """
-    if setting_class is None:
-        setting_class = TaskQueueApiSettings
+    if config_path is None:
+        config_path = get_config_file_path()
 
-    if path is None:
-        path = get_config_file_path()
-
-    return setting_class(_env_file=path)
+    return setting_class(_env_file=config_path)

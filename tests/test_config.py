@@ -19,9 +19,23 @@ def test_config_parameter_order():
     """Test parameter preference order"""
     environ = os.environ.copy()
     os.environ["run_argo_tests"] = "True"
-    settings = get_task_queue_settings(
-        setting_class=TaskQueueTestSettings
-    )
+
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        config_path = os.path.join(tmp_dir, "test_config.env")
+
+        with open(config_path, "w", encoding="utf-8") as config_file:
+            os.environ["TASK_QUEUE_CONFIG_PATH"] = config_path
+
+            config_vals = {"TASK_QUEUE_ENV_TEST": True}
+
+            for k, v in config_vals.items():
+                config_file.write(f"{k}={v}\n")
+
+        settings = get_task_queue_settings(
+            setting_class=TaskQueueTestSettings
+        )
+
     os.environ = environ
 
     # 1) Environment variables, 2) Config.json, 3) A default value
@@ -48,16 +62,13 @@ def test_config_file_rerouting():
                 config_file.write(f"{k}={v}\n")
 
         os.environ["TASK_QUEUE_CONFIG_PATH"] = config_path
-        settings = get_task_queue_settings(config_path,
-                                           setting_class=TaskQueueTestSettings)
+        settings = get_task_queue_settings(TaskQueueTestSettings, config_path)
 
     assert settings.UNIT_TEST_QUEUE_BASE == new_test_val
 
 
 def test_setting_class():
     """Test the setting_class argument returns the indicated class."""
-
-    assert isinstance(get_task_queue_settings(), config.TaskQueueApiSettings)
 
     setting_test = get_task_queue_settings(
         setting_class=TaskQueueTestSettings

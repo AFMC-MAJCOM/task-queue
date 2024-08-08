@@ -88,7 +88,7 @@ The Task Queue library uses [Pydantic Settings](https://docs.pydantic.dev/latest
 5. Variables loaded from the secrets directory.
 6. The default field values for the Settings model.
 
-A shown by priority (4), the library accepts a dotenv (.env) file for parameterization. The default location for this file is [config.env](.task_queue/config/config.env). However, this default path can be overridden using the `TASK_QUEUE_CONFIG_PATH` environment variable. If this feature is used when launching a Task Queue container, then the path must be mounted when the container is launched.
+As shown by priority (4), the library accepts a dotenv (.env) file for parameterization. The configuration file path is set using the `TASK_QUEUE_CONFIG_PATH` environment variable. If this feature is used when launching a Task Queue container, then the path must be mounted when the container is launched.
 
 The configuration models for the Task Queue are found in [config.py](.task_queue/config/config.py), and include:
 
