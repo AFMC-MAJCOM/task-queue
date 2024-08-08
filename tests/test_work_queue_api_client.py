@@ -7,6 +7,7 @@ from requests.exceptions import RequestException
 
 from task_queue.work_queue_api_client import ApiClient
 from task_queue.work_queue_web_api import app
+from task_queue.queue_base import QueueItemStage
 
 url = "http://localhost:8000"
 test_client = ApiClient(url)
@@ -31,6 +32,9 @@ def mocked_requests(*args, **kwargs):
     # Replace item_id passed into url
     if 'good-item-id' in route:
         route = re.sub('good-item-id','{item_id}',route)
+
+    if "WAITING" in route:
+        route = re.sub('WAITING','{queue_item_stage}',route)
 
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
@@ -60,6 +64,16 @@ def test_client_description(mock_get):
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
     response = test_client.get_queue_sizes()
+    assert isinstance(response, dict)
+
+@mock.patch('requests.post', side_effect=mocked_requests)
+def test_client_requeue(mock_get):
+    response = test_client.requeue('good-item-id')
+    assert response is None
+
+@mock.patch('requests.get', side_effect=mocked_requests)
+def test_client_lookup_state(mock_get):
+    response = test_client.lookup_state(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
 @mock.patch('requests.get', side_effect=mocked_requests)

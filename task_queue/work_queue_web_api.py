@@ -2,7 +2,7 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any, Annotated
+from typing import Dict, Any, Annotated, Union
 from annotated_types import Ge, Le, MinLen
 from pydantic import BaseModel
 import os
@@ -199,6 +199,27 @@ async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+@app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
+async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+    """API endpoint to look up all item ids from a specific stage.
+
+    Parameters:
+    -----------
+    queue_item_stage: str
+        Desired Queue Item Stage.
+
+    Returns:
+    -----------
+    Returns a list of item ids.
+    """
+    try:
+        queue_item_stage_enum = QueueItemStage[queue_item_stage]
+        result = queue.lookup_state(queue_item_stage_enum)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400,
+              detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
 class LookupQueueItemModel(BaseModel):
     """A Pydantic model representing the return dictionary for the /lookup_item
     endpoint and lookup_item() in client."""
@@ -252,11 +273,21 @@ async def describe_queue() -> QueueDescribeModel:
         "arguments": asdict(queue_settings)
     }
 
+@app.post("/api/v1/queue/requeue")
+def requeue(item_ids:Union[str,list[str]]):
+    """API endpoint to move input queue items from FAILED to WAITING.
+
+    Parameters:
+    -----------
+    item_ids: [str]
+        ID of Queue Item
+    """
+    queue.requeue(item_ids)
+
 class QueuePutModel(BaseModel):
     """A Pydantic model representing the input dictionary for the /put
     endpoint and put() in client.
     """
-    
 
 @app.post("/api/v1/queue/put")
 async def put(items:Annotated[Dict[str,Any], MinLen(1)]) -> None:

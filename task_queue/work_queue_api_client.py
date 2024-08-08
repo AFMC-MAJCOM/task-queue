@@ -9,7 +9,6 @@ from task_queue.work_queue_web_api import QueueGetSizesModel, \
 LookupQueueItemModel, QueueDescribeModel
 
 
-
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
 
@@ -121,6 +120,12 @@ class ApiClient(QueueBase):
         ------------
         Returns a list of all item ids in the current queue stage.
         """
+        stage = queue_item_stage.name
+        response = requests.get(
+            f"{self.api_base_url}lookup_state/{stage}",
+            timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     @validate_call
     def lookup_item(self, queue_item_id:str) -> LookupQueueItemModel:
@@ -152,12 +157,12 @@ class ApiClient(QueueBase):
         -----------
         item_ids: [str]
             ID of Queue Item
-
-        Returns:
-        ------------
-        Returns a list of IDs that were moved from FAIL to WAITING
         """
-        return None
+        response = requests.post(f"{self.api_base_url}requeue",
+                               timeout=self.timeout,
+                               json=item_ids
+                              )
+        response.raise_for_status()
 
     @validate_call
     def description(self) -> QueueDescribeModel:
