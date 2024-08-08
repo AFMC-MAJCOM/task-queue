@@ -2,10 +2,10 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing_extensions import Annotated
 from typing import Dict, Any, Union, List, Tuple
 import os
 import json
+from typing_extensions import Annotated
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
