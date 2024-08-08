@@ -212,6 +212,18 @@ def test_v1_queue_lookup_item():
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
 
+def test_get_success():
+    """Test getting n_items successfully
+    """
+    queue.put(default_items)
+    n = round(n_items / 2)
+    response = client.get(f"/api/v1/queue/get/{n}")
+    processing = queue.size(QueueItemStage.PROCESSING)
+
+    assert response.status_code == 200
+    assert len(response.json()) == n
+    assert n == processing
+
 def test_put_valid_items():
     response = client.post("/api/v1/queue/put", json=default_items)
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
