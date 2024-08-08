@@ -236,3 +236,12 @@ def test_put_invalid_items():
 
     total_items_after = queue.size(QueueItemStage.WAITING)
     assert total_items_before == total_items_after
+
+def test_put_partial_invalid_items():
+
+    def bad_item():
+        return
+
+    with pytest.raises(TypeError):
+        response = client.post("/api/v1/queue/put", json={'good_item': \
+                                                          bad_item})

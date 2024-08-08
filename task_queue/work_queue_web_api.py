@@ -161,16 +161,16 @@ queue = queue_settings.make_queue()
 
 
 def json_serializable_validator(o):
-    """Determines if the object passed in is JSON serializable.
+    """Raises a value error if a give item is not serializable.
 
     Parameters:
     -----------
     o: JSON value
-        Queue Item data.
+        An item being validated.
 
     Returns:
     -----------
-    Returns True or False if the object is JSON serializable.
+    Returns the original input.
     """
     json.dumps(o)
     return o
