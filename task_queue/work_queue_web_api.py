@@ -2,7 +2,9 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any
+from typing import Dict, Any, Annotated
+from annotated_types import Ge, Le, MinLen
+from pydantic import BaseModel
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -156,8 +158,17 @@ def queue_settings_from_env(env_dict):
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
+class QueueGetSizesModel(BaseModel):
+    """A Pydantic model representing the return dictionary for the /sizes
+    endpoint and get_queue_sizes() in client."""
+    WAITING : int
+    PROCESSING : int
+    SUCCESS : int
+    FAIL : int
+
+
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes() -> Dict[str, int]:
+async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -170,7 +181,7 @@ async def get_queue_sizes() -> Dict[str, int]:
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
+async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -188,8 +199,16 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+class LookupQueueItemModel(BaseModel):
+    """A Pydantic model representing the return dictionary for the /lookup_item
+    endpoint and lookup_item() in client."""
+
+    item_id : str
+    status : QueueItemStage
+    item_body : Any
+
 @app.get("/api/v1/queue/lookup_item/{item_id}")
-async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     """API endpoint to lookup an Item currently in the Queue.
 
     Parameters:
@@ -213,8 +232,15 @@ async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+class QueueDescribeModel(BaseModel):
+    """A Pydantic model representing the return dictionary for the /describe
+    endpoint and description() in client."""
+
+    implementation : str
+    arguments : Dict[str, Any]
+
 @app.get("/api/v1/queue/describe")
-async def describe_queue() -> Dict[str,Any]:
+async def describe_queue() -> QueueDescribeModel:
     """API endpoint to descibe the Queue.
 
     Returns:
@@ -226,8 +252,14 @@ async def describe_queue() -> Dict[str,Any]:
         "arguments": asdict(queue_settings)
     }
 
+class QueuePutModel(BaseModel):
+    """A Pydantic model representing the input dictionary for the /put
+    endpoint and put() in client.
+    """
+    
+
 @app.post("/api/v1/queue/put")
-async def put(items:Dict[str,Any]) -> None:
+async def put(items:Annotated[Dict[str,Any], MinLen(1)]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:

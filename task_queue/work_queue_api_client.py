@@ -1,8 +1,14 @@
 """Wherein is contained the ApiClient class.
 """
 import requests
+from pydantic import validate_call, BaseModel, PositiveInt
+from typing import Dict, List, Tuple, Union, Any
 
-from .queue_base import QueueBase
+from .queue_base import QueueBase, QueueItemStage
+from task_queue.work_queue_web_api import QueueGetSizesModel, \
+LookupQueueItemModel, QueueDescribeModel
+
+
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -16,6 +22,7 @@ class ApiClient(QueueBase):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
+    @validate_call
     def put(self, items: dict) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
@@ -29,7 +36,8 @@ class ApiClient(QueueBase):
                                  timeout=self.timeout)
         response.raise_for_status()
 
-    def get(self, n_items=1):
+    @validate_call
+    def get(self, n_items:PositiveInt=1) -> List[Tuple[str,Any]]:
         """Gets the next n Items from the Queue, moving them to PROCESSING.
 
         Parameters:
@@ -44,6 +52,7 @@ class ApiClient(QueueBase):
         """
         return None
 
+    @validate_call
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
 
@@ -54,6 +63,7 @@ class ApiClient(QueueBase):
         """
         return None
 
+    @validate_call
     def fail(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to FAIL.
 
@@ -64,7 +74,8 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def size(self, queue_item_stage):
+    @validate_call
+    def size(self, queue_item_stage:QueueItemStage) -> int:
         """Determines how many Items are in some stage of the Queue.
 
         Parameters:
@@ -76,9 +87,10 @@ class ApiClient(QueueBase):
         ------------
         Returns the number of Items in that stage of the Queue as an integer.
         """
-        return None
+        return 0
 
-    def lookup_status(self, queue_item_id:str):
+    @validate_call
+    def lookup_status(self, queue_item_id:str) -> QueueItemStage:
         """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
@@ -94,9 +106,10 @@ class ApiClient(QueueBase):
         response = requests.get(f"{self.api_base_url}status/{queue_item_id}",
                                timeout=self.timeout)
         response.raise_for_status()
-        return response.json()
+        return QueueItemStage(response.json())
 
-    def lookup_state(self, queue_item_stage):
+    @validate_call
+    def lookup_state(self, queue_item_stage:QueueItemStage) -> List[str]:
         """Lookup which item ids are in the current Queue stage.
 
         Parameters:
@@ -109,7 +122,8 @@ class ApiClient(QueueBase):
         Returns a list of all item ids in the current queue stage.
         """
 
-    def lookup_item(self, queue_item_id:str):
+    @validate_call
+    def lookup_item(self, queue_item_id:str) -> LookupQueueItemModel:
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -126,9 +140,12 @@ class ApiClient(QueueBase):
             f"{self.api_base_url}lookup_item/{queue_item_id}",
             timeout=self.timeout)
         response.raise_for_status()
-        return response.json()
+        response = response.json()
+        response['status'] = QueueItemStage(response['status'])
+        return response
 
-    def requeue(self, item_ids):
+    @validate_call
+    def requeue(self, item_ids:Union[str,List[str]]) -> List[str]:
         """Move input queue items from FAILED to WAITING.
 
         Parameters:
@@ -142,7 +159,8 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def description(self):
+    @validate_call
+    def description(self) -> QueueDescribeModel:
         """A brief description of the Queue.
 
         Returns:
@@ -154,7 +172,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def get_queue_sizes(self):
+    @validate_call
+    def get_queue_sizes(self) -> QueueGetSizesModel:
         """Gets the number of Items in each Stage of the Queue.
 
         Returns:
