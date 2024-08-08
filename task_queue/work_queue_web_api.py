@@ -2,8 +2,8 @@
 API.
 """
 from dataclasses import dataclass, asdict
-from typing import Dict, Any
 from typing_extensions import Annotated
+from typing import Dict, Any, Union, List, Tuple
 import os
 import json
 
@@ -208,6 +208,27 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
+@app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
+async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+    """API endpoint to look up all item ids from a specific stage.
+
+    Parameters:
+    -----------
+    queue_item_stage: str
+        Desired Queue Item Stage.
+
+    Returns:
+    -----------
+    Returns a list of item ids.
+    """
+    try:
+        queue_item_stage_enum = QueueItemStage[queue_item_stage]
+        result = queue.lookup_state(queue_item_stage_enum)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400,
+              detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
 @app.get("/api/v1/queue/lookup_item/{item_id}")
 async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
     """API endpoint to lookup an Item currently in the Queue.
@@ -245,6 +266,34 @@ async def describe_queue() -> Dict[str,Any]:
         "implementation": queue.__class__.__name__,
         "arguments": asdict(queue_settings)
     }
+
+@app.get("/api/v1/queue/get/{n_items}")
+async def get(n_items:int) ->  List[Tuple[str, Any]]:
+    """API endpoint to get the next n Items from the Queue
+    and move them to PROCESSING.
+
+    Parameters:
+    -----------
+    n_items: int
+        Number of items to retrieve from Queue.
+
+    Returns:
+    ----------
+    Returns a list of n_items from the Queue, as
+    List[(queue_item_id, queue_item_body)]
+    """
+    return queue.get(n_items)
+
+@app.post("/api/v1/queue/requeue")
+def requeue(item_ids:Union[str,list[str]]):
+    """API endpoint to move input queue items from FAILED to WAITING.
+
+    Parameters:
+    -----------
+    item_ids: [str]
+        ID of Queue Item
+    """
+    queue.requeue(item_ids)
 
 QueueItemBodyType = Annotated[Any, \
                     AfterValidator(json_serializable_validator)]
