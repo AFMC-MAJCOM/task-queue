@@ -217,7 +217,7 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
     )
 
 
-def get_task_queue_settings(setting_class, config_path=None):
+def get_task_queue_settings(setting_class, config_path=None, **kwargs):
     """Wrapper for returning the TaskQueueSettings object.
 
     This function enables dynamically setting the configuration path.
@@ -228,6 +228,8 @@ def get_task_queue_settings(setting_class, config_path=None):
         The setting class to instantiate.
     config_path: str (optional)
         The path (relative or absolute) to a .env configuration file.
+    **kwargs:
+        Arguments to pass to the settings class
 
     Returns:
     -----------
@@ -236,4 +238,4 @@ def get_task_queue_settings(setting_class, config_path=None):
     if config_path is None:
         config_path = get_config_file_path()
 
-    return setting_class(_env_file=config_path)
+    return setting_class(_env_file=config_path, **kwargs)
