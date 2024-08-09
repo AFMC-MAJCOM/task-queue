@@ -6,7 +6,7 @@ import requests
 
 from .queue_base import QueueBase, QueueItemStage
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
-LookupQueueItemModel, QueueDescribeModel
+    LookupQueueItemModel, QueueDescribeModel, QueueItemBodyType
 
 
 class ApiClient(QueueBase):
@@ -25,7 +25,7 @@ class ApiClient(QueueBase):
         self.timeout = timeout
 
     @validate_call
-    def put(self, items: Dict[str, Any]) -> None:
+    def put(self, items: Dict[str, QueueItemBodyType]) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:

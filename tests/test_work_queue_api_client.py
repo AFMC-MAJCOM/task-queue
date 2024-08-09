@@ -63,7 +63,6 @@ def test_constructor():
 def test_client_lookup_status(mock_get):
     test_client.lookup_status('good-item-id')
     route = mock_get.call_args[0][0]
-    print(route)
     assert route == f"{test_client.api_base_url}status/good-item-id"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)

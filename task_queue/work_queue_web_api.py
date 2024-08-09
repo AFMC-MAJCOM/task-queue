@@ -3,7 +3,8 @@ API.
 """
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
-from annotated_types import Ge, Le, MinLen
+from annotated_types import Ge, Le
+from pydantic import PositiveInt
 import os
 
 from fastapi import FastAPI, HTTPException
@@ -14,7 +15,7 @@ from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 from task_queue.in_memory_queue import in_memory_queue
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
-LookupQueueItemModel, QueueDescribeModel
+    LookupQueueItemModel, QueueDescribeModel, QueueItemBodyType
 
 
 app = FastAPI()
@@ -199,11 +200,11 @@ async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
     Parameters:
     -----------
     queue_item_stage: str
-        Desired Queue Item Stage.
+        Desired Queue Item Stage (i.e. WAITING, FAIL)
 
     Returns:
     -----------
-    Returns a list of item ids.
+    Returns a list of item ids in that stage.
     """
     try:
         queue_item_stage_enum = QueueItemStage[queue_item_stage]
@@ -248,13 +249,13 @@ async def describe_queue() -> QueueDescribeModel:
     }
 
 @app.get("/api/v1/queue/get/{n_items}")
-async def get(n_items:int) ->  List[Tuple[str, Any]]:
+async def get(n_items:PositiveInt=1) ->  List[Tuple[str, Any]]:
     """API endpoint to get the next n Items from the Queue
     and move them to PROCESSING.
 
     Parameters:
     -----------
-    n_items: int
+    n_items: int (default=1)
         Number of items to retrieve from Queue.
 
     Returns:
@@ -265,7 +266,7 @@ async def get(n_items:int) ->  List[Tuple[str, Any]]:
     return queue.get(n_items)
 
 @app.post("/api/v1/queue/requeue")
-def requeue(item_ids:Union[str,list[str]]):
+def requeue(item_ids:Union[str,list[str]]) -> None:
     """API endpoint to move input queue items from FAILED to WAITING.
 
     Parameters:
@@ -276,7 +277,7 @@ def requeue(item_ids:Union[str,list[str]]):
     queue.requeue(item_ids)
 
 @app.post("/api/v1/queue/put")
-async def put(items:Annotated[Dict[str,Any], MinLen(1)]) -> None:
+async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
