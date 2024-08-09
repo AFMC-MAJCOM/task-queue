@@ -4,9 +4,12 @@ API.
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Union, List, Tuple
 import os
+import json
+from typing_extensions import Annotated
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
+from pydantic import AfterValidator
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
@@ -156,6 +159,23 @@ def queue_settings_from_env(env_dict):
 queue_settings = queue_settings_from_env(os.environ)
 queue = queue_settings.make_queue()
 
+
+def json_serializable_validator(o):
+    """Raises a value error if a give item is not serializable.
+
+    Parameters:
+    -----------
+    o: JSON value
+        An item being validated.
+
+    Returns:
+    -----------
+    Returns the original input.
+    """
+    json.dumps(o)
+    return o
+
+
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes() -> Dict[str, int]:
     """API endpoint to get the number of jobs in each stage.
@@ -275,14 +295,18 @@ def requeue(item_ids:Union[str,list[str]]):
     """
     queue.requeue(item_ids)
 
+QueueItemBodyType = Annotated[Any, \
+                    AfterValidator(json_serializable_validator)]
+
 @app.post("/api/v1/queue/put")
-async def put(items:Dict[str,Any]) -> None:
+async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
     -----------
     items: dict
         Dictionary of Queue Items to add Queue, where Item is a key:value
-        pair, where key is the item ID and value is the queue item body.
+        pair, where key is a the item ID and value is the queue item body.
+        The item ID must be a string and the item body must be serializable.
     """
     queue.put(items)
