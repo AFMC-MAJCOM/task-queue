@@ -223,16 +223,6 @@ class InMemoryQueue(QueueBase):
             'item_body':item_body
         }
 
-    def description(self):
-        """A brief description of the Queue.
-
-        Returns:
-        ------------
-        Returns a dictionary with relevant information about the Queue.
-        """
-        desc = {"implementation": "memory"}
-        return desc
-
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
 
@@ -248,6 +238,16 @@ class InMemoryQueue(QueueBase):
                 self.memory_queue.waiting,
                 item
             )
+
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {"implementation": "memory"}
+        return desc
 
 # Pylint is disabled because the goal is to just have
 # the function return False and not fail

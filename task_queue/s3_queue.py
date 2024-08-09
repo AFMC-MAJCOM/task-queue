@@ -267,19 +267,6 @@ class JsonS3Queue(QueueBase):
             'item_body':item_body
         }
 
-    def description(self):
-        """A brief description of the Queue.
-
-        Returns:
-        ------------
-        Returns a dictionary with relevant information about the Queue.
-        """
-        desc = {
-            "implementation": "s3",
-            "s3_path": self.queue_base_path
-        }
-        return desc
-
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
 
@@ -294,6 +281,19 @@ class JsonS3Queue(QueueBase):
                 os.path.join(self.fail_path, id_to_fname(item)),
                 self.queue_path
             )
+
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {
+            "implementation": "s3",
+            "s3_path": self.queue_base_path
+        }
+        return desc
 
 def ensure_s3_prefix(path:str):
     """Returns a valid s3 path.

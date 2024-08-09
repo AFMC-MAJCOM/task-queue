@@ -1,8 +1,9 @@
 """This file contains pydantic models used for pydantic type checking of the
 inputs and outputs of the API and Client, when applicable."""
 import json
-from pydantic import BaseModel
 from typing import Any, Dict, Annotated
+
+from pydantic import BaseModel
 from pydantic.functional_validators import AfterValidator
 
 from task_queue.queue_base import QueueItemStage
@@ -43,4 +44,3 @@ class QueueDescribeModel(BaseModel):
     endpoint and description() in client."""
     implementation : str
     arguments : Dict[str, Any]
-

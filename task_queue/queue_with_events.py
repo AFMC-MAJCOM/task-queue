@@ -270,20 +270,6 @@ class QueueWithEvents(QueueBase):
         """
         return self.queue.lookup_item(queue_item_id)
 
-    def description(self):
-        """A brief description of the Queue.
-
-        Returns:
-        ------------
-        Returns a dictionary with relevant information about the Queue.
-        """
-        desc = {
-            "implementation": "event",
-            "event_base_name": self.event_base_name,
-            "base_queue_description": self.queue.description()
-        }
-        return desc
-
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
 
@@ -302,6 +288,20 @@ class QueueWithEvents(QueueBase):
                 QueueItemStage.FAIL,
                 QueueItemStage.WAITING
             )
+
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {
+            "implementation": "event",
+            "event_base_name": self.event_base_name,
+            "base_queue_description": self.queue.description()
+        }
+        return desc
 
 
 def record_queue_move_event(

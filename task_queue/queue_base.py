@@ -123,15 +123,6 @@ class QueueBase(ABC):
         """
 
     @abstractmethod
-    def description(self):
-        """A brief description of the Queue.
-
-        Returns:
-        ------------
-        Returns a dictionary with relevant information about the Queue.
-        """
-
-    @abstractmethod
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
 
@@ -163,3 +154,12 @@ class QueueBase(ABC):
 
         item_ids = [id_ for id_ in item_ids if id_ in failed_ids]
         return item_ids
+
+    @abstractmethod
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
