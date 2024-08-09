@@ -238,9 +238,6 @@ def test_put_invalid_items():
     assert total_items_before == total_items_after
 
 def test_put_partial_invalid_items():
-
-    def bad_item():
-        return
-
+    bad_item = object()
     with pytest.raises(TypeError):
         client.post("/api/v1/queue/put", json={'good_item': bad_item})
