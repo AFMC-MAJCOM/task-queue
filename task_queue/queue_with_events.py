@@ -8,9 +8,6 @@ from task_queue.queue_base import QueueBase, QueueItemStage
 from task_queue.events.event import Event
 
 
-QUEUE_EVENT_SCHEMA_VERSION="0.0.1"
-
-
 class QueueAddEventData(pydantic.BaseModel):
     """Class with Queue information and Item data to be used when logging Event
     in Event Store.
@@ -91,6 +88,8 @@ class QueueWithEvents(QueueBase):
         self.add_event_name = add_event_name
         self.move_event_name = move_event_name
 
+        self.event_schema_version = "0.0.1"
+
     # Pylint disabled because BaseException is used to set exc
     # pylint: disable=broad-exception-caught
     def put(self, items):
@@ -118,7 +117,7 @@ class QueueWithEvents(QueueBase):
                 queue_event_data.append(
                     Event(
                         name=self.add_event_name,
-                        version=QUEUE_EVENT_SCHEMA_VERSION,
+                        version=self.event_schema_version,
                         data=QueueAddEventData(
                             queue_index_key=k,
                             queue_item_data=v,
@@ -161,7 +160,7 @@ class QueueWithEvents(QueueBase):
         queue_event_data = [
             Event(
                 name=self.move_event_name,
-                version=QUEUE_EVENT_SCHEMA_VERSION,
+                version=self.event_schema_version,
                 data=QueueMoveEventData(
                     queue_index_key=k,
                     stage_from=QueueItemStage.WAITING,
@@ -184,9 +183,7 @@ class QueueWithEvents(QueueBase):
         queue_item_id: str
             ID of Queue Item
         """
-        record_queue_move_event(
-            self.event_store,
-            self.move_event_name,
+        self.record_queue_move_event(
             queue_item_id,
             QueueItemStage.PROCESSING,
             QueueItemStage.SUCCESS
@@ -202,9 +199,7 @@ class QueueWithEvents(QueueBase):
         queue_item_id: str
             ID of Queue Item
         """
-        record_queue_move_event(
-            self.event_store,
-            self.move_event_name,
+        self.record_queue_move_event(
             queue_item_id,
             QueueItemStage.PROCESSING,
             QueueItemStage.FAIL
@@ -295,48 +290,41 @@ class QueueWithEvents(QueueBase):
         item_ids = self._requeue(item_ids)
         self.queue.requeue(item_ids)
         for item in item_ids:
-            record_queue_move_event(
-                self.event_store,
-                self.move_event_name,
+            self.record_queue_move_event(
                 item,
                 QueueItemStage.FAIL,
                 QueueItemStage.WAITING
             )
 
 
-def record_queue_move_event(
-    event_store,
-    queue_move_event_name,
-    item_id,
-    from_stage,
-    to_stage
-):
-    """Tracks the movement of Items in Queue via Event Store.
+    def record_queue_move_event(
+        self,
+        item_id,
+        from_stage,
+        to_stage
+    ):
+        """Tracks the movement of Items in Queue via Event Store
 
-    Parameters:
-    -----------
-    event_store: EventStoreInterface
-        Event Store to track item movement.
-    queue_move_event_name: str
-        name of Event
-    item_id: str
-        ID of Queue Item
-    from_stage: QueueItemStage
-        Stage Item is being moved from.
-    to_stage: QueueItemStage
-        Stage Item is being moved to.
-    """
-    queue_event_data = Event(
-        name = queue_move_event_name,
-        version = QUEUE_EVENT_SCHEMA_VERSION,
-        data = QueueMoveEventData(
-            queue_index_key=item_id,
-            stage_from=from_stage,
-            stage_to=to_stage
-        ).model_dump()
-    )
+        Parameters:
+        -----------
+        item_id: str
+            ID of Queue Item
+        from_stage: QueueItemStage
+            Stage Item is being moved from.
+        to_stage: QueueItemStage
+            Stage Item is being moved to.
+        """
+        queue_event_data = Event(
+            name = self.move_event_name,
+            version = self.event_schema_version,
+            data = QueueMoveEventData(
+                queue_index_key=item_id,
+                stage_from=from_stage,
+                stage_to=to_stage
+            ).model_dump()
+        )
 
-    event_store.add(queue_event_data)
+        self.event_store.add(queue_event_data)
 
 def queue_with_events(
     queue,

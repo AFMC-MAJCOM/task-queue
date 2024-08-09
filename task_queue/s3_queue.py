@@ -10,7 +10,6 @@ from task_queue.queue_base import QueueBase
 from . import s5fs
 from . import queue_base
 
-INDEX_NAME = "index.txt"
 
 fs = s3fs.S3FileSystem()
 
@@ -29,7 +28,7 @@ class JsonS3Queue(QueueBase):
             queue_base_s3_path,
             queue_base.QueueItemStage.PROCESSING.name
         )
-        self.queue_index_path = os.path.join(queue_base_s3_path, INDEX_NAME)
+        self.queue_index_path = os.path.join(queue_base_s3_path, "index.txt")
         self.success_path = os.path.join(
             queue_base_s3_path,
             queue_base.QueueItemStage.SUCCESS.name
