@@ -135,13 +135,13 @@ SQL_QUEUE_NAME=queue_name
 The container can then be spun up using the below command.
 
 ```
-docker run --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 (Optional) If you started your own local postgres server and are using a linux machine run this command instead.
 
 ```
-docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:80 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 ### Running the CLI
