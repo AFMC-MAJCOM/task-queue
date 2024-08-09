@@ -1,5 +1,7 @@
 """Wherein is contained the ApiClient class.
 """
+from typing import Dict, Any, Union, List, Tuple
+from pydantic import validate_call, PositiveInt
 import requests
 
 from .queue_base import QueueBase, QueueItemStage
@@ -12,11 +14,15 @@ class ApiClient(QueueBase):
     api_base_url: str
         The base url for all api endpoints.
     """
+    api_base_url: str
+    timeout: float = 5
+
     def __init__(self, api_base_url: str, timeout: float = 5):
         self.api_base_url = api_base_url + "/api/v1/queue/"
         self.timeout = timeout
 
-    def put(self, items: dict) -> None:
+    @validate_call
+    def put(self, items: Dict[str, Any]) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
@@ -29,7 +35,8 @@ class ApiClient(QueueBase):
                                  timeout=self.timeout)
         response.raise_for_status()
 
-    def get(self, n_items=1):
+    @validate_call
+    def get(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
         """Gets the next n Items from the Queue, moving them to PROCESSING.
 
         Parameters:
@@ -42,9 +49,13 @@ class ApiClient(QueueBase):
         Returns a list of n_items from the Queue, as
         List[(queue_item_id, queue_item_body)]
         """
-        return None
+        response = requests.get(f"{self.api_base_url}get/{n_items}",
+                               timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
-    def success(self, queue_item_id):
+    @validate_call
+    def success(self, queue_item_id:str) -> None:
         """Moves a Queue Item from PROCESSING to SUCCESS.
 
         Parameters:
@@ -54,7 +65,8 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def fail(self, queue_item_id):
+    @validate_call
+    def fail(self, queue_item_id:str) -> None:
         """Moves a Queue Item from PROCESSING to FAIL.
 
         Parameters:
@@ -64,7 +76,8 @@ class ApiClient(QueueBase):
         """
         return None
 
-    def size(self, queue_item_stage):
+    @validate_call
+    def size(self, queue_item_stage:QueueItemStage) -> int:
         """Determines how many Items are in some stage of the Queue.
 
         Parameters:
@@ -76,9 +89,10 @@ class ApiClient(QueueBase):
         ------------
         Returns the number of Items in that stage of the Queue as an integer.
         """
-        return None
+        return 0
 
-    def lookup_status(self, queue_item_id:str):
+    @validate_call
+    def lookup_status(self, queue_item_id:str) -> QueueItemStage:
         """Lookup which stage in the Queue Item is currently in.
 
         Parameters:
@@ -96,8 +110,9 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def lookup_state(self, queue_item_stage:QueueItemStage):
-        """Lookup which item ids are in the current Queue Stage.
+    @validate_call
+    def lookup_state(self, queue_item_stage:QueueItemStage) -> List[str]:
+        """Lookup which item ids are in the current Queue stage.
 
         Parameters:
         -----------
@@ -115,7 +130,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def lookup_item(self, queue_item_id:str):
+    @validate_call
+    def lookup_item(self, queue_item_id:str) -> Dict[str,Any]:
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -134,7 +150,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def requeue(self, item_ids):
+    @validate_call
+    def requeue(self, item_ids:Union[str, List[str]]) -> None:
         """Move input queue items from FAILED to WAITING.
 
         Parameters:
@@ -148,7 +165,8 @@ class ApiClient(QueueBase):
                               )
         response.raise_for_status()
 
-    def description(self):
+    @validate_call
+    def description(self) -> Dict[str, Any]:
         """A brief description of the Queue.
 
         Returns:
@@ -160,7 +178,8 @@ class ApiClient(QueueBase):
         response.raise_for_status()
         return response.json()
 
-    def get_queue_sizes(self):
+    @validate_call
+    def get_queue_sizes(self) -> Dict[str, int]:
         """Gets the number of Items in each Stage of the Queue.
 
         Returns:
