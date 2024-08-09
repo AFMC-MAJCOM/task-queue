@@ -4,7 +4,6 @@ API.
 from dataclasses import dataclass, asdict
 import logging
 from typing import Dict, Any, Union, List, Tuple
-import os
 
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
