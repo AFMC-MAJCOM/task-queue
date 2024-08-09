@@ -163,7 +163,6 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
-
         response = requests.post(
             request_url,
             json=request_body,
@@ -347,5 +346,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         print("Got response from Argo")
 
         response.raise_for_status()
-
+        p = self._get_response_ids_and_status(response.json())
+        for i in p:
+            if p[i] == QueueItemStage.SUCCESS:
+                print("succeeded")
+                res = requests.delete(f"{request_url}/workflows{i}")
+                print(res.status_code)
+                print(res.json())
         return self._get_response_ids_and_status(response.json())

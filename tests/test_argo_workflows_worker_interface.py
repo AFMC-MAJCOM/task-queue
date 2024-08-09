@@ -85,7 +85,6 @@ def test_argo_worker_end_to_end_success():
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item()
-
     worker.send_job(
         queue_item_id,
         queue_item_body
