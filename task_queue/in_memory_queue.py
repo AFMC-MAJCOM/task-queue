@@ -208,8 +208,8 @@ class InMemoryQueue(QueueBase):
 
         Returns:
         ------------
-        Returns the Queue Item ID, the status of that Item, and the body, or it
-        will raise an error if Item is not in Queue.
+        Returns a dictionary with the Queue Item ID, the status of that Item,
+        and the body, or it will raise an error if Item is not in Queue.
         """
         # Get item stage
         item_stage = self.lookup_status(queue_item_id)
@@ -217,7 +217,11 @@ class InMemoryQueue(QueueBase):
         dict_for_stage = self.memory_queue.get_for_stage(item_stage)
         item_body = dict_for_stage[queue_item_id]
 
-        return (queue_item_id, item_stage, item_body)
+        return {
+            'item_id':queue_item_id,
+            'status':item_stage,
+            'item_body':item_body
+        }
 
     def description(self):
         """A brief description of the Queue.
@@ -244,6 +248,7 @@ class InMemoryQueue(QueueBase):
                 self.memory_queue.waiting,
                 item
             )
+
 
 # Pylint is disabled because the goal is to just have
 # the function return False and not fail
