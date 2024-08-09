@@ -122,7 +122,7 @@ class QueueBase(ABC):
         Returns a list of all item ids in the current queue stage.
         """
 
-     @abstractmethod
+    @abstractmethod
     def description(self):
         """A brief description of the Queue.
 
