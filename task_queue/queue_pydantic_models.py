@@ -1,7 +1,7 @@
 """This file contains pydantic models used for pydantic type checking of the
 inputs and outputs of the API and Client, when applicable."""
 import json
-from typing import Any, Dict, Annotated
+from typing import Any, Annotated
 
 from pydantic import BaseModel
 from pydantic.functional_validators import AfterValidator
@@ -37,10 +37,3 @@ class LookupQueueItemModel(BaseModel):
     item_id : str
     status : QueueItemStage
     item_body : QueueItemBodyType
-
-
-class QueueDescribeModel(BaseModel):
-    """A Pydantic model representing the return dictionary for the /describe
-    endpoint and description() in client."""
-    implementation : str
-    arguments : Dict[str, Any]

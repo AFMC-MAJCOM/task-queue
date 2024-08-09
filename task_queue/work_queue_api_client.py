@@ -5,7 +5,7 @@ from pydantic import validate_call, PositiveInt
 import requests
 
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
-    LookupQueueItemModel, QueueDescribeModel, QueueItemBodyType
+    LookupQueueItemModel, QueueItemBodyType
 from .queue_base import QueueBase, QueueItemStage
 
 
@@ -171,7 +171,7 @@ class ApiClient(QueueBase):
         response.raise_for_status()
 
     @validate_call
-    def description(self) -> QueueDescribeModel:
+    def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:
         """A brief description of the Queue.
 
         Returns:

@@ -15,7 +15,7 @@ from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 from task_queue.in_memory_queue import in_memory_queue
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
-    LookupQueueItemModel, QueueDescribeModel, QueueItemBodyType
+    LookupQueueItemModel, QueueItemBodyType
 
 
 app = FastAPI()
@@ -236,7 +236,7 @@ async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue() -> QueueDescribeModel:
+async def describe_queue() -> Dict[str, Union[str, Dict[str,Any]]]:
     """API endpoint to descibe the Queue.
 
     Returns:
