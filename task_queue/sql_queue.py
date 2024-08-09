@@ -255,6 +255,19 @@ class SQLQueue(QueueBase):
             'item_body':item_body
         }
 
+    def description(self):
+        """A brief description of the Queue.
+
+        Returns:
+        ------------
+        Returns a dictionary with relevant information about the Queue.
+        """
+        desc = {
+            "implementation": "sql",
+            "engine_url": str(self.engine.url)
+        }
+        return desc
+
     def requeue(self, item_ids):
         """Move input queue items from FAILED to WAITING.
 
@@ -268,19 +281,6 @@ class SQLQueue(QueueBase):
                          self.queue_name,
                          QueueItemStage.WAITING,
                          item)
-
-    def description(self):
-        """A brief description of the Queue.
-
-        Returns:
-        ------------
-        Returns a dictionary with relevant information about the Queue.
-        """
-        desc = {
-            "implementation": "sql",
-            "engine_url": str(self.engine.url)
-        }
-        return desc
 
 
 def update_stage(engine, queue_name, new_stage, item_key):
