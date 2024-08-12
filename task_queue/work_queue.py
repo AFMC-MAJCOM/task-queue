@@ -1,5 +1,7 @@
 """Wherein is contained the WorkQueue class.
 """
+import subprocess
+import json
 from task_queue.queue_base import QueueItemStage
 
 class WorkQueue():
@@ -80,6 +82,7 @@ class WorkQueue():
 
             if status == QueueItemStage.SUCCESS:
                 self._queue.success(queue_item_id)
+                self._interface.delete_job(queue_item_id)
             elif status == QueueItemStage.FAIL:
                 self._queue.fail(queue_item_id)
 

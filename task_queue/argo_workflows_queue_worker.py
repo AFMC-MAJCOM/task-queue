@@ -149,6 +149,31 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         return payload
 
+    def get_workflow_name(self, queue_item_id):
+        url = f"{self._argo_workflows_endpoint}/api/v1/workflows/pivot"
+        try:
+            res = requests.get(url)
+            res.raise_for_status()
+
+            wf = res.json()
+
+            for item in wf.get("items",[]):
+                labels = self.get_labels(item)
+                wf_item_id = labels['work-queue.queue-item-id']
+                
+                if wf_item_id == queue_item_id:
+                    name = item.get("metadata",{}).get("name","Unknown")
+                    return name
+        except requests.exceptions.RequestException as e:
+            print(f"Exception: {e}")
+
+    def delete_job(self, queue_item_id):
+        print("deleting")
+        name = self.get_workflow_name(queue_item_id)
+        url = self.urlconcat(self._argo_workflows_endpoint,"api","v1","workflows",self._namespace,name)
+        requests.delete(url)
+
+
     def send_job(self, item_id, queue_item_body):
         """Starts a job from queue item.
 
@@ -163,6 +188,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
+
         response = requests.post(
             request_url,
             json=request_body,
@@ -336,7 +362,6 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         print("Getting status from Argo Workflows")
         request_url = self._argo_workflows_list_url
         request_params = self._construct_poll_query()
-
         response = requests.get(
             request_url,
             params=request_params,
@@ -346,11 +371,5 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         print("Got response from Argo")
 
         response.raise_for_status()
-        p = self._get_response_ids_and_status(response.json())
-        for i in p:
-            if p[i] == QueueItemStage.SUCCESS:
-                print("succeeded")
-                res = requests.delete(f"{request_url}/workflows{i}")
-                print(res.status_code)
-                print(res.json())
+
         return self._get_response_ids_and_status(response.json())

@@ -3,6 +3,8 @@
 import random
 import time
 import os
+import subprocess
+import json
 
 import pytest
 
@@ -59,7 +61,6 @@ def port_forwarded_worker():
         "pivot"
     )
 
-
 def wait_for_finish(worker, queue_item_id):
     """Runs until item moves out of processing stage.
 
@@ -89,9 +90,10 @@ def test_argo_worker_end_to_end_success():
         queue_item_id,
         queue_item_body
     )
-
+    print(queue_item_id)
+    print(queue_item_body)
     status = wait_for_finish(worker, queue_item_id)
-
+    #worker.delete_job(queue_item_id=queue_item_id)
     assert status == QueueItemStage.SUCCESS
 
 
