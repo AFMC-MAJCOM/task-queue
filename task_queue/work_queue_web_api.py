@@ -1,10 +1,12 @@
 """Wherein is contained the functions and classes concering the Work Queue Web
 API.
 """
-from dataclasses import dataclass, asdict
 import logging
-from typing import Dict, Any, Union, List, Tuple
+from dataclasses import dataclass, asdict
+from typing import Dict, Any, Annotated, Union, Tuple, List
+from annotated_types import Ge, Le
 
+from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
@@ -13,6 +15,9 @@ from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
 from task_queue import config
 from task_queue.in_memory_queue import in_memory_queue
+from task_queue.queue_pydantic_models import QueueGetSizesModel, \
+    LookupQueueItemModel, QueueItemBodyType
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -156,7 +161,7 @@ queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes() -> Dict[str, int]:
+async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -169,7 +174,7 @@ async def get_queue_sizes() -> Dict[str, int]:
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
+async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -188,17 +193,17 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
-async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
     """API endpoint to look up all item ids from a specific stage.
 
     Parameters:
     -----------
     queue_item_stage: str
-        Desired Queue Item Stage.
+        Desired Queue Item Stage (i.e. WAITING, FAIL)
 
     Returns:
     -----------
-    Returns a list of item ids.
+    Returns a list of item ids in that stage.
     """
     try:
         queue_item_stage_enum = QueueItemStage[queue_item_stage]
@@ -209,7 +214,7 @@ async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
 @app.get("/api/v1/queue/lookup_item/{item_id}")
-async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     """API endpoint to lookup an Item currently in the Queue.
 
     Parameters:
@@ -224,17 +229,13 @@ async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
     """
     try:
         response = queue.lookup_item(item_id)
-        return {
-            "item_id":response[0],
-            "status":response[1],
-            "item_body":response[2],
-        }
+        return response
     except KeyError as exc:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue() -> Dict[str,Any]:
+async def describe_queue() -> Dict[str, Union[str, Dict[str,Any]]]:
     """API endpoint to descibe the Queue.
 
     Returns:
@@ -247,13 +248,13 @@ async def describe_queue() -> Dict[str,Any]:
     }
 
 @app.get("/api/v1/queue/get/{n_items}")
-async def get(n_items:int) ->  List[Tuple[str, Any]]:
+async def get(n_items:PositiveInt=1) ->  List[Tuple[str, Any]]:
     """API endpoint to get the next n Items from the Queue
     and move them to PROCESSING.
 
     Parameters:
     -----------
-    n_items: int
+    n_items: int (default=1)
         Number of items to retrieve from Queue.
 
     Returns:
@@ -264,7 +265,7 @@ async def get(n_items:int) ->  List[Tuple[str, Any]]:
     return queue.get(n_items)
 
 @app.post("/api/v1/queue/requeue")
-def requeue(item_ids:Union[str,list[str]]):
+def requeue(item_ids:Union[str,list[str]]) -> None:
     """API endpoint to move input queue items from FAILED to WAITING.
 
     Parameters:
@@ -275,7 +276,7 @@ def requeue(item_ids:Union[str,list[str]]):
     queue.requeue(item_ids)
 
 @app.post("/api/v1/queue/put")
-async def put(items:Dict[str,Any]) -> None:
+async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
