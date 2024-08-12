@@ -1,12 +1,13 @@
 """Tests for validating input arguments passed to the CLI
 """
-from task_queue.cli.work_queue_service_cli import (
-                                    validate_args,
-                                    JSON_S3_QUEUE_CLI_CHOICE,
-                                    JSON_SQL_QUEUE_CLI_CHOICE,
-                                    ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE,
-                                    NO_EVENT_STORE_CLI_CHOICE,
-                                    SQL_EVENT_STORE_CLI_CHOICE)
+from task_queue.cli.work_queue_service_cli import validate_args
+from task_queue.config import config
+
+JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
+JSON_SQL_QUEUE_CLI_CHOICE=config.QueueImplementations.SQL_JSON.value
+ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE=config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
+NO_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.NO_EVENTS.value
+SQL_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.SQL_JSON.value
 
 
 def test_validate_args_s3_success():
