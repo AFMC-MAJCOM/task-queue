@@ -95,6 +95,17 @@ class ApiClient(QueueBase):
         return 0
 
     @validate_call
+    def sizes(self) -> QueueGetSizesModel:
+        """Determines how many Items are in each stage of the Queue.
+
+        Returns:
+        ------------
+        Returns the number of Items in each stage of the Queue as an integer.
+        """
+        return {"WAITING": 0, "PROCESSING": 0, "SUCCESS": 0,
+                "FAIL": 0, "TOTAL": 0}
+
+    @validate_call
     def lookup_status(self, queue_item_id:str) -> QueueItemStage:
         """Lookup which stage in the Queue Item is currently in.
 

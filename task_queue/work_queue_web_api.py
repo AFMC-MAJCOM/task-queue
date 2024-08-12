@@ -168,10 +168,7 @@ async def get_queue_sizes() -> QueueGetSizesModel:
     ----------
     Returns the number of jobs in each stage of the queue.
     """
-    return {
-        s.name : queue.size(s)
-        for s in QueueItemStage
-    }
+    return queue.sizes()
 
 @app.get("/api/v1/queue/status/{item_id}")
 async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:

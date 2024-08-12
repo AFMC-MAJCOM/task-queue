@@ -29,6 +29,7 @@ class QueueGetSizesModel(BaseModel):
     PROCESSING : int
     SUCCESS : int
     FAIL : int
+    TOTAL : int
 
 
 class LookupQueueItemModel(BaseModel):

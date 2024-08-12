@@ -79,6 +79,15 @@ class QueueBase(ABC):
         """
 
     @abstractmethod
+    def sizes(self):
+        """Determines how many Items are in each stage of the Queue.
+
+        Returns:
+        ------------
+        Returns the number of Items in each stage of the Queue as an integer.
+        """
+
+    @abstractmethod
     def lookup_status(self, queue_item_id):
         """Lookup which stage in the Queue Item is currently in.
 
