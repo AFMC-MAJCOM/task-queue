@@ -2,17 +2,20 @@
 """
 import random
 import time
+<<<<<<< HEAD
 import os
 import subprocess
 import json
+=======
+>>>>>>> 46f13800c41c6707c66f122f77031e2bb821871c
 
 import pytest
 
 from task_queue.argo_workflows_queue_worker import ArgoWorkflowsQueueWorker
 from task_queue.queue_base import QueueItemStage
+from .test_config import TaskQueueTestSettings
 
-
-run_argo_tests = os.environ.get('RUN_ARGO_TESTS', False)
+run_argo_tests = TaskQueueTestSettings().run_argo_tests
 
 if not run_argo_tests:
     pytest.skip(allow_module_level=True)

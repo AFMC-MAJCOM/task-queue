@@ -1,18 +1,29 @@
 """Wherein is contained the functions and classes concering the Work Queue Web
 API.
 """
+import logging
 from dataclasses import dataclass, asdict
-from typing import Dict, Any, Union
-import os
+from typing import Dict, Any, Annotated, Union, Tuple, List
+from annotated_types import Ge, Le
 
+from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
 from task_queue.queue_base import QueueItemStage
 from task_queue.s3_queue import json_s3_queue
 from task_queue.sql_queue import json_sql_queue
+from task_queue import config
 from task_queue.in_memory_queue import in_memory_queue
+from task_queue.queue_pydantic_models import QueueGetSizesModel, \
+    LookupQueueItemModel, QueueItemBodyType
 
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+api_settings = config.TaskQueueApiSettings()
+api_settings.log_settings()
 app = FastAPI()
 
 
@@ -20,17 +31,14 @@ app = FastAPI()
 class QueueSettings():
     """Class concerning the Queue Settings.
     """
-    # Disabled because this method is inherited
-    # and uses env_dict as a param later
-    # pylint: disable=unused-argument
+
     @staticmethod
-    def from_env(env_dict):
+    def from_env():
         """Returns instance of QueueSettings
 
-        Parameters:
+        Returns:
         -----------
-        env_dict: dict
-            Dictionary of environment variables.
+        A QueueSettings object.
         """
         return QueueSettings()
 
@@ -47,17 +55,18 @@ class S3QueueSettings(QueueSettings):
     s3_base_path : str
 
     @staticmethod
-    def from_env(env_dict):
+    def from_env():
         """Returns an S3QueueSettings object given an s3 Queue Base path.
 
-        Parameters:
+        Returns:
         -----------
-        env_dict: dict
-            Dictionary of environment variables.
+        S3 Queue instance.
         """
-        return S3QueueSettings(
-            env_dict['S3_QUEUE_BASE_PATH']
+        s3_settings = config.get_task_queue_settings(
+            setting_class = config.TaskQueueS3Settings
         )
+        s3_settings.log_settings()
+        return S3QueueSettings(s3_settings.S3_QUEUE_BASE_PATH)
 
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
@@ -73,33 +82,31 @@ class SqlQueueSettings(QueueSettings):
     queue_name : str
 
     @staticmethod
-    def from_env(env_dict):
-        """Creates and returns an instance of SqlQueueSettings based on the
-        given env_dict.
-
-        Parameters:
-        -----------
-        env_dict: dict
-            Dictionary of environment variables.
+    def from_env():
+        """Creates and returns an instance of SqlQueueSettings.
 
         Returns:
         -----------
         Returns an instance of SQLQueueSettings.
         """
-        if "SQL_QUEUE_CONNECTION_STRING" in env_dict:
-            conn_str = env_dict["SQL_QUEUE_CONNECTION_STRING"]
+        sql_settings = config.get_task_queue_settings(
+            setting_class = config.TaskQueueSqlSettings
+        )
+        sql_settings.log_settings()
+        if sql_settings.SQL_QUEUE_CONNECTION_STRING is not None:
+            conn_str = sql_settings.SQL_QUEUE_CONNECTION_STRING
         else:
-            user = env_dict['SQL_QUEUE_POSTGRES_USER']
-            password = env_dict['SQL_QUEUE_POSTGRES_PASSWORD']
-            host = env_dict['SQL_QUEUE_POSTGRES_HOSTNAME']
-            database = env_dict['SQL_QUEUE_POSTGRES_DATABASE']
+            user = sql_settings.SQL_QUEUE_POSTGRES_USER
+            password = sql_settings.SQL_QUEUE_POSTGRES_PASSWORD
+            host = sql_settings.SQL_QUEUE_POSTGRES_HOSTNAME
+            database = sql_settings.SQL_QUEUE_POSTGRES_DATABASE
 
             conn_str = \
                 f"postgresql+psycopg2://{user}:{password}@{host}/{database}"
 
         return SqlQueueSettings(
             conn_str,
-            env_dict['SQL_QUEUE_NAME'],
+            sql_settings.SQL_QUEUE_NAME,
         )
 
     def make_queue(self):
@@ -117,7 +124,7 @@ class InMemoryQueueSettings(QueueSettings):
     The only implementation of this class so far is for testing.
     """
     @staticmethod
-    def from_env(env_dict):
+    def from_env():
         """Returns instance of QueueSettings
         Parameters:
         -----------
@@ -132,32 +139,29 @@ class InMemoryQueueSettings(QueueSettings):
         return in_memory_queue()
 
 
-def queue_settings_from_env(env_dict):
+def queue_settings_from_env():
     """Creates an instance of QueueSettings from an environment dictionary.
-
-    Parameters:
-    -----------
-    env_dict: dict
-        Dictionary of environment variables.
 
     Returns:
     -----------
     Returns QueueSettings.
     """
-    impl = env_dict['QUEUE_IMPLEMENTATION']
-    if impl == "s3-json":
-        return S3QueueSettings.from_env(env_dict)
-    if impl == "sql-json":
-        return SqlQueueSettings.from_env(env_dict)
-    if impl == "in-memory":
-        return InMemoryQueueSettings.from_env(env_dict)
+    if api_settings.QUEUE_IMPLEMENTATION  \
+        == config.QueueImplementations.S3_JSON:
+        return S3QueueSettings.from_env()
+    if api_settings.QUEUE_IMPLEMENTATION \
+        == config.QueueImplementations.SQL_JSON:
+        return SqlQueueSettings.from_env()
+    if api_settings.QUEUE_IMPLEMENTATION \
+        == config.QueueImplementations.IN_MEMORY:
+        return InMemoryQueueSettings.from_env()
     return None
 
-queue_settings = queue_settings_from_env(os.environ)
+queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
 @app.get("/api/v1/queue/sizes")
-async def get_queue_sizes() -> Dict[str, int]:
+async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
 
     Returns:
@@ -170,7 +174,7 @@ async def get_queue_sizes() -> Dict[str, int]:
     }
 
 @app.get("/api/v1/queue/status/{item_id}")
-async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
+async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
     """API endpoint to look up the status of a specific item in queue.
 
     Parameters:
@@ -189,17 +193,17 @@ async def lookup_queue_item_status(item_id:str) -> QueueItemStage:
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/lookup_state/{queue_item_stage}")
-async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
+async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
     """API endpoint to look up all item ids from a specific stage.
 
     Parameters:
     -----------
     queue_item_stage: str
-        Desired Queue Item Stage.
+        Desired Queue Item Stage (i.e. WAITING, FAIL)
 
     Returns:
     -----------
-    Returns a list of item ids.
+    Returns a list of item ids in that stage.
     """
     try:
         queue_item_stage_enum = QueueItemStage[queue_item_stage]
@@ -210,7 +214,7 @@ async def lookup_queue_item_state(queue_item_stage: str) -> list[str]:
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
 @app.get("/api/v1/queue/lookup_item/{item_id}")
-async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
+async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
     """API endpoint to lookup an Item currently in the Queue.
 
     Parameters:
@@ -225,17 +229,13 @@ async def lookup_queue_item(item_id:str) -> Dict[str,Any]:
     """
     try:
         response = queue.lookup_item(item_id)
-        return {
-            "item_id":response[0],
-            "status":response[1],
-            "item_body":response[2],
-        }
+        return response
     except KeyError as exc:
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
 @app.get("/api/v1/queue/describe")
-async def describe_queue() -> Dict[str,Any]:
+async def describe_queue() -> Dict[str, Union[str, Dict[str,Any]]]:
     """API endpoint to descibe the Queue.
 
     Returns:
@@ -247,8 +247,25 @@ async def describe_queue() -> Dict[str,Any]:
         "arguments": asdict(queue_settings)
     }
 
+@app.get("/api/v1/queue/get/{n_items}")
+async def get(n_items:PositiveInt=1) ->  List[Tuple[str, Any]]:
+    """API endpoint to get the next n Items from the Queue
+    and move them to PROCESSING.
+
+    Parameters:
+    -----------
+    n_items: int (default=1)
+        Number of items to retrieve from Queue.
+
+    Returns:
+    ----------
+    Returns a list of n_items from the Queue, as
+    List[(queue_item_id, queue_item_body)]
+    """
+    return queue.get(n_items)
+
 @app.post("/api/v1/queue/requeue")
-def requeue(item_ids:Union[str,list[str]]):
+def requeue(item_ids:Union[str,list[str]]) -> None:
     """API endpoint to move input queue items from FAILED to WAITING.
 
     Parameters:
@@ -259,7 +276,7 @@ def requeue(item_ids:Union[str,list[str]]):
     queue.requeue(item_ids)
 
 @app.post("/api/v1/queue/put")
-async def put(items:Dict[str,Any]) -> None:
+async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
     Parameters:
