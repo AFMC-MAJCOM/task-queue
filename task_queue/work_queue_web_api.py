@@ -161,7 +161,7 @@ queue = queue_settings.make_queue()
 
 
 def json_serializable_validator(o):
-    """Raises a value error if a give item is not serializable.
+    """Raises a value error if a given item is not serializable.
 
     Parameters:
     -----------
@@ -306,7 +306,7 @@ async def put(items:Dict[str,QueueItemBodyType]) -> None:
     -----------
     items: dict
         Dictionary of Queue Items to add Queue, where Item is a key:value
-        pair, where key is a the item ID and value is the queue item body.
+        pair, where key is the item ID and value is the queue item body.
         The item ID must be a string and the item body must be serializable.
     """
     queue.put(items)
