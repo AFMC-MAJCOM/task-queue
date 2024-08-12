@@ -185,25 +185,6 @@ class JsonS3Queue(QueueBase):
         )
         return item_stage_size
 
-    def sizes(self):
-        """Determines how many items are in each stage of the queue.
-
-        Returns:
-        ------------
-        Returns the number of items in each stage of the queue as an integer.
-        """
-        waiting_size = self.size(QueueItemStage.WAITING)
-        processing_size = self.size(QueueItemStage.PROCESSING)
-        success_size = self.size(QueueItemStage.SUCCESS)
-        fail_size = self.size(QueueItemStage.FAIL)
-        total_size = waiting_size + processing_size + success_size + fail_size
-
-        sizes_dict = {"WAITING": waiting_size, "PROCESSING": processing_size,
-                      "SUCCESS": success_size, "FAIL": fail_size,
-                      "TOTAL": total_size}
-
-        return sizes_dict
-
     def lookup_status(self, queue_item_id):
         """Lookup which stage in the Queue Item is currently in.
 

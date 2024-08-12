@@ -60,6 +60,7 @@ def test_v1_queue_sizes():
         'PROCESSING' : 1,
         'SUCCESS' : 1,
         'FAIL' : 1,
+        'TOTAL': 20
     }
 
     response = client.get("/api/v1/queue/sizes")
