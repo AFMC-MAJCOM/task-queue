@@ -6,7 +6,7 @@ from functools import reduce
 
 import s3fs
 
-from task_queue.queue_base import QueueBase, QueueItemStage
+from task_queue.queue_base import QueueBase
 from . import s5fs
 from . import queue_base
 
