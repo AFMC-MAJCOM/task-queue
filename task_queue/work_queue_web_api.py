@@ -293,9 +293,6 @@ def requeue(item_ids:Union[str,list[str]]) -> None:
     """
     queue.requeue(item_ids)
 
-QueueItemBodyType = Annotated[Any, \
-                    AfterValidator(json_serializable_validator)]
-
 @app.post("/api/v1/queue/put")
 async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
