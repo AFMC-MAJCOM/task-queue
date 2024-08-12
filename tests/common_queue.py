@@ -326,11 +326,11 @@ def test_lookup_item(queue: qb.QueueBase):
 
     queue.success(get[0][0])
 
-    item_id, status, body = queue.lookup_item(get[0][0])
+    res = queue.lookup_item(get[0][0])
 
-    assert item_id == get[0][0]
-    assert status == qb.QueueItemStage.SUCCESS
-    assert body == get[0][1]
+    assert res['item_id'] == get[0][0]
+    assert res['status'] == qb.QueueItemStage.SUCCESS
+    assert res['item_body'] == get[0][1]
 
 def test_lookup_item_fail(queue: qb.QueueBase):
     """Tests that the proper error is thrown when lookup_item fails.
