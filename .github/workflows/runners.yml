@@ -67,11 +67,12 @@ jobs:
     - name: Test with pytest
       run: |
         export RUN_ARGO_TESTS=True
-        export SQL_HOST=localhost
-        export SQL_USERNAME=postgres
-        export SQL_PASSWORD=postgres
-        export SQL_DB_NAME=postgres
-        export SQL_PORT=5432
+        export SQL_QUEUE_NAME=test
+        export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
+        export SQL_QUEUE_POSTGRES_USER=postgres
+        export SQL_QUEUE_POSTGRES_PASSWORD=postgres
+        export SQL_QUEUE_POSTGRES_DATABASE=postgres
+        export SQL_QUEUE_POSTGRES_PORT=5432
         export AWS_ACCESS_KEY_ID=minioadmin
         export AWS_SECRET_ACCESS_KEY=minioadmin
         export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/

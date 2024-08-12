@@ -4,7 +4,10 @@ from typing import Dict, Any, Union, List, Tuple
 from pydantic import validate_call, PositiveInt
 import requests
 
+from task_queue.queue_pydantic_models import QueueGetSizesModel, \
+    LookupQueueItemModel, QueueItemBodyType
 from .queue_base import QueueBase, QueueItemStage
+
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -22,7 +25,7 @@ class ApiClient(QueueBase):
         self.timeout = timeout
 
     @validate_call
-    def put(self, items: Dict[str, Any]) -> None:
+    def put(self, items: Dict[str, QueueItemBodyType]) -> None:
         """Adds a new Item to the Queue in the WAITING stage.
 
         Parameters:
@@ -110,7 +113,7 @@ class ApiClient(QueueBase):
         response = requests.get(f"{self.api_base_url}status/{queue_item_id}",
                                timeout=self.timeout)
         response.raise_for_status()
-        return response.json()
+        return QueueItemStage(response.json())
 
     @validate_call
     def lookup_state(self, queue_item_stage:QueueItemStage) -> List[str]:
@@ -133,7 +136,7 @@ class ApiClient(QueueBase):
         return response.json()
 
     @validate_call
-    def lookup_item(self, queue_item_id:str) -> Dict[str,Any]:
+    def lookup_item(self, queue_item_id:str) -> LookupQueueItemModel:
         """Lookup an Item currently in the Queue.
 
         Parameters:
@@ -150,7 +153,9 @@ class ApiClient(QueueBase):
             f"{self.api_base_url}lookup_item/{queue_item_id}",
             timeout=self.timeout)
         response.raise_for_status()
-        return response.json()
+        response = response.json()
+        response['status'] = QueueItemStage(response['status'])
+        return response
 
     @validate_call
     def requeue(self, item_ids:Union[str, List[str]]) -> None:
@@ -168,7 +173,7 @@ class ApiClient(QueueBase):
         response.raise_for_status()
 
     @validate_call
-    def description(self) -> Dict[str, Any]:
+    def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:
         """A brief description of the Queue.
 
         Returns:
@@ -181,7 +186,7 @@ class ApiClient(QueueBase):
         return response.json()
 
     @validate_call
-    def get_queue_sizes(self) -> Dict[str, int]:
+    def get_queue_sizes(self) -> QueueGetSizesModel:
         """Gets the number of Items in each Stage of the Queue.
 
         Returns:
