@@ -160,6 +160,7 @@ def queue_settings_from_env():
 queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
+
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
@@ -284,5 +285,6 @@ async def put(items:Dict[str,QueueItemBodyType]) -> None:
     items: dict
         Dictionary of Queue Items to add Queue, where Item is a key:value
         pair, where key is the item ID and value is the queue item body.
+        The item ID must be a string and the item body must be serializable.
     """
     queue.put(items)
