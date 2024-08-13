@@ -6,7 +6,7 @@ import requests
 
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
-from .queue_base import QueueBase, QueueItemStage
+from ..queues.queue_base import QueueBase, QueueItemStage
 
 
 class ApiClient(QueueBase):

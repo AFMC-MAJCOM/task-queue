@@ -6,7 +6,7 @@ from typing import Any, Annotated
 from pydantic import BaseModel
 from pydantic.functional_validators import AfterValidator
 
-from task_queue.queue_base import QueueItemStage
+from task_queue.queues.queue_base import QueueItemStage
 
 def json_serializable_validator(o):
     """This function is used to determine if an object is JSON serializable for

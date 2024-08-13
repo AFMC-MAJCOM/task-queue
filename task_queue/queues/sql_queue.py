@@ -7,7 +7,7 @@ from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert, JSONB
 from sqlalchemy import Engine
 
-from task_queue.queue_base import QueueBase, QueueItemStage
+from .queue_base import QueueBase, QueueItemStage
 
 
 class SqlQueue(SQLModel, table=True):
