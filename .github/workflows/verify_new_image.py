@@ -24,7 +24,7 @@ def verify_new_image(version: str) -> bool:
 
 
 if __name__=="__main__":
-     assert len(sys.argv) == 3
+    assert len(sys.argv) == 3
     version = sys.argv[1]
     print(f" Version: {version}")
 
