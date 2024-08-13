@@ -2,12 +2,6 @@
 """
 import random
 import time
-<<<<<<< HEAD
-import os
-import subprocess
-import json
-=======
->>>>>>> 46f13800c41c6707c66f122f77031e2bb821871c
 
 import pytest
 

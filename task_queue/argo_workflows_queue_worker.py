@@ -111,6 +111,19 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             self._namespace
         )
 
+    @property
+    def _argo_workflows_delete_url(self, workflow_name):
+        """Returns the URL to the argo workflows server to delete a workflow.
+        """
+        return self.urlconcat(
+            self._argo_workflows_endpoint,
+            "api",
+            "v1",
+            "workflows",
+            self._namespace,
+            workflow_name
+        )
+
 
     def _construct_submit_body(self, item_id, queue_item_body):
         """Creates body for the submit URL.
@@ -149,10 +162,21 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         return payload
 
-    def get_workflow_name(self, queue_item_id):
-        url = f"{self._argo_workflows_endpoint}/api/v1/workflows/pivot"
+    def _get_workflow_name(self, queue_item_id):
+        """Gets the name of the argo workflow using the queue_item_id.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Queue Item ID
+
+        Returns:
+        -----------
+        Returns the name of the argo workflow that corresponds to the given
+        Queue Item ID.
+        """
         try:
-            res = requests.get(url)
+            res = requests.get(self._argo_workflows_list_url)
             res.raise_for_status()
 
             wf = res.json()
@@ -160,18 +184,30 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             for item in wf.get("items",[]):
                 labels = self.get_labels(item)
                 wf_item_id = labels['work-queue.queue-item-id']
-                
                 if wf_item_id == queue_item_id:
                     name = item.get("metadata",{}).get("name","Unknown")
                     return name
+
         except requests.exceptions.RequestException as e:
             print(f"Exception: {e}")
 
     def delete_job(self, queue_item_id):
-        print("deleting")
-        name = self.get_workflow_name(queue_item_id)
-        url = self.urlconcat(self._argo_workflows_endpoint,"api","v1","workflows",self._namespace,name)
-        requests.delete(url)
+        """Sends a delete request to argo workflows to delete a specific
+        completed workflow.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Item ID of job in workflow
+        """
+        name = self._get_workflow_name(queue_item_id)
+        delete_url = self._argo_workflows_delete_url(name)
+        response = requests.delete(delete_url)
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            print(f"Couldn't delete workflow {name}")
+            raise e
 
 
     def send_job(self, item_id, queue_item_body):
@@ -362,6 +398,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         print("Getting status from Argo Workflows")
         request_url = self._argo_workflows_list_url
         request_params = self._construct_poll_query()
+
         response = requests.get(
             request_url,
             params=request_params,
