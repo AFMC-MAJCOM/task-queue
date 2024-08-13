@@ -1,6 +1,6 @@
 """Wherein is contained the WorkQueue class.
 """
-from task_queue.queue_base import QueueItemStage
+from task_queue.queues.queue_base import QueueItemStage
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
