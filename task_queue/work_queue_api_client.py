@@ -33,6 +33,8 @@ class ApiClient(QueueBase):
         items: dict
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key is the item ID and value is the queue item body.
+            The item ID must be a string and the item body must be
+            serializable.
         """
         response = requests.post(f"{self.api_base_url}put", json=items, \
                                  timeout=self.timeout)
