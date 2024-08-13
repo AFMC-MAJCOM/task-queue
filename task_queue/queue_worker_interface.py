@@ -24,6 +24,18 @@ class QueueWorkerInterface(ABC):
         """
         raise NotImplementedError("Please Implement this method")
 
+    @abstractmethod
+    def delete_job(self, queue_item_id):
+        """Sends a delete request to argo workflows to delete a specific
+        completed workflow.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Queue Item ID
+        """
+        raise NotImplementedError("Please Implement this method")
+
 
     @abstractmethod
     def poll_all_status(self):
@@ -61,6 +73,17 @@ class DummyWorkerInterface(QueueWorkerInterface):
             matching the submit_body schema.
         """
         self._job_status[item_id] = QueueItemStage.PROCESSING
+
+    def delete_job(self, queue_item_id):
+        """Sends a delete request to argo workflows to delete a specific
+        completed workflow.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Queue Item ID
+        """
+        self._job_status[queue_item_id] = None
 
     def poll_all_status(self):
         """Poll status of all jobs sent by the worker interface.
