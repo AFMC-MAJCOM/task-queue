@@ -30,4 +30,4 @@ if __name__=="__main__":
 
     new_release = verify_new_image(version)
     print(new_release)
-    sys.exit(False)
+    sys.exit(True)
