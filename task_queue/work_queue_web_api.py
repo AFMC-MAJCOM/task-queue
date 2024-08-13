@@ -7,7 +7,7 @@ from typing import Dict, Any, Annotated, Union, Tuple, List
 import json
 from annotated_types import Ge, Le
 
-from pydantic import PositiveIn
+from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
@@ -160,22 +160,6 @@ def queue_settings_from_env():
 
 queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
-
-
-def json_serializable_validator(o):
-    """Raises a value error if a given item is not serializable.
-
-    Parameters:
-    -----------
-    o: JSON value
-        An item being validated.
-
-    Returns:
-    -----------
-    Returns the original input.
-    """
-    json.dumps(o)
-    return o
 
 
 @app.get("/api/v1/queue/sizes")
