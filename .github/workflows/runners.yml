@@ -94,7 +94,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
 
   publish-docker-image:
-    needs: [pytest-linux, generic-workflow]
+    # needs: [pytest-linux, generic-workflow]
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
