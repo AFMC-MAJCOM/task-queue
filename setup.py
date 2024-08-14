@@ -28,6 +28,5 @@ setup(
         "psycopg2-binary",
         "requests",
         "fastapi[all]",
-        "fsspec == 2024.3.1",
     ]
 )

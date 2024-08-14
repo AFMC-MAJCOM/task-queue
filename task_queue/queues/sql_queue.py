@@ -21,7 +21,7 @@ class SqlQueue(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-    json_data: dict = Field(sa_column=Column(JSONB))
+    json_data: Any = Field(sa_column=Column(JSONB))
     index_key: str
     queue_name: str
 
