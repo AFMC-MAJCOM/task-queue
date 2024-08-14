@@ -112,16 +112,12 @@ class SQLQueue(QueueBase):
 
             outputs = []
             for queue_item in results:
-                print("______________________")
-                print(type(json.loads(queue_item.json_data)))
                 outputs.append((queue_item.index_key,
-                                json.loads(json.loads(queue_item.json_data))))
+                                json.loads(queue_item.json_data)))
                 update_stage(self.engine,
                              self.queue_name,
                              QueueItemStage.PROCESSING,
                              queue_item.index_key)
-            print("++++++++++++++++++")
-            # print(outputs)
             return outputs
 
     def success(self, queue_item_id):
@@ -251,7 +247,7 @@ class SQLQueue(QueueBase):
             results = session.exec(stmt)
 
             for queue_item in results:
-                item_body = json.loads(json.loads(queue_item.json_data))
+                item_body = json.loads(queue_item.json_data)
 
         return {
             'item_id':queue_item_id,
