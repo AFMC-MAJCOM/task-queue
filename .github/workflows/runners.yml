@@ -42,6 +42,8 @@ jobs:
   publish-docker-image:
     needs: [validate_code, publish-image-check]
     if: github.ref == 'refs/heads/main'
+    permissions:
+      packages: write
     uses: ./.github/workflows/publish_docker_image.yml
 
   create-git-tag:
