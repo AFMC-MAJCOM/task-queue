@@ -12,13 +12,10 @@ jobs:
    validate_code:
      runs-on: ubuntu-latest
      if: github.ref != 'refs/heads/main'
-     steps:
-     - uses: ./.github/workflows/validate_code.yml
+     uses: ./.github/workflows/validate_code.yml
 
    publish-docker-image:
      needs: [validate_code]
-     runs-on: ubuntu-latest
      permissions:
        packages: write
-     steps:
-     - uses: ./.github/workflows/publish_docker_image.yml
+     uses: ./.github/workflows/publish_docker_image.yml

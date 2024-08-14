@@ -7,8 +7,6 @@ permissions:
 
 jobs:
   generic-workflow:
-    runs-on: ubuntu-latest
-    uses: actions/checkout@v3
     uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
     with:
       project_root: task_queue
