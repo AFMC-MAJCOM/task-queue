@@ -22,4 +22,3 @@ jobs:
        packages: write
      steps:
      - uses: ./.github/workflows/publish_docker_image.yml
-
