@@ -1,6 +1,6 @@
 """Wherein is contained the functions for implementing the SQL Queue.
 """
-from typing import Optional
+from typing import Optional, Any
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
