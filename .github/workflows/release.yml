@@ -1,0 +1,19 @@
+
+name: Task Queue Manual Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+   setup:
+     if: github.ref != 'refs/heads/main'
+     uses: ./.github/workflows/validate_code.yml
+
+   publish-docker-image:
+     needs: [setup]
+     uses: ./.github/workflows/publish_docker_image.yml
+
