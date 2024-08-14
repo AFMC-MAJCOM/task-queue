@@ -31,6 +31,7 @@ jobs:
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
 
   publish-image-check:
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Main Version
