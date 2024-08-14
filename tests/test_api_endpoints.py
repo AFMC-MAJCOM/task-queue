@@ -67,16 +67,16 @@ def test_v1_queue_size():
     fail_response_size = client.get("/api/v1/queue/size/FAIL")
 
     assert wait_response_size.status_code == 200
-    assert wait_reponse_size.json() == wait_actual_size
+    assert wait_response_size.json() == wait_actual_size
 
     assert proc_response_size.status_code == 200
-    assert proc_reponse_size.json() == proc_actual_size
+    assert proc_response_size.json() == proc_actual_size
 
     assert succ_response_size.status_code == 200
-    assert succ_reponse_size.json() == succ_actual_size
+    assert succ_response_size.json() == succ_actual_size
 
     assert fail_response_size.status_code == 200
-    assert fail_reponse_size.json() == fail_actual_size
+    assert fail_response_size.json() == fail_actual_size
 
 
 def test_v1_queue_sizes():
@@ -94,6 +94,7 @@ def test_v1_queue_sizes():
         'PROCESSING' : 1,
         'SUCCESS' : 1,
         'FAIL' : 1,
+        'TOTAL': 20,
     }
 
     response = client.get("/api/v1/queue/sizes")
