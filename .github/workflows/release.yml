@@ -17,5 +17,7 @@ jobs:
 
    publish-docker-image:
      needs: [setup]
+     permissions:
+        contents: write
      uses: ./.github/workflows/publish_docker_image.yml
 
