@@ -65,6 +65,9 @@ class SQLQueue(QueueBase):
 
         db_items = []
         for k, v in items.items():
+            print("------put---------")
+            print(type(v))
+            print(v)
             try:
                 db_items.append(
                     SqlQueue(
@@ -112,6 +115,9 @@ class SQLQueue(QueueBase):
 
             outputs = []
             for queue_item in results:
+                print("-------get---------")
+                print(type(queue_item.json_data))
+                print(queue_item.json_data)
                 outputs.append((queue_item.index_key,
                                 json.loads(queue_item.json_data)))
                 update_stage(self.engine,
