@@ -17,7 +17,7 @@ jobs:
      - uses: ./.github/workflows/validate_code.yml
 
    publish-docker-image:
-     needs: [setup]
+     needs: [validate_code]
      runs-on: ubuntu-latest
      permissions:
        packages: write
