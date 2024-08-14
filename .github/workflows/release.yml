@@ -15,7 +15,7 @@ jobs:
      uses: ./.github/workflows/validate_code.yml
 
    publish-docker-image:
-     needs: [validate_code]
+     needs: [validate]
      permissions:
        packages: write
      uses: ./.github/workflows/publish_docker_image.yml
