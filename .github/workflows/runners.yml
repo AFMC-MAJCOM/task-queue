@@ -45,8 +45,6 @@ jobs:
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
-    with:
-      name: ""
 
   create-git-tag:
     needs: [validate]

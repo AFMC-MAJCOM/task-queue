@@ -9,15 +9,8 @@ permissions:
   contents: read
 
 jobs:
-   validate:
-     name: validate
-     if: github.ref != 'refs/heads/main'
-     uses: ./.github/workflows/validate_code.yml
-
    publish-docker-image:
-     needs: [validate]
+     if: github.ref != 'refs/heads/main'
      permissions:
        packages: write
      uses: ./.github/workflows/publish_docker_image.yml
-     with:
-       name: _manual
