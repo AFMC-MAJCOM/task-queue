@@ -25,7 +25,7 @@ setup(
         "pandas",
         "pyarrow",
         "sqlmodel",
-        "psycopg2-binary = 2.9.9",
+        "psycopg2-binary == 2.9.9",
         "requests",
         "fastapi[all]"
     ]
