@@ -10,14 +10,13 @@ from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
-from task_queue.queue_base import QueueItemStage
-from task_queue.s3_queue import json_s3_queue
-from task_queue.sql_queue import json_sql_queue
+from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues.s3_queue import json_s3_queue
+from task_queue.queues.sql_queue import json_sql_queue
+from task_queue.queues.in_memory_queue import in_memory_queue
 from task_queue import config
-from task_queue.in_memory_queue import in_memory_queue
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
-
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

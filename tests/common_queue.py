@@ -6,7 +6,7 @@ import warnings
 import pytest
 import uuid
 
-import task_queue.queue_base as qb
+import task_queue.queues.queue_base as qb
 
 
 pytestmark = pytest.mark.skip()
