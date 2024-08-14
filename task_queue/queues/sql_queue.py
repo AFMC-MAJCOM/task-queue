@@ -120,7 +120,7 @@ class SQLQueue(QueueBase):
                              self.queue_name,
                              QueueItemStage.PROCESSING,
                              queue_item.index_key)
-            print(outputs)
+
             return outputs
 
     def success(self, queue_item_id):

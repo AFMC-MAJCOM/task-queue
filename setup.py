@@ -24,7 +24,7 @@ setup(
         "s3fs >= 2023.6.0",
         "pandas",
         "pyarrow",
-        "sqlmodel",
+        "sqlmodel=0.0.21",
         "psycopg2-binary",
         "requests",
         "fastapi[all]"
