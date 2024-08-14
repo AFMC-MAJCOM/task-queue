@@ -5,7 +5,7 @@ import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert, JSONB
-from sqlalchemy import Engine
+from sqlalchemy import Engine, Column
 
 from .queue_base import QueueBase, QueueItemStage
 
@@ -21,7 +21,7 @@ class SqlQueue(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-    json_data: dict = Field(sa_type=JSONB, default={})
+    json_data: dict = Field(sa_column=Column(JSONB))
     index_key: str
     queue_name: str
 
@@ -65,13 +65,12 @@ class SQLQueue(QueueBase):
 
         db_items = []
         for k, v in items.items():
-            print("------put---------")
-            print(type(v))
-            print(v)
             try:
+                # Only add v if it is JSON serializable
+                json.dumps(v)
                 db_items.append(
                     SqlQueue(
-                        json_data=json.dumps(v),
+                        json_data=v,
                         index_key=str(k),
                         queue_name=self.queue_name
                     ).model_dump(exclude_unset=True)
@@ -115,15 +114,13 @@ class SQLQueue(QueueBase):
 
             outputs = []
             for queue_item in results:
-                print("-------get---------")
-                print(type(queue_item.json_data))
-                print(queue_item.json_data)
                 outputs.append((queue_item.index_key,
                                 json.loads(queue_item.json_data)))
                 update_stage(self.engine,
                              self.queue_name,
                              QueueItemStage.PROCESSING,
                              queue_item.index_key)
+            print(outputs)
             return outputs
 
     def success(self, queue_item_id):
