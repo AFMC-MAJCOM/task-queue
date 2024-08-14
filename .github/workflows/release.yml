@@ -12,7 +12,8 @@ jobs:
    setup:
      runs-on: ubuntu-latest
      if: github.ref != 'refs/heads/main'
-         uses: ./.github/workflows/validate_code.yml
+     steps:
+     - uses: ./.github/workflows/validate_code.yml
 
    publish-docker-image:
      needs: [setup]
