@@ -28,6 +28,6 @@ setup(
         "psycopg2-binary",
         "requests",
         "fastapi[all]",
-        "SQLAlchemy == 2.0.28"
+        "fsspec == 2024.3.1",
     ]
 )
