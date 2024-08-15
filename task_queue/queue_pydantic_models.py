@@ -1,7 +1,7 @@
 """This file contains pydantic models used for pydantic type checking of the
 inputs and outputs of the API and Client, when applicable."""
 import json
-from typing import Any, Annotated
+from typing import Any, Annotated, Optional, List
 
 from pydantic import BaseModel
 from pydantic.functional_validators import AfterValidator
@@ -37,3 +37,41 @@ class LookupQueueItemModel(BaseModel):
     item_id : str
     status : QueueItemStage
     item_body : QueueItemBodyType
+
+
+class ArgoOwnerRefernceModel(BaseModel):
+    """A Pydantic model representing the owner refernce options for submitting
+    jobs to the argo workflows."""
+    apiVersion: Optional[str] = None
+    blockOwnerDeletion: Optional[bool] = True
+    controller: Optional[bool] = True
+    kind: Optional[str] = None
+    name: Optional[str] = None
+    uid: Optional[str] = None
+
+
+class ArgoSubmitOptionsModel(BaseModel):
+    """A Pydantic model representing the submit options for submitting jobs to
+    the argo workflows."""
+    annotations : Optional[str] = None
+    dryRun : Optional[bool] = True
+    entryPoint : Optional[str] = None
+    generateName : Optional[str] = None
+    labels : Optional[str] = None
+    name : Optional[str] = None
+    ownerReference : Optional[ArgoOwnerRefernceModel] = None
+    parameters : Optional[List[str]] = None
+    podPriorityClassName : Optional[str] = None
+    priority : Optional[int] = 0
+    serverDryRun : Optional[bool] = True
+    serviceAccount : Optional[str] = None
+
+
+class ArgoSubmitBodyModel(BaseModel):
+    """A Pydantic model representing the submit body schema for submitting jobs
+    to the argo workflows."""
+    namespace : Optional[str] = None
+    resourceKind : Optional[str] = None
+    resourceName : Optional[str] = None
+    submitOptions : Optional[ArgoSubmitOptionsModel] = None
+

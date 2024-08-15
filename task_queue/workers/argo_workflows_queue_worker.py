@@ -6,6 +6,7 @@ import pandas as pd
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queue_pydantic_models import ArgoSubmitBodyModel
 
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
@@ -112,7 +113,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         )
 
 
-    def _construct_submit_body(self, item_id, queue_item_body):
+    def _construct_submit_body(self, item_id, queue_item_body)->ArgoSubmitBodyModel:
         """Creates body for the submit URL.
 
         Parameters:
