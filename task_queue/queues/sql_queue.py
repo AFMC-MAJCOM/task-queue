@@ -4,7 +4,7 @@ from typing import Optional, Any
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert, JSONB
+from sqlalchemy.dialects.postgresql import insert, JSONB, JSON
 from sqlalchemy import Engine, Column
 
 from .queue_base import QueueBase, QueueItemStage
@@ -21,7 +21,7 @@ class SqlQueue(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-    json_data: Any = Field(sa_column=Column(JSONB))
+    json_data: str = Field(sa_column=Column(JSONB))
     index_key: str
     queue_name: str
 
@@ -67,10 +67,11 @@ class SQLQueue(QueueBase):
         for k, v in items.items():
             try:
                 # Only add v if it is JSON serializable
-                json.dumps(v)
+                # json.dumps(v)
                 db_items.append(
                     SqlQueue(
                         json_data=v,
+                        # json_data=json.dumps(v),
                         index_key=str(k),
                         queue_name=self.queue_name
                     ).model_dump(exclude_unset=True)
