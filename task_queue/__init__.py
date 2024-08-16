@@ -1,5 +1,6 @@
 """Task Queue.
 """
+
 from .config.config import get_task_queue_settings
 from .config import config
 
@@ -9,4 +10,4 @@ __all__ = [
     "config",
 ]
 
-__version__ = "1.5.2"
+__version__ = "1.5.6"

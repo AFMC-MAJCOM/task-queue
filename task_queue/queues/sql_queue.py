@@ -7,7 +7,7 @@ from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import Engine
 
-from task_queue.queue_base import QueueBase, QueueItemStage
+from .queue_base import QueueBase, QueueItemStage
 
 
 class SqlQueue(SQLModel, table=True):
@@ -49,7 +49,8 @@ class SQLQueue(QueueBase):
         items: dict
             Dictionary of Queue Items to add Queue, where Item is a key:value
             pair, where key=index_key, and value is the json expected when the
-            job is submitted for processing.
+            job is submitted for processing. The item ID must be a string and
+            the item body must be serializable.
 
         Returns:
         -----------
