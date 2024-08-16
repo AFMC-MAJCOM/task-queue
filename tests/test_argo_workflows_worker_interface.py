@@ -2,6 +2,7 @@
 """
 import random
 import time
+import requests
 
 import pytest
 
