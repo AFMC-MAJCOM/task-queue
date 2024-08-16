@@ -47,17 +47,17 @@ jobs:
       run: |
         mkdir ~/minio
         minio server ~/minio --console-address :9090 &!
-    # - name: Setup Minikube
-    #   id: minikube
-    #   uses: medyagh/setup-minikube@latest
-    # - name: Prepare for Argo Tests
-    #   run: | 
-    #     minikube start
-    #     kubectl create namespace pivot
-    #     kubectl apply -n pivot -f resources/quick-start-minimal.yaml
-    #     kubectl apply -n pivot -f resources/test_workflow_template.yaml
-    #     kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
-    #     kubectl port-forward -n pivot service/argo-server 2746:2746 &
+    - name: Setup Minikube
+      id: minikube
+      uses: medyagh/setup-minikube@latest
+    - name: Prepare for Argo Tests
+      run: | 
+        minikube start
+        kubectl create namespace pivot
+        kubectl apply -n pivot -f resources/quick-start-minimal.yaml
+        kubectl apply -n pivot -f resources/test_workflow_template.yaml
+        kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
+        kubectl port-forward -n pivot service/argo-server 2746:2746 &
 
     - name: Install dependencies
       run: |
@@ -66,7 +66,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-
+        export RUN_ARGO_TESTS=True
         export SQL_QUEUE_NAME=test
         export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
         export SQL_QUEUE_POSTGRES_USER=postgres
@@ -76,7 +76,7 @@ jobs:
         export AWS_ACCESS_KEY_ID=minioadmin
         export AWS_SECRET_ACCESS_KEY=minioadmin
         export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
-        pytest -s -k test_put_get
+        pytest -vv
 
   version_check:
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
       run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
-      
+
   publish-docker-image:
     needs: [pytest-linux, generic-workflow]
     if: github.ref == 'refs/heads/main'

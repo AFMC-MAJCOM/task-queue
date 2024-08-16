@@ -5,7 +5,7 @@ import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert, JSONB, Any
-from sqlalchemy import Engine, Column, MetaData, Table
+from sqlalchemy import Engine, Column
 
 from .queue_base import QueueBase, QueueItemStage
 
@@ -66,14 +66,8 @@ class SQLQueue(QueueBase):
         db_items = []
         for k, v in items.items():
             try:
-                # Only add v if it is JSON serializable
-                json.dumps(v)
-                # print("------------------")
-                # print(type(json.dumps(v)))
-                # print(json.dumps(v))
                 db_items.append(
                     SqlQueue(
-                        # json_data=v,
                         json_data=json.dumps(v),
                         index_key=str(k),
                         queue_name=self.queue_name
@@ -84,8 +78,6 @@ class SQLQueue(QueueBase):
 
 
         with Session(self.engine) as session:
-            # breakpoint()
-
             statement = (insert(SqlQueue).values(db_items) \
                          .on_conflict_do_nothing())
             session.exec(statement)
@@ -96,17 +88,6 @@ class SQLQueue(QueueBase):
             raise BaseException(
                 "Error writing at least one queue object to SQL:",
                 fail_items)
-
-        md = MetaData()
-        md.reflect(bind=self.engine)
-        print("--------=-=-=-=-=-----------")
-        print(md.tables.keys())
-        table = Table('sqlqueue', md, autoload_with=self.engine)
-        columns = table.c
-
-        print("--------=-=-=-=-=-----------")
-        for c in columns:
-           print(c.name, c.type)
 
         return success
 
@@ -133,14 +114,12 @@ class SQLQueue(QueueBase):
             outputs = []
             for queue_item in results:
                 outputs.append((queue_item.index_key,
-                                # queue_item.json_data))
                                 json.loads(queue_item.json_data)))
                 update_stage(self.engine,
                              self.queue_name,
                              QueueItemStage.PROCESSING,
                              queue_item.index_key)
-            print("-----------------------")
-            print(outputs)
+
             return outputs
 
     def success(self, queue_item_id):

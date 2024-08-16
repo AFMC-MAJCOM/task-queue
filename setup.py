@@ -27,6 +27,6 @@ setup(
         "sqlmodel",
         "psycopg2-binary",
         "requests",
-        "fastapi[all]",
+        "fastapi[all]"
     ]
 )
