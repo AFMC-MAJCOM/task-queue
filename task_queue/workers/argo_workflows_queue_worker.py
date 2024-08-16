@@ -175,7 +175,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Queue Item ID.
         """
         try:
-            res = requests.get(self._argo_workflows_list_url)
+            res = requests.get(self._argo_workflows_list_url, timeout=10)
             res.raise_for_status()
 
             wf = res.json()
@@ -186,9 +186,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                 if wf_item_id == queue_item_id:
                     name = item.get("metadata",{}).get("name","Unknown")
                     return name
+            return None
 
         except requests.exceptions.RequestException as e:
             print(f"Exception: {e}")
+            raise e
 
     def send_job(self, item_id, queue_item_body):
         """Starts a job from queue item.
@@ -230,7 +232,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         name = self._get_workflow_name(queue_item_id)
         delete_url = self._argo_workflows_delete_url(name)
-        response = requests.delete(delete_url)
+        response = requests.delete(delete_url, timeout = 10)
         try:
             print(f"Deleting workflow {name}")
             response.raise_for_status()
