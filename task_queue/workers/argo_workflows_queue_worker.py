@@ -111,7 +111,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             self._namespace
         )
 
-    @property
+   # @property
     def _argo_workflows_delete_url(self, workflow_name):
         """Returns the URL to the argo workflows server to delete a workflow.
         """
@@ -233,6 +233,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         delete_url = self._argo_workflows_delete_url(name)
         response = requests.delete(delete_url)
         try:
+            print(f"Deleting workflow {name}")
             response.raise_for_status()
         except requests.HTTPError as e:
             print(f"Couldn't delete workflow {name}")

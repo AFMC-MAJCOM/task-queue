@@ -75,6 +75,7 @@ def wait_for_finish(worker, queue_item_id):
             break
 
         time.sleep(1)
+    worker.delete_job(queue_item_id)
 
     return status
 
@@ -154,7 +155,6 @@ def test_argo_worker_end_to_end_concurrent():
     assert sum(s == QueueItemStage.SUCCESS for s in statuses) == \
         n_processes - n_fail
     assert sum(s == QueueItemStage.FAIL for s in statuses) == n_fail
-
 
 def test_argo_worker_no_workflows():
     """Test worker with no workflows works as expected.
