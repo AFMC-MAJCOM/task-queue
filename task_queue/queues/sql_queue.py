@@ -67,11 +67,11 @@ class SQLQueue(QueueBase):
         for k, v in items.items():
             try:
                 # Only add v if it is JSON serializable
-                json.dumps(v)
+                # json.dumps(v)
                 db_items.append(
                     SqlQueue(
                         json_data=v,
-                        # json_data=json.dumps(v),
+                        json_data=json.dumps(v),
                         index_key=str(k),
                         queue_name=self.queue_name
                     ).model_dump(exclude_unset=True)
