@@ -27,7 +27,7 @@ class QueueWorkerInterface(ABC):
     @abstractmethod
     def delete_job(self, queue_item_id):
         """Sends a delete request to argo workflows to delete a specific
-        completed workflow.
+        workflow.
 
         Parameters:
         -----------
@@ -76,7 +76,7 @@ class DummyWorkerInterface(QueueWorkerInterface):
 
     def delete_job(self, queue_item_id):
         """Sends a delete request to argo workflows to delete a specific
-        completed workflow.
+        workflow.
 
         Parameters:
         -----------

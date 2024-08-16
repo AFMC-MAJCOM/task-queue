@@ -115,9 +115,8 @@ def test_delete_jobs(default_work_queue):
     pushed_jobs = default_work_queue.push_next_jobs(n_jobs)
     success_id, _ = pushed_jobs[0]
     fail_id, _ = pushed_jobs[1]
-    
-    assert default_work_queue._queue.size(QueueItemStage.PROCESSING) == n_jobs
 
+    assert default_work_queue._queue.size(QueueItemStage.PROCESSING) == n_jobs
 
     # Terminate two of the jobs
     default_work_queue._interface.mock_success(success_id)
@@ -125,6 +124,10 @@ def test_delete_jobs(default_work_queue):
 
     default_work_queue.update_job_status()
 
-    assert default_work_queue._queue.size(QueueItemStage.PROCESSING) == 1
+    statuses = default_work_queue._interface.poll_all_status()
 
+    # Dummy workflow can't delete workflows, instead they are just assinged the
+    # status of None
+    assert statuses[success_id] is None
+    assert statuses[fail_id] is None
 

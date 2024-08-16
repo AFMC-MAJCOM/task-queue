@@ -111,7 +111,6 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             self._namespace
         )
 
-   # @property
     def _argo_workflows_delete_url(self, workflow_name):
         """Returns the URL to the argo workflows server to delete a workflow.
         """
@@ -222,7 +221,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
     def delete_job(self, queue_item_id):
         """Sends a delete request to argo workflows to delete a specific
-        completed workflow.
+        workflow.
 
         Parameters:
         -----------

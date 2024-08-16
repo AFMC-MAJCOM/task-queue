@@ -80,7 +80,9 @@ def wait_for_finish(worker, queue_item_id):
     return status
 
 def get_workflow_ids(worker):
-    url = (f"http://localhost:2746/api/v1/workflows/pivot")
+    """Returns the workflow ids of all jobs in the argo workflows.
+    """
+    url = "http://localhost:2746/api/v1/workflows/pivot"
     wf = requests.get(url).json()
 
     item_ids = []
@@ -95,14 +97,15 @@ def test_argo_worker_end_to_end_success():
     worker = port_forwarded_worker()
 
     queue_item_id, queue_item_body = make_queue_item()
+
     worker.send_job(
         queue_item_id,
         queue_item_body
     )
 
     status = wait_for_finish(worker, queue_item_id)
-    assert status == QueueItemStage.SUCCESS
 
+    assert status == QueueItemStage.SUCCESS
 
 def test_argo_worker_end_to_end_fail():
     """Test item fails.
@@ -119,7 +122,6 @@ def test_argo_worker_end_to_end_fail():
     status = wait_for_finish(worker, queue_item_id)
 
     assert status == QueueItemStage.FAIL
-
 
 def test_argo_worker_end_to_end_concurrent():
     """Test multiple items running concurrently, with some succeeding and some
@@ -192,7 +194,7 @@ def test_argo_worker_delete_workflows():
         queue_item_body
     )
     assert queue_item_id in get_workflow_ids(worker)
-    status = wait_for_finish(worker, queue_item_id)
+    wait_for_finish(worker, queue_item_id)
     assert queue_item_id not in get_workflow_ids(worker)
 
     queue_item_id, queue_item_body = make_queue_item(fail=True)
@@ -201,5 +203,5 @@ def test_argo_worker_delete_workflows():
         queue_item_body
     )
     assert queue_item_id in get_workflow_ids(worker)
-    status = wait_for_finish(worker, queue_item_id)
+    wait_for_finish(worker, queue_item_id)
     assert queue_item_id not in get_workflow_ids(worker)
