@@ -86,6 +86,17 @@ def test_client_description_fail(mock_get):
         test_client.description()
 
 @mock.patch('requests.get', side_effect=mocked_requests)
+def test_client_get_queue_size(mock_get):
+    test_client.get_queue_size(QueueItemStage.WAITING)
+    route = mock_get.call_args[0][0]
+    assert route == f"{test_client.api_base_url}size/{QueueItemStage.WAITING}"
+
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_get_queue_size(mock_get):
+    with pytest.raises(RequestException):
+        test_client.get_queue_size(QueueItemStage.WAITING)
+
+@mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
     test_client.get_queue_sizes()
     route = mock_get.call_args[0][0]
