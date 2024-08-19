@@ -3,6 +3,7 @@
 import requests
 
 import pandas as pd
+from pytest import validate_call
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
@@ -113,7 +114,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         )
 
 
-    def _construct_submit_body(self, item_id, queue_item_body)->ArgoSubmitBodyModel:
+    def _construct_submit_body(self, item_id, queue_item_body):
         """Creates body for the submit URL.
 
         Parameters:
@@ -150,7 +151,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         return payload
 
-    def send_job(self, item_id, queue_item_body):
+    @validate_call
+    def send_job(self, item_id, queue_item_body:ArgoQueueItemBodyModel):
         """Starts a job from queue item.
 
         Parameters:

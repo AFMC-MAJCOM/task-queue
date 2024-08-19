@@ -39,32 +39,32 @@ class LookupQueueItemModel(BaseModel):
     item_body : QueueItemBodyType
 
 
-class ArgoOwnerRefernceModel(BaseModel):
-    """A Pydantic model representing the owner refernce options for submitting
-    jobs to the argo workflows."""
-    apiVersion: Optional[str] = None
-    blockOwnerDeletion: Optional[bool] = True
-    controller: Optional[bool] = True
-    kind: Optional[str] = None
-    name: Optional[str] = None
-    uid: Optional[str] = None
+# class ArgoOwnerRefernceModel(BaseModel):
+#     """A Pydantic model representing the owner refernce options for submitting
+#     jobs to the argo workflows."""
+#     apiVersion: Optional[str] = None
+#     blockOwnerDeletion: Optional[bool] = True
+#     controller: Optional[bool] = True
+#     kind: Optional[str] = None
+#     name: Optional[str] = None
+#     uid: Optional[str] = None
 
 
-class ArgoSubmitOptionsModel(BaseModel):
-    """A Pydantic model representing the submit options for submitting jobs to
-    the argo workflows."""
-    annotations : Optional[str] = None
-    dryRun : Optional[bool] = True
-    entryPoint : Optional[str] = None
-    generateName : Optional[str] = None
-    labels : Optional[str] = None
-    name : Optional[str] = None
-    ownerReference : Optional[ArgoOwnerRefernceModel] = None
-    parameters : Optional[List[str]] = None
-    podPriorityClassName : Optional[str] = None
-    priority : Optional[int] = 0
-    serverDryRun : Optional[bool] = True
-    serviceAccount : Optional[str] = None
+# class ArgoSubmitOptionsModel(BaseModel):
+#     """A Pydantic model representing the submit options for submitting jobs to
+#     the argo workflows."""
+#     annotations : Optional[str] = None
+#     dryRun : Optional[bool] = True
+#     entryPoint : Optional[str] = None
+#     generateName : Optional[str] = None
+#     labels : Optional[str] = None
+#     name : Optional[str] = None
+#     ownerReference : Optional[ArgoOwnerRefernceModel] = None
+#     parameters : Optional[List[str]] = None
+#     podPriorityClassName : Optional[str] = None
+#     priority : Optional[int] = 0
+#     serverDryRun : Optional[bool] = True
+#     serviceAccount : Optional[str] = None
 
 
 class ArgoSubmitBodyModel(BaseModel):
@@ -73,5 +73,10 @@ class ArgoSubmitBodyModel(BaseModel):
     namespace : Optional[str] = None
     resourceKind : Optional[str] = None
     resourceName : Optional[str] = None
-    submitOptions : Optional[ArgoSubmitOptionsModel] = None
+    submitOptions : Optional[Dict[str,Any]] = None
+
+class ArgoQueueItemBodyModel(BaseModel):
+    """A Pydantic model representing the queue item body schema for submitting
+    jobs to the argo workflows"""
+    submit_body : ArgoSubmitBodyModel
 
