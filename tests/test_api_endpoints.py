@@ -61,10 +61,10 @@ def test_v1_queue_size():
     succ_actual_size = 1
     fail_actual_size = 1
 
-    wait_response_size = client.get(f"/api/v1/queue/size/WAITING")
-    proc_response_size = client.get(f"/api/v1/queue/size/PROCESSING")
-    succ_response_size = client.get(f"/api/v1/queue/size/SUCCESS")
-    fail_response_size = client.get(f"/api/v1/queue/size/FAIL")
+    wait_response_size = client.get("/api/v1/queue/size/WAITING")
+    proc_response_size = client.get("/api/v1/queue/size/PROCESSING")
+    succ_response_size = client.get("/api/v1/queue/size/SUCCESS")
+    fail_response_size = client.get("/api/v1/queue/size/FAIL")
 
     assert wait_response_size.status_code == 200
     assert wait_response_size.json() == wait_actual_size
