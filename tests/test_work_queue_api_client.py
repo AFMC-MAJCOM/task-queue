@@ -102,6 +102,11 @@ def test_client_requeue(mock_get):
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}requeue"
 
+@mock.patch('requests.post', side_effect=mocked_requests)
+def test_client_requeue_bad_input(mock_get):
+    response = test_client.requeue('bad-item-id')
+    assert isinstance(response, dict)
+
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_state(mock_get):
     response = test_client.lookup_state(QueueItemStage.WAITING)

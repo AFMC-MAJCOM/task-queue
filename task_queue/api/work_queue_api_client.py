@@ -171,6 +171,7 @@ class ApiClient(QueueBase):
                                json=item_ids
                               )
         response.raise_for_status()
+        return response.json()
 
     @validate_call
     def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:
