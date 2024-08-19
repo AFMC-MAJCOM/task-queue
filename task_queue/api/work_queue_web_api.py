@@ -161,20 +161,19 @@ queue = queue_settings.make_queue()
 
 
 @app.get("/api/v1/queue/size/{queue_item_stage}")
-async def get_queue_size(queue_item_stage:QueueItemStage) -> int:
+async def get_queue_size(queue_item_stage:str) -> int:
     """Determines how many Items are in some stage of the Queue.
 
     Parameters:
     -----------
-    queue_item_stage: QueueItemStage object
-        The specific stage of the Queue (PROCESSING, FAIL, etc.).
+    queue_item_stage: str
+        Desired Queue Item Stage (i.e. WAITING, FAIL)
 
     Returns:
     ------------
     Returns the number of Items in that stage of the Queue as an integer.
     """
     try:
-        queue_item_stage = queue_item_stage.name
         queue_item_stage_enum = QueueItemStage[queue_item_stage]
         result = queue.size(queue_item_stage_enum)
         return result

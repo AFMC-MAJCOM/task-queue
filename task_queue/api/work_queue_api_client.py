@@ -82,12 +82,12 @@ class ApiClient(QueueBase):
         return None
 
     @validate_call
-    def get_queue_size(self, queue_item_stage:QueueItemStage) -> int:
+    def size(self, queue_item_stage:QueueItemStage) -> int:
         """Determines how many Items are in some stage of the Queue.
 
         Parameters:
         -----------
-        queue_item_stage: QueueItemStage
+        queue_item_stage: QueueItemStage object
             The specific stage of the Queue (PROCESSING, FAIL, etc.).
 
         Returns:
@@ -101,7 +101,7 @@ class ApiClient(QueueBase):
         return response.json()
 
     @validate_call
-    def get_queue_sizes(self) -> QueueGetSizesModel:
+    def sizes(self) -> QueueGetSizesModel:
         """Gets the number of Items in each Stage of the Queue.
 
         Returns:
