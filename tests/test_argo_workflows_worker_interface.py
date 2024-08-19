@@ -78,7 +78,7 @@ def wait_for_finish(worker, queue_item_id):
 
     return status
 
-
+@pytest.mark.integration
 def test_argo_worker_end_to_end_success():
     """Test item succeeds.
     """
@@ -95,7 +95,7 @@ def test_argo_worker_end_to_end_success():
 
     assert status == QueueItemStage.SUCCESS
 
-
+@pytest.mark.integration
 def test_argo_worker_end_to_end_fail():
     """Test item fails.
     """
@@ -112,7 +112,7 @@ def test_argo_worker_end_to_end_fail():
 
     assert status == QueueItemStage.FAIL
 
-
+@pytest.mark.integration
 def test_argo_worker_end_to_end_concurrent():
     """Test multiple items running concurrently, with some succeeding and some
     failing.
@@ -148,7 +148,7 @@ def test_argo_worker_end_to_end_concurrent():
         n_processes - n_fail
     assert sum(s == QueueItemStage.FAIL for s in statuses) == n_fail
 
-
+@pytest.mark.integration
 def test_argo_worker_no_workflows():
     """Test worker with no workflows works as expected.
     """
@@ -158,6 +158,7 @@ def test_argo_worker_no_workflows():
 
     assert len(statuses) == 0
 
+@pytest.mark.integration
 def test_argo_worker_rerun_item():
     """Tests argo can rerun a job.
     """

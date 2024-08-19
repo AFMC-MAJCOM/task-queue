@@ -56,72 +56,86 @@ def mocked_requests(*args, **kwargs):
 
     return MockResponse("Bad URL", 404)
 
+@pytest.mark.unit
 def test_constructor():
     assert test_client.api_base_url == f"{url}/api/v1/queue/"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
     test_client.lookup_status('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}status/good-item-id"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_status_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.lookup_status('bad-item-id')
 
+@pytest.mark.unit
 def test_client_lookup_status_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.lookup_status(1)
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_description(mock_get):
     test_client.description()
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}describe"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_description_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.description()
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get_queue_sizes(mock_get):
     test_client.get_queue_sizes()
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}sizes"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_get_queue_sizes_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.get_queue_sizes()
 
+@pytest.mark.unit
 @mock.patch('requests.post', side_effect=mocked_requests)
 def test_client_requeue(mock_get):
     test_client.requeue('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}requeue"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_state(mock_get):
     response = test_client.lookup_state(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_item(mock_get):
     test_client.lookup_item('good-item-id')
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}lookup_item/good-item-id"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_item_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.lookup_item('bad-item-id')
 
+@pytest.mark.unit
 def test_client_lookup_item_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.lookup_status(1)
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_get(mock_get):
     get_test_value = 165475
@@ -129,26 +143,31 @@ def test_client_get(mock_get):
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}get/{get_test_value}"
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_get_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.get()
 
+@pytest.mark.unit
 def test_client_get_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.get(-1)
 
+@pytest.mark.unit
 @mock.patch('requests.post', side_effect=mocked_requests)
 def test_client_put(mock_post):
     test_client.put({})
     route = mock_post.call_args[0][0]
     assert route == f"{test_client.api_base_url}put"
 
+@pytest.mark.unit
 @mock.patch('requests.post', side_effect=mocked_requests_fail)
 def test_client_put_fail(mock_post):
     with pytest.raises(RequestException):
         test_client.put({})
 
+@pytest.mark.unit
 def test_client_put_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.put("{}")

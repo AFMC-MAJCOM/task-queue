@@ -72,13 +72,16 @@ def events():
     Returns:
     -----------
     List of events.
-    """ 
+    """
     return [
         single_event(test_event_names[i%n_event_types],i, (i // n_event_types))
         for i in range(0, n_events)
     ]
 
-ALL_EVENT_STORE_TYPES = ["memory", "sql"]
+ALL_EVENT_STORE_TYPES = [
+    pytest.param("memory", marks=pytest.mark.unit),
+    pytest.param("sql", marks=pytest.mark.integration)
+]
 
 @pytest.fixture
 def new_empty_store(request):

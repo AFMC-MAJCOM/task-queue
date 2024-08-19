@@ -1,5 +1,7 @@
 """Tests for validating input arguments passed to the CLI
 """
+import pytest
+
 from task_queue.cli.work_queue_service_cli import validate_args
 from task_queue.config import config
 
@@ -9,7 +11,7 @@ ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE=config.WorkerInterfaceChoices.ARGO_WORKFLOWS
 NO_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.NO_EVENTS.value
 SQL_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.SQL_JSON.value
 
-
+@pytest.mark.unit
 def test_validate_args_s3_success():
     """Test valid arguments for the S3 queue
     """
@@ -29,6 +31,7 @@ def test_validate_args_s3_success():
     assert success
     assert error_string == ''
 
+@pytest.mark.unit
 def test_validate_args_s3_missing_base_path():
     """Ensure base path is provided when using S3 queue
     """
@@ -49,6 +52,7 @@ def test_validate_args_s3_missing_base_path():
     assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_sql_success():
     """Test valid arguments for sql queue
     """
@@ -68,6 +72,7 @@ def test_validate_args_sql_success():
     assert success
     assert error_string == ''
 
+@pytest.mark.unit
 def test_validate_args_sql_missing_queue_name():
     """Ensure queue name is provided when using sql queue
     """
@@ -88,6 +93,7 @@ def test_validate_args_sql_missing_queue_name():
     assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_sql_missing_connection_string():
     """Ensure connection string is provided when using sql queue
     """
@@ -108,6 +114,7 @@ def test_validate_args_sql_missing_connection_string():
     assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_worker_interface_success():
     """Test valid arguments for argo-workflows interface
     """
@@ -127,8 +134,9 @@ def test_validate_args_worker_interface_success():
     assert success
     assert error_string == ''
 
+@pytest.mark.unit
 def test_validate_args_worker_interface_missing_id():
-    """Ensure worker_interface_id is provided when using 
+    """Ensure worker_interface_id is provided when using
        argo workflows worker interface
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -148,6 +156,7 @@ def test_validate_args_worker_interface_missing_id():
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_worker_interface_missing_endpoint():
     """Ensure endpoint is provided when using argo-workflows
        worker_interface
@@ -169,6 +178,7 @@ def test_validate_args_worker_interface_missing_endpoint():
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_worker_interface_missing_namespace():
     """Ensure namespace is provided when using argo-workflows
        worker_interface
@@ -190,6 +200,7 @@ def test_validate_args_worker_interface_missing_namespace():
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_event_store_implementation_success():
     """Test valid arguments for event store implementation.
     """
@@ -209,8 +220,9 @@ def test_validate_args_event_store_implementation_success():
     assert success
     assert error_string == ''
 
+@pytest.mark.unit
 def test_validate_args_event_store_implementation_missing_add_name():
-    """Ensure add_to_queue_event_name is provided when  
+    """Ensure add_to_queue_event_name is provided when
        event_store_implementation is set to sql-json
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -230,8 +242,9 @@ def test_validate_args_event_store_implementation_missing_add_name():
     assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_event_store_implementation_missing_move_name():
-    """Ensure move_queue_event_name is provided when  
+    """Ensure move_queue_event_name is provided when
        event_store_implementation is set to sql-json
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -251,9 +264,10 @@ def test_validate_args_event_store_implementation_missing_move_name():
     assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_event_store_implementation_sql_json_only_option():
-    """Ensure sql-json is selected for event_store_implementation if 
-       with_queue_events is set 
+    """Ensure sql-json is selected for event_store_implementation if
+       with_queue_events is set
     """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
