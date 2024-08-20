@@ -2,6 +2,7 @@
 """
 import random
 import time
+import requests
 
 import pytest
 
@@ -59,7 +60,6 @@ def port_forwarded_worker():
         "pivot"
     )
 
-
 def wait_for_finish(worker, queue_item_id):
     """Runs until item moves out of processing stage.
 
@@ -75,9 +75,21 @@ def wait_for_finish(worker, queue_item_id):
             break
 
         time.sleep(1)
+    worker.delete_job(queue_item_id)
 
     return status
 
+def get_workflow_ids(worker):
+    """Returns the workflow ids of all jobs in the argo workflows.
+    """
+    url = "http://localhost:2746/api/v1/workflows/pivot"
+    wf = requests.get(url).json()
+
+    item_ids = []
+    for item in wf.get("items",[]):
+        labels = worker.get_labels(item)
+        item_ids.append(labels['work-queue.queue-item-id'])
+    return item_ids
 
 def test_argo_worker_end_to_end_success():
     """Test item succeeds.
@@ -95,7 +107,6 @@ def test_argo_worker_end_to_end_success():
 
     assert status == QueueItemStage.SUCCESS
 
-
 def test_argo_worker_end_to_end_fail():
     """Test item fails.
     """
@@ -111,7 +122,6 @@ def test_argo_worker_end_to_end_fail():
     status = wait_for_finish(worker, queue_item_id)
 
     assert status == QueueItemStage.FAIL
-
 
 def test_argo_worker_end_to_end_concurrent():
     """Test multiple items running concurrently, with some succeeding and some
@@ -148,7 +158,6 @@ def test_argo_worker_end_to_end_concurrent():
         n_processes - n_fail
     assert sum(s == QueueItemStage.FAIL for s in statuses) == n_fail
 
-
 def test_argo_worker_no_workflows():
     """Test worker with no workflows works as expected.
     """
@@ -174,3 +183,25 @@ def test_argo_worker_rerun_item():
     status = wait_for_finish(worker, queue_item_id)
 
     assert status == QueueItemStage.SUCCESS
+
+def test_argo_worker_delete_workflows():
+    """Test that a completed argo workflow is deleted after updating Queue."""
+    worker = port_forwarded_worker()
+
+    queue_item_id, queue_item_body = make_queue_item()
+    worker.send_job(
+        queue_item_id,
+        queue_item_body
+    )
+    assert queue_item_id in get_workflow_ids(worker)
+    wait_for_finish(worker, queue_item_id)
+    assert queue_item_id not in get_workflow_ids(worker)
+
+    queue_item_id, queue_item_body = make_queue_item(fail=True)
+    worker.send_job(
+        queue_item_id,
+        queue_item_body
+    )
+    assert queue_item_id in get_workflow_ids(worker)
+    wait_for_finish(worker, queue_item_id)
+    assert queue_item_id not in get_workflow_ids(worker)
