@@ -51,7 +51,7 @@ jobs:
       id: minikube
       uses: medyagh/setup-minikube@latest
     - name: Prepare for Argo Tests
-      run: | 
+      run: |
         minikube start
         kubectl create namespace pivot
         kubectl apply -n pivot -f resources/quick-start-minimal.yaml
@@ -92,7 +92,7 @@ jobs:
       run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
-      
+
   publish-docker-image:
     needs: [pytest-linux, generic-workflow]
     if: github.ref == 'refs/heads/main'
@@ -112,7 +112,7 @@ jobs:
           version=$(python setup.py --version)
           echo "Task Queue Version = ${version}"
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help 
+          docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
           docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
           docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
@@ -121,7 +121,7 @@ jobs:
     needs: [pytest-linux, generic-workflow]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: write
     steps:
       - name: Checkout code
