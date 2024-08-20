@@ -20,17 +20,20 @@ def create_logger(module_name: str, local_output_file: str, logger_level=logging
 
 
 def get_log_fp():
-    filename = str(datetime.datetime.now())
-    filename = filename.replace(" ", "_")
-    filename = filename.replace(":", "_")
-    filename = filename.split(".")[0]
-    filename = filename.replace("-", "_")
-    filename = filename + ".log"
+    log = str(datetime.datetime.now())
+    log = log.replace(" ", "_")
+    log = log.replace(":", "_")
+    log = log.split(".")[0]
+    log = log.replace("-", "_")
+    log = log + ".log"
 
-    if not os.path.isdir("../logs"):
-        os.mkdir("../logs")
-    return os.path.join(f"../logs/{filename}")
+    log_dir = os.getcwd() + "/logs"
+    if not os.path.isdir(log_dir):
+        os.mkdir(log_dir)
+    return os.path.join(log_dir, log)
 
 
-logger_level = sys.argv
-logger = create_logger(__name__, get_log_fp())
+# logger_level = sys.argv
+# logger = create_logger(__name__, get_log_fp(), logger_level)
+
+print(sys.argv)
