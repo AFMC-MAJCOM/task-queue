@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
+      - uses: actions/checkout@v3
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
