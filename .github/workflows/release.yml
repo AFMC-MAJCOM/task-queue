@@ -10,7 +10,7 @@ permissions:
 
 jobs:
    publish-docker-image:
-     if: github.ref != 'refs/heads/main'
+     if: github.ref == 'refs/heads/main'
      permissions:
        packages: write
      uses: ./.github/workflows/publish_docker_image.yml
