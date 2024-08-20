@@ -39,11 +39,10 @@ jobs:
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: echo "PUBLISH_DOCKER_IMAGE=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
-        if: "${PUBLISH_DOCKER_IMAGE}" == 'True'
 
   publish-docker-image:
     needs: [validate, publish-image-check]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && '$PUBLISH_DOCKER_IMAGE' == 'True'
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
