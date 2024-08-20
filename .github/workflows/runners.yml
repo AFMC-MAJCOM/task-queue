@@ -32,7 +32,7 @@ jobs:
 
   publish-image-check:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref != 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Main Version
@@ -42,7 +42,7 @@ jobs:
 
   publish-docker-image:
     needs: [validate, publish-image-check]
-    if: github.ref == 'refs/heads/main' && '$PUBLISH_DOCKER_IMAGE' == 'True'
+    if: github.ref != 'refs/heads/main' && '$PUBLISH_DOCKER_IMAGE' == 'True'
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
