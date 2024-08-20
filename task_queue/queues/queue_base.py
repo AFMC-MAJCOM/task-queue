@@ -18,6 +18,42 @@ class QueueBase(ABC):
     """Abstract Base Class for Queue.
     """
 
+    def _put(self, items):
+        """Remove Item from items if the Item ID exists in the queue.
+
+        Parameters:
+        ------------
+        items: dict
+            Dictionary of Queue Items where Item is a key:value pair, where key
+            is the item ID and value is the queue item body.
+            The item ID must be a string and the item body must be
+            serializable.
+
+        Returns:
+        ------------
+        Returns a dictionary of items.
+        """
+        # Get all IDs in queue
+        queue_ids = (self.lookup_state(QueueItemStage.FAIL)
+        + self.lookup_state(QueueItemStage.SUCCESS)
+        + self.lookup_state(QueueItemStage.WAITING)
+        + self.lookup_state(QueueItemStage.PROCESSING))
+
+        item_ids = items.keys()
+        duplicate_ids = list(set(item_ids).intersection(set(queue_ids)))
+
+        for id_ in duplicate_ids:
+            warnings.filterwarnings(
+                "always",
+                category=UserWarning,
+                module=r'.*queue_base'
+            )
+            warnings.warn(f"Item {id_} already in queue. Skipping.")
+
+        for k in duplicate_ids:
+            items.pop(k)
+        return items
+
     @abstractmethod
     def put(self, items):
         """Adds a new Item to the Queue in the WAITING stage.

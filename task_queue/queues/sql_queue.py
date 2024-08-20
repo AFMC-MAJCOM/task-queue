@@ -57,6 +57,7 @@ class SQLQueue(QueueBase):
         Returns 0 if it was successful or else raises exception.
         """
         success = 0
+        # items = self._put(items)
 
         if len(items) == 0:
             return success

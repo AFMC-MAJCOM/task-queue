@@ -65,8 +65,9 @@ class JsonS3Queue(QueueBase):
         in_index = get_queue_index_items(self.queue_index_path)
         item_keys_to_add = subtract_duplicates(items.keys(), in_index)
 
-        # These are only items whose keys are not in the index
+        # # These are only items whose keys are not in the index
         items_to_add = { k:items[k] for k in item_keys_to_add }
+        # items_to_add = self._put(items)
 
         # Path of each item is its ID
         item_paths = {
