@@ -41,7 +41,7 @@ jobs:
         run: echo "PUBLISH_DOCKER_IMAGE=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
 
   publish-docker-image:
-    needs: [validate, publish-image-check]
+    needs: [publish-image-check]
     if: github.ref != 'refs/heads/main' && '$PUBLISH_DOCKER_IMAGE' == 'True'
     permissions:
       packages: write
