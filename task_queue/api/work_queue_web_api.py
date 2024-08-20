@@ -1,7 +1,6 @@
 """Wherein is contained the functions and classes concering the Work Queue Web
 API.
 """
-import logging
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le
@@ -14,14 +13,13 @@ from task_queue.queues.queue_base import QueueItemStage
 from task_queue.queues.s3_queue import json_s3_queue
 from task_queue.queues.sql_queue import json_sql_queue
 from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue import config
+from task_queue import config, logger
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
 api_settings = config.TaskQueueApiSettings()
+logger.setLevel(api_settings.LOGGER_LEVEL)
+logger.info(f"Logger level set to {logger.level}")
 api_settings.log_settings()
 app = FastAPI()
 

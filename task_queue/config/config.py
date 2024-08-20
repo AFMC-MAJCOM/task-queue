@@ -1,6 +1,5 @@
 """Contains functions and classes concerning configuration management.
 """
-
 import logging
 import os
 from enum import Enum
@@ -11,9 +10,8 @@ from pydantic import (
     Field,
     field_validator,
 )
+from task_queue import logger
 
-
-logger = logging.getLogger(__name__)
 
 
 def get_config_file_path() -> str:
@@ -56,6 +54,16 @@ class TaskQueueBaseSetting(BaseSettings):
         env_file_encoding='utf-8',
         extra='ignore'
     )
+    _LOGGER_LEVEL: str = 'DEBUG'
+
+    @property
+    def LOGGER_LEVEL(self):
+        try:
+            return getattr(logging, self._LOGGER_LEVEL)
+        except AttributeError as e:
+            log.info("Given logger level is invalid defaulting to DEBUG")
+            self.LOGGER_LEVEL = 'DEBUG'
+            return getattr(logging, self._LOGGER_LEVEL)
 
     def log_settings(self):
         """Log configuration parameters"""

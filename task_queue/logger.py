@@ -3,9 +3,9 @@ import sys
 import datetime
 import os
 
-def create_logger(module_name: str, local_output_file: str, logger_level=logging.DEBUG):
+def create_logger(module_name: str, logger_level=logging.DEBUG):
     logger = logging.getLogger(module_name)
-    file_handler = logging.FileHandler(local_output_file)
+    file_handler = logging.FileHandler(get_log_fp())
     stream_handler = logging.StreamHandler(sys.stdout)
     # Add formatting to the statements
     fmt = logging.Formatter(fmt="%(asctime)s [%(levelname)s]: %(message)s")
@@ -33,7 +33,4 @@ def get_log_fp():
     return os.path.join(log_dir, log)
 
 
-# logger_level = sys.argv
-# logger = create_logger(__name__, get_log_fp(), logger_level)
-
-print(sys.argv)
+logger = create_logger(__name__)
