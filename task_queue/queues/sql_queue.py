@@ -4,8 +4,8 @@ from typing import Optional
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import Engine
+from sqlalchemy.dialects.postgresql import insert, JSONB, Any
+from sqlalchemy import Engine, Column
 
 from .queue_base import QueueBase, QueueItemStage
 
@@ -21,7 +21,7 @@ class SqlQueue(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-    json_data: str
+    json_data: Any = Field(sa_column=Column(JSONB))
     index_key: str
     queue_name: str
 
@@ -76,6 +76,7 @@ class SQLQueue(QueueBase):
             except BaseException as e:
                 print(e)
 
+
         with Session(self.engine) as session:
             statement = (insert(SqlQueue).values(db_items) \
                          .on_conflict_do_nothing())
@@ -85,7 +86,7 @@ class SQLQueue(QueueBase):
 
         if len(db_items) != len(items):
             raise BaseException(
-                "Error writing at least one queue object to S3:",
+                "Error writing at least one queue object to SQL:",
                 fail_items)
 
         return success
@@ -248,7 +249,7 @@ class SQLQueue(QueueBase):
             results = session.exec(stmt)
 
             for queue_item in results:
-                item_body = json.loads((queue_item.json_data))
+                item_body = json.loads(queue_item.json_data)
 
         return {
             'item_id':queue_item_id,
