@@ -40,7 +40,7 @@ jobs:
       - name: New Release Version Check
         run: |
             echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
-            echo "$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
+            echo "$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})"
             echo "EOF" >> $GITHUB_ENV
       - name: Clean Up Results
         run: PUBLISH_DOCKER_IMAGE=$(echo "$PUBLISH_DOCKER_IMAGE" | tr -d '\n')
