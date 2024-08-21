@@ -98,12 +98,14 @@ def test_put_get(new_empty_queue):
     """
     qtest.test_put_get(new_empty_queue)
 
+@pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_mixed_duplicates(new_empty_queue):
     """Tests that duplicates are not added to queue but new items are.
     """
     qtest.test_mixed_duplicates(new_empty_queue)
 
+@pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_add_to_queue_no_duplicates(new_empty_queue):
     """Tests that no duplicates are added to the queue.
@@ -116,6 +118,7 @@ def test_get_empty_queue(new_empty_queue):
     """
     qtest.test_get_empty_queue(new_empty_queue)
 
+@pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_exception(new_empty_queue):
     """Tests that put will not add non-JSON serializable items.
@@ -128,6 +131,7 @@ def test_queue_size(new_empty_queue):
     """
     qtest.test_queue_size(new_empty_queue)
 
+@pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_out_of_order(new_empty_queue):
     """Tests out of order.

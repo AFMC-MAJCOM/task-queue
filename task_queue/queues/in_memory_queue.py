@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Any
 import itertools
 import json
-import warnings
 
 from .queue_base import QueueBase, QueueItemStage
 
@@ -79,24 +78,8 @@ class InMemoryQueue(QueueBase):
             The item ID must be a string and the item body must be
             serializable.
         """
-        # # Catch duplicates
-        # duplicate_items = [
-        #     k
-        #     for k,v in items.items()
-        #     if k in self.memory_queue.index
-        # ]
-        # for id_ in duplicate_items:
-        #     warnings.filterwarnings(
-        #         "always",
-        #         category=UserWarning,
-        #         module=r'.*in_memory_queue'
-        #     )
-        #     warnings.warn(f"Item {id_} already in queue. Skipping.")
-
-
         # Filter out IDs that already exist in the index
-        # self.memory_queue.regenerate_index()
-        # items = self._put(items)
+        items = self._put(items)
         filtered_items = {
             k:v
             for k,v in items.items()

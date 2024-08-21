@@ -13,6 +13,11 @@ class QueueItemStage(Enum):
     SUCCESS = 2
     FAIL = 3
 
+warnings.filterwarnings(
+                "always",
+                category=UserWarning,
+                message=r'Item .* already in queue. Skipping'
+            )
 
 class QueueBase(ABC):
     """Abstract Base Class for Queue.
@@ -43,16 +48,12 @@ class QueueBase(ABC):
         duplicate_ids = list(set(item_ids).intersection(set(queue_ids)))
 
         for id_ in duplicate_ids:
-            warnings.filterwarnings(
-                "always",
-                category=UserWarning,
-                module=r'.*queue_base'
-            )
             warnings.warn(f"Item {id_} already in queue. Skipping.")
 
+        no_duplicate_items = items.copy()
         for k in duplicate_ids:
-            items.pop(k)
-        return items
+            no_duplicate_items.pop(k)
+        return no_duplicate_items
 
     @abstractmethod
     def put(self, items):

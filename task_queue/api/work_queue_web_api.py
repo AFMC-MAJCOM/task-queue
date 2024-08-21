@@ -2,6 +2,7 @@
 API.
 """
 import logging
+import warnings
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le
@@ -286,4 +287,9 @@ async def put(items:Dict[str,QueueItemBodyType]) -> None:
         pair, where key is the item ID and value is the queue item body.
         The item ID must be a string and the item body must be serializable.
     """
-    queue.put(items)
+    with warnings.catch_warnings(record=True) as warn:
+        queue.put(items)
+        if len(warn) > 0:
+            warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
+            raise HTTPException(status_code=200,
+                            detail=warnings_list)
