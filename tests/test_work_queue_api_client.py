@@ -106,10 +106,10 @@ def test_client_get_queue_sizes_fail(mock_get):
         test_client.get_queue_sizes()
 
 @mock.patch('requests.post', side_effect=mocked_requests)
-def test_client_requeue(mock_get):
+def test_client_requeue(mock_post):
     """Tests that Client requeue hits the correct endpoint."""
     test_client.requeue('good-item-id')
-    route = mock_get.call_args[0][0]
+    route = mock_post.call_args[0][0]
     assert route == f"{test_client.api_base_url}requeue"
 
 @mock.patch('requests.post', side_effect=mocked_requests_fail)
@@ -125,12 +125,12 @@ def test_client_requeue_bad_input(mock_post):
     assert isinstance(response, dict)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_state(mock_post):
+def test_client_lookup_state(mock_get):
     """Tests that Client lookup_state hits the correct endpoint."""
     response = test_client.lookup_state(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
-@mock.patch('requests.post', side_effect=mocked_requests_fail)
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_lookup_state_fail(mock_get):
     """Tests that Client handles error if lookup_state has a bad response"""
     with pytest.raises(RequestException):

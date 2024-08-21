@@ -178,9 +178,9 @@ class ApiClient(QueueBase):
                                json=item_ids
                               )
         response.raise_for_status()
+        # Notify user if there were any items skipped.
         if response.json():
             for er in response.json()['detail']:
-                
                 warnings.warn(er)
 
     @validate_call
