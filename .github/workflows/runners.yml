@@ -52,7 +52,9 @@ jobs:
       - name: Clean Up Results
         run: PUBLISH_DOCKER_IMAGE=$(echo "$PUBLISH_DOCKER_IMAGE" | tr -d '\n')
       - name: Results
-        run: echo "$PUBLISH_DOCKER_IMAGE"
+        run: |
+            echo "$PUBLISH_DOCKER_IMAGE"
+            echo ('$PUBLISH_DOCKER_IMAGE' == 'True')
 
   publish-docker-image:
     needs: [publish-image-check]
