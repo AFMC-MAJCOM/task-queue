@@ -43,6 +43,9 @@ def mocked_requests(*args, **kwargs):
                                 "status":QueueItemStage.WAITING,
                                 "item_body":"good-item-body"},
                                 200)
+    if '/requeue' in route:
+        return MockResponse(None,200)
+
     if '/get/' in route:
         split = route.split('/')
         split[len(split) - 1] = '{n_items}'
@@ -118,11 +121,10 @@ def test_client_requeue_fail(mock_post):
     with pytest.raises(RequestException):
         test_client.requeue('')
 
-@mock.patch('requests.post', side_effect=mocked_requests)
-def test_client_requeue_bad_input(mock_post):
-    """Tests that Client gets good response even if input is bad."""
-    response = test_client.requeue('bad-item-id')
-    assert isinstance(response, dict)
+def test_client_requeue_invalid_parameter():
+    """Tests that Client Client throws pydantic error for requeue."""
+    with pytest.raises(ValidationError):
+        test_client.requeue(1)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_state(mock_get):
