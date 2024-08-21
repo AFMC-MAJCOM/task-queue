@@ -38,17 +38,17 @@ jobs:
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
-        run: "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})"
-        # echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
-        # echo "EOF" >> $GITHUB_ENV
-      - name: Clean Up Results
-        run: echo "PUBLISH_DOCKER_IMAGE=$(echo -n '$publish_docker')" >> $GITHUB_ENV
-      - name: Results
-        run: echo "$PUBLISH_DOCKER_IMAGE"
+        run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
+      - name: Successful Version Check
+        if: success()
+        run: echo "PUBLISH_DOCKER_IMAGE=true" >> $GITHUB_ENV
+      - name: Failed Version Check
+        if: failure()
+        run: echo "PUBLISH_DOCKER_IMAGE=false" >> $GITHUB_ENV
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'True') }}
+    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'true') }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
