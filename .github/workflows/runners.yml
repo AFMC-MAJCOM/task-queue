@@ -50,7 +50,7 @@ jobs:
             echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
       - name: Clean Up Results
-        run: PUBLISH_DOCKER_IMAGE=$(echo "$PUBLISH_DOCKER_IMAGE" | tr -d '\n') >> $GITHUB_ENV
+        run: PUBLISH_DOCKER_IMAGE=$(echo "$PUBLISH_DOCKER_IMAGE" | tr -d '\n')
       - name: Results
         run: echo "$PUBLISH_DOCKER_IMAGE"
 
