@@ -41,6 +41,10 @@ jobs:
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Add Result to ENV
         run: echo PUBLISH_DOCKER_IMAGE=${{true}} >> $GITHUB_ENV
+      - name: Test Conditional
+        run: |
+            echo $PUBLISH_DOCKER_IMAGE
+            echo $PUBLISH_DOCKER_IMAGE == true
       #   run: |
       #       echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
       #       echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
