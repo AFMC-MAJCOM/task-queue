@@ -59,7 +59,8 @@ jobs:
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'true') }}
+    if: github.ref != 'refs/heads/main'
+    if: '$PUBLISH_DOCKER_IMAGE' == 'true'
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
