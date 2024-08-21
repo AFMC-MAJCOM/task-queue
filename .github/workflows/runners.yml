@@ -43,7 +43,7 @@ jobs:
             echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
       - name: Result
-        run: echo "$PUBLISH_DOCKER_IMAGE"
+        run: echo ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'True') }}
 
   publish-docker-image:
     needs: [publish-image-check]
