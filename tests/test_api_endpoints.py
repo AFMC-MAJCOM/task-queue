@@ -2,7 +2,6 @@
 """
 import pytest
 import os
-import warnings
 
 from fastapi.testclient import TestClient
 
