@@ -1,9 +1,10 @@
 """Wherein is contained the ApiClient class.
 """
 from typing import Dict, Any, Union, List, Tuple
+import warnings
+
 from pydantic import validate_call, PositiveInt
 import requests
-import warnings
 
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
