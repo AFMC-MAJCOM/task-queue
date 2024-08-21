@@ -125,7 +125,7 @@ def test_client_requeue_bad_input(mock_post):
     assert isinstance(response, dict)
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_lookup_state(mock_get):
+def test_client_lookup_state(mock_post):
     """Tests that Client lookup_state hits the correct endpoint."""
     response = test_client.lookup_state(QueueItemStage.WAITING)
     assert isinstance(response, dict)
