@@ -32,34 +32,29 @@ jobs:
 
   publish-image-check:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     permissions:
           contents: write
     steps:
       - uses: actions/checkout@v3
-      # - name: Copy files
-      #   working-directory: ${{ env.WORK_DIR }}/local_checkout
-      #   run: cp -r .github "$GITHUB_WORKSPACE/"
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Successful Version Check
         if: success()
-        # run: echo "PUBLISH_DOCKER_IMAGE=$(true)" >> $GITHUB_ENV
         run: echo "Publishing docker image"
         env:
            PUBLISH_DOCKER_IMAGE: ${{true}}
       - name: Failed Version Check
         if: failure()
-        # run: echo "PUBLISH_DOCKER_IMAGE=$(false)" >> $GITHUB_ENV
         run: echo "Not publishing docker image"
         env:
            PUBLISH_DOCKER_IMAGE: ${{false}}
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
+    if: ${{ (github.ref == 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
