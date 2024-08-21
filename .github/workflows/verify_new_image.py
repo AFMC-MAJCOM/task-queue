@@ -34,6 +34,6 @@ if __name__=="__main__":
 
     with open(env_file, "a") as myfile:
         if new_release:
-            myfile.write("PUBLISH_DOCKER_IMAGE=1")
+            myfile.write("PUBLISH_DOCKER_IMAGE='1'")
         else:
-            myfile.write("PUBLISH_DOCKER_IMAGE=0")
+            myfile.write("PUBLISH_DOCKER_IMAGE='0'")
