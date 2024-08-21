@@ -45,7 +45,7 @@ jobs:
       - name: Result
         run: |
             echo "$PUBLISH_DOCKER_IMAGE"
-            echo ${{ ('$PUBLISH_DOCKER_IMAGE' == 'True\n') }}
+            echo ${{ ($PUBLISH_DOCKER_IMAGE == 'True') }}
 
   publish-docker-image:
     needs: [publish-image-check]
