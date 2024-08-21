@@ -42,7 +42,7 @@ jobs:
         # echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
         # echo "EOF" >> $GITHUB_ENV
       - name: Clean Up Results
-        run: "PUBLISH_DOCKER_IMAGE=$(echo -n '$publish_docker')" >> $GITHUB_ENV
+        run: echo "PUBLISH_DOCKER_IMAGE=$(echo -n '$publish_docker')" >> $GITHUB_ENV
       - name: Results
         run: echo "$PUBLISH_DOCKER_IMAGE"
 
