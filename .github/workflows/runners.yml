@@ -43,7 +43,7 @@ jobs:
       - name: Result
         run: echo "$PUBLISH_DOCKER_IMAGE"
       - name: Condition
-        run: echo ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
+        run: echo ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'True') }}
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
@@ -57,7 +57,7 @@ jobs:
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
+    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'True') }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
