@@ -33,4 +33,7 @@ if __name__=="__main__":
     env_file = os.getenv('GITHUB_ENV')
 
     with open(env_file, "a") as myfile:
-        myfile.write(f"PUBLISH_DOCKER_IMAGE={new_release}")
+        if new_release:
+            myfile.write("PUBLISH_DOCKER_IMAGE=1")
+        else:
+            myfile.write("PUBLISH_DOCKER_IMAGE=0")
