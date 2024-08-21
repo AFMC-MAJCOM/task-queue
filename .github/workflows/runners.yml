@@ -38,12 +38,7 @@ jobs:
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
-        run: |
-            {
-                echo "PUBLISH_DOCKER_IMAGE<<EOF"
-                python .github/workflows/verify_new_image.py ${MAIN_VERSION}
-                echo EOF
-            } >> $GITHUB_ENV
+        run: echo "PUBLISH_DOCKER_IMAGE=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
 
   publish-docker-image:
     needs: [publish-image-check]
