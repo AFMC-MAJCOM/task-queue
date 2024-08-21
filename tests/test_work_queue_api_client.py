@@ -86,18 +86,27 @@ def test_client_description_fail(mock_get):
         test_client.description()
 
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_get_queue_size(mock_get):
+def test_client_size(mock_get):
     response = test_client.size(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
+@mock.patch('requests.get', side_effect=mocked_requests_fail)
+def test_client_size_fail(mock_get):
+    with pytest.raises(RequestException):
+        test_client.size(QueueItemStage.WAITING)
+
+def test_client_size_invalid_parameter():
+    with pytest.raises(ValidationError):
+        test_client.size("BAD_STAGE")
+
 @mock.patch('requests.get', side_effect=mocked_requests)
-def test_client_get_queue_sizes(mock_get):
+def test_client_sizes(mock_get):
     test_client.sizes()
     route = mock_get.call_args[0][0]
     assert route == f"{test_client.api_base_url}sizes"
 
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
-def test_client_get_queue_sizes_fail(mock_get):
+def test_client_sizes_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.sizes()
 
