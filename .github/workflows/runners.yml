@@ -39,10 +39,8 @@ jobs:
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
-      - name: Result
-        run: |
-            echo PUBLISH_DOCKER_IMAGE=${{true}} >> $GITHUB_ENV
-            echo ${{ ($PUBLISH_DOCKER_IMAGE == true) }}
+      - name: Add Result to ENV
+        run: echo PUBLISH_DOCKER_IMAGE=${{true}} >> $GITHUB_ENV
       #   run: |
       #       echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
       #       echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
