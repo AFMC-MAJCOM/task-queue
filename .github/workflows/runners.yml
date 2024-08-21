@@ -33,8 +33,6 @@ jobs:
   publish-image-check:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    permissions:
-          contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Main Version
@@ -53,7 +51,7 @@ jobs:
            PUBLISH_DOCKER_IMAGE: ${{false}}
 
   publish-docker-image:
-    needs: [publish-image-check]
+    needs: [validate, publish-image-check]
     if: ${{ (github.ref == 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
     permissions:
       packages: write
