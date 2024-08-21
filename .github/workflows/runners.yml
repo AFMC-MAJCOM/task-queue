@@ -45,7 +45,7 @@ jobs:
       - name: Condition
         run: echo ${{ (github.ref != 'refs/heads/main') }}
       - name: Condition 2
-        run: echo ${{  ('$PUBLISH_DOCKER_IMAGE' == '$PUBLISH_DOCKER_IMAGE_VALID') }}
+        run: echo ${{ (${PUBLISH_DOCKER_IMAGE} == ${PUBLISH_DOCKER_IMAGE_VALID}) }}
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
