@@ -48,17 +48,18 @@ jobs:
         if: success()
         uses: docker/login-action@v1
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-              version=$(python setup.py --version)
-              echo "Task Queue Version = ${version}"
-              docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
-              docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
-              docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
-              docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
-              docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
+           run: echo "Here"
+          # registry: ghcr.io
+          # username: ${{ github.actor }}
+          # password: ${{ secrets.GITHUB_TOKEN }}
+          # run: |
+          #     version=$(python setup.py --version)
+          #     echo "Task Queue Version = ${version}"
+          #     docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest
+          #     docker run ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
+          #     docker push ghcr.io/afmc-majcom/task-queue/task-queue:latest
+          #     docker tag ghcr.io/afmc-majcom/task-queue/task-queue:latest ghcr.io/afmc-majcom/task-queue/task-queue:${version}
+          #     docker push ghcr.io/afmc-majcom/task-queue/task-queue:${version}
         # uses: ./.github/workflows/publish_docker_image.yml
         # run: echo "PUBLISH_DOCKER_IMAGE=${true}" >> $GITHUB_ENV
       - name: Failed Version Check
