@@ -51,7 +51,7 @@ jobs:
            PUBLISH_DOCKER_IMAGE: ${{false}}
 
   publish-docker-image:
-    needs: [validate, publish-image-check]
+    needs: [publish-image-check]
     if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE') }}
     permissions:
       packages: write
