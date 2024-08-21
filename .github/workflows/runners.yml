@@ -46,10 +46,14 @@ jobs:
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Successful Version Check
         if: success()
-        run: echo "PUBLISH_DOCKER_IMAGE=$(true)" >> $GITHUB_ENV
+        # run: echo "PUBLISH_DOCKER_IMAGE=$(true)" >> $GITHUB_ENV
+        env:
+           PUBLISH_DOCKER_IMAGE: 'true'
       - name: Failed Version Check
         if: failure()
-        run: echo "PUBLISH_DOCKER_IMAGE=$(false)" >> $GITHUB_ENV
+        # run: echo "PUBLISH_DOCKER_IMAGE=$(false)" >> $GITHUB_ENV
+        env:
+           PUBLISH_DOCKER_IMAGE: 'false'
 
   publish-docker-image:
     needs: [publish-image-check]
