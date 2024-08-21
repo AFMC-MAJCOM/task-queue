@@ -3,11 +3,18 @@
 from typing import Dict, Any, Union, List, Tuple
 from pydantic import validate_call, PositiveInt
 import requests
+import warnings
 
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 from ..queues.queue_base import QueueBase, QueueItemStage
 
+
+warnings.filterwarnings(
+                    "always",
+                    category=UserWarning,
+                    module=r'.*work_queue_api_client'
+                )
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -171,7 +178,10 @@ class ApiClient(QueueBase):
                                json=item_ids
                               )
         response.raise_for_status()
-        return response.json()
+        if response.json():
+            for er in response.json()['detail']:
+                
+                warnings.warn(er)
 
     @validate_call
     def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:
