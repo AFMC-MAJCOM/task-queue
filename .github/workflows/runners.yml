@@ -44,7 +44,7 @@ jobs:
       - name: Clean Up Results
         run: PUBLISH_DOCKER_IMAGE=$(echo -n "$publish_docker")
       - name: Results
-        run: echo "$PUBLISH_DOCKER_IMAGE"
+        run: echo "$PUBLISH_DOCKER_IMAGE" >> $GITHUB_ENV
 
   publish-docker-image:
     needs: [publish-image-check]
