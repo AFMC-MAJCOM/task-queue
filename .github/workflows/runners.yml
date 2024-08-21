@@ -41,17 +41,19 @@ jobs:
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Successful Version Check
         if: success()
-        run: echo "PUBLISH_DOCKER_IMAGE=${true}" >> $GITHUB_ENV
+        uses: ./.github/workflows/publish_docker_image.yml
+        # run: echo "PUBLISH_DOCKER_IMAGE=${true}" >> $GITHUB_ENV
       - name: Failed Version Check
         if: failure()
-        run: echo "PUBLISH_DOCKER_IMAGE=${false}" >> $GITHUB_ENV
+        # run: echo "PUBLISH_DOCKER_IMAGE=${false}" >> $GITHUB_ENV
+        run: echo "Not publishing a new docker image."
 
-  publish-docker-image:
-    needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'true') }}
-    permissions:
-      packages: write
-    uses: ./.github/workflows/publish_docker_image.yml
+  # publish-docker-image:
+  #   needs: [publish-image-check]
+  #   if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'true') }}
+  #   permissions:
+  #     packages: write
+  #   uses: ./.github/workflows/publish_docker_image.yml
 
   create-git-tag:
     needs: [validate]
