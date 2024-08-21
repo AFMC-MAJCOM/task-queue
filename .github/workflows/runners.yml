@@ -46,8 +46,8 @@ jobs:
       #   if: failure()
       #   run: echo "PUBLISH_DOCKER_IMAGE=dont_publish" >> $GITHUB_ENV
         run: |
-            echo -n "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
-            echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
+            echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
+            echo -n "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
 
   publish-docker-image:
