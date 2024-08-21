@@ -38,25 +38,25 @@ jobs:
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
-        run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
-      - name: Add Result to ENV
-        if: success()
-        run: echo "PUBLISH_DOCKER_IMAGE=publish" >> $GITHUB_ENV
-      - name: Add Result to ENV
-        if: failure()
-        run: echo "PUBLISH_DOCKER_IMAGE=dont_publish" >> $GITHUB_ENV
-      #   run: |
-      #       echo "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
-      #       echo "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
-      #       echo "EOF" >> $GITHUB_ENV
-      # - name: Result
-      #   run: |
-      #       echo "$PUBLISH_DOCKER_IMAGE"
-      #       echo ${{ ($PUBLISH_DOCKER_IMAGE == 'True') }}
+      #   run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
+      # - name: Add Result to ENV
+      #   if: success()
+      #   run: echo "PUBLISH_DOCKER_IMAGE=publish" >> $GITHUB_ENV
+      # - name: Add Result to ENV
+      #   if: failure()
+      #   run: echo "PUBLISH_DOCKER_IMAGE=dont_publish" >> $GITHUB_ENV
+        run: |
+            echo -n "PUBLISH_DOCKER_IMAGE<<EOF" >> $GITHUB_ENV
+            echo -n "publish_docker=$(python .github/workflows/verify_new_image.py ${MAIN_VERSION})" >> $GITHUB_ENV
+            echo -n "EOF" >> $GITHUB_ENV
+      - name: Result
+        run: |
+            echo "$PUBLISH_DOCKER_IMAGE"
+            echo ${{ ($PUBLISH_DOCKER_IMAGE == 'True') }}
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'publish') }}
+    if: ${{ (github.ref != 'refs/heads/main') && ('$PUBLISH_DOCKER_IMAGE' == 'True') }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
