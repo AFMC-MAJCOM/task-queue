@@ -37,9 +37,9 @@ jobs:
           contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: Copy files
-        working-directory: ${{ env.WORK_DIR }}/local_checkout
-        run: cp -r .github "$GITHUB_WORKSPACE/"
+      # - name: Copy files
+      #   working-directory: ${{ env.WORK_DIR }}/local_checkout
+      #   run: cp -r .github "$GITHUB_WORKSPACE/"
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
