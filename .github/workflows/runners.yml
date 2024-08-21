@@ -47,13 +47,13 @@ jobs:
       - name: Successful Version Check
         if: success()
         # run: echo "PUBLISH_DOCKER_IMAGE=$(true)" >> $GITHUB_ENV
-        run: "Publishing docker image"
+        run: echo "Publishing docker image"
         env:
            PUBLISH_DOCKER_IMAGE: 'true'
       - name: Failed Version Check
         if: failure()
         # run: echo "PUBLISH_DOCKER_IMAGE=$(false)" >> $GITHUB_ENV
-        run: "Not publishing docker image"
+        run: echo "Not publishing docker image"
         env:
            PUBLISH_DOCKER_IMAGE: 'false'
 
