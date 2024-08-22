@@ -60,7 +60,9 @@ jobs:
 
   publish-docker-image:
     needs: [publish-image-check]
-    if: ${{ (github.ref != 'refs/heads/main') && ${CREATE_DOCKER_IMAGE} }}
+    env:
+       CREATE_DOCKER_IMAGE: ${{ env.CREATE_DOCKER_IMAGE }}
+    if: ${{ (github.ref != 'refs/heads/main') && ("$CREATE_DOCKER_IMAGE") }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
