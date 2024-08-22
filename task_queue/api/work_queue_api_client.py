@@ -16,6 +16,12 @@ warnings.filterwarnings(
                     module=r'.*work_queue_api_client'
                 )
 
+warnings.filterwarnings(
+                    "always",
+                    category=UserWarning,
+                    module=r'.*work_queue_api_client'
+                )
+
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
 
@@ -182,6 +188,10 @@ class ApiClient(QueueBase):
                                json=item_ids
                               )
         response.raise_for_status()
+        # Notify user if there were any items skipped.
+        if response.json():
+            for er in response.json()['detail']:
+                warnings.warn(er)
 
     @validate_call
     def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:

@@ -274,7 +274,12 @@ def requeue(item_ids:Union[str,list[str]]) -> None:
     item_ids: [str]
         ID of Queue Item
     """
-    queue.requeue(item_ids)
+    with warnings.catch_warnings(record=True) as warn:
+        queue.requeue(item_ids)
+        if len(warn) > 0:
+            warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
+            raise HTTPException(status_code=200,
+                            detail=warnings_list)
 
 @app.post("/api/v1/queue/put")
 async def put(items:Dict[str,QueueItemBodyType]) -> None:
