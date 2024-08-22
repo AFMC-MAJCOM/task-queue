@@ -44,7 +44,7 @@ jobs:
       - name: Export Results
         id: export
         env:
-          result: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
+          result: ${{ (github.ref != 'refs/heads/main') && (env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID) }}
         run: |
             echo "create_docker_image=$result" >> "$GITHUB_OUTPUT"
             echo "$result"
@@ -70,7 +70,7 @@ jobs:
   publish-docker-image:
     needs: [publish-image-check]
     runs-on: ubuntu-latest
-    if: "(github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE)"
+    if: "(needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE)"
     steps:
       - name: Print
         env:
