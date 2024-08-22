@@ -28,6 +28,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
+        export QUEUE_IMPLEMENTATION=in-memory
         pytest -vv -m unit
 
   pytest-linux:
