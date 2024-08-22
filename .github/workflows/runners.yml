@@ -48,7 +48,7 @@ jobs:
         run: |
             echo "$PUBLISH_DOCKER_IMAGE"
             echo "$PUBLISH_DOCKER_IMAGE_VALID"
-            echo ${{ "$PUBLISH_DOCKER_IMAGE"=="$PUBLISH_DOCKER_IMAGE_VALID" }}
+            echo ("$PUBLISH_DOCKER_IMAGE"=="$PUBLISH_DOCKER_IMAGE_VALID")
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
