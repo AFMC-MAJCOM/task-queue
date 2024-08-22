@@ -70,7 +70,7 @@ jobs:
   publish-docker-image:
     needs: [publish-image-check]
     runs-on: ubuntu-latest
-    if: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
+    if: "(github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE)"
     steps:
       - name: Print
         env:
