@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools_scm]
+write_to = "src/task_queue/_version.py"
+
+
+[project]
+name = "task_queue"
+dependencies = [
+    "fastapi[all]",
+    "pandas",
+    "pendulum >= 2.1.2",
+    "psycopg2-binary",
+    "pyarrow",
+    "requests",
+    "s3fs >= 2023.6.0",
+    "sqlmodel",
+]
+dynamic = ["version"]
