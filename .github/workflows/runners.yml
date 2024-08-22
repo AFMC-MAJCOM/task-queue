@@ -79,7 +79,7 @@ jobs:
         # env:
         #    test: ${{ needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE }}
         #    test2: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
-        run: echo "This shouldnt happen"
+        run: echo "This should happen"
     # permissions:
     #   packages: write
     # uses: ./.github/workflows/publish_docker_image.yml
