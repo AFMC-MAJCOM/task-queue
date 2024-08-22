@@ -161,6 +161,11 @@ class QueueBase(ABC):
         failed_ids = self.lookup_state(QueueItemStage.FAIL)
         missing_ids = list(set(item_ids) - set(failed_ids))
         for id_ in missing_ids:
+            warnings.filterwarnings(
+                "always",
+                category=UserWarning,
+                module=r'.*queue_base'
+            )
             warnings.warn(f"Item {id_} not in a FAIL state. Skipping.")
 
         item_ids = [id_ for id_ in item_ids if id_ in failed_ids]

@@ -185,10 +185,14 @@ def test_v1_queue_requeue_invalid():
     """
     queue.put(default_items)
 
-    # Check that it does not fail when input is invalid
-    with pytest.warns(UserWarning):
-        response = client.post("/api/v1/queue/requeue", json='bad-item-id')
-        assert response.status_code == 200
+    expected_dict = {
+        "detail":['Item bad-item-id not in a FAIL state. Skipping.']
+    }
+
+    # Check that it does not fail when input is invalid but informs the user
+    response = client.post("/api/v1/queue/requeue", json='bad-item-id')
+    assert response.status_code == 200
+    assert response.json() == expected_dict
 
 def test_v1_queue_lookup_item():
     """Tests the lookup_item endpoint.
