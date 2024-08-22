@@ -32,7 +32,7 @@ jobs:
 
   publish-image-check:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     outputs:
        PUBLISH_DOCKER_IMAGE: ${{ steps.export.outputs.publish }}
        PUBLISH_DOCKER_IMAGE_VALID: ${{ steps.export.outputs.valid }}
@@ -52,7 +52,7 @@ jobs:
             echo "valid=$valid_check" >> "$GITHUB_OUTPUT"
 
   publish-docker-image:
-    needs: [publish-image-check]
+    needs: [validate, publish-image-check]
     if: needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE == needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE_VALID
     permissions:
       packages: write
