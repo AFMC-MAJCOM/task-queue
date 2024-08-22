@@ -34,7 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     outputs:
-       CREATE_DOCKER_IMAGE: ${{ steps.export.outputs.create_docker_image }}
+       # CREATE_DOCKER_IMAGE: ${{ steps.export.outputs.create_docker_image }}
+       PUBLISH_DOCKER_IMAGE: ${{ steps.export.outputs.publish }}
+       PUBLISH_DOCKER_IMAGE_VALID: ${{ steps.export.outputs.valid }}
     steps:
       - uses: actions/checkout@v3
       - name: Main Version
@@ -44,10 +46,11 @@ jobs:
       - name: Export Results
         id: export
         env:
-          result: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
+          publish_result: ${{ env.PUBLISH_DOCKER_IMAGE }}
+          valid_check: ${{ env.PUBLISH_DOCKER_IMAGE_VALID }}
         run: |
-            echo "create_docker_image=$result" >> "$GITHUB_OUTPUT"
-            echo "$result"
+            echo "publish=$publish_result" >> "$GITHUB_OUTPUT"
+            echo "valid=$valid_check" >> "$GITHUB_OUTPUT"
       # - name: Result
       #   run: echo "$PUBLISH_DOCKER_IMAGE"
       # - name: Condition
@@ -70,15 +73,13 @@ jobs:
   publish-docker-image:
     needs: [publish-image-check]
     runs-on: ubuntu-latest
-    if: needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE
+    if: needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE == needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE_VALID
     steps:
       - name: Print
-        env:
-           test: ${{ needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE }}
-           test2: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
-        run: |
-            echo "$test"
-            echo "$test2"
+        # env:
+        #    test: ${{ needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE }}
+        #    test2: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
+        run: echo "This shouldnt happen"
     # permissions:
     #   packages: write
     # uses: ./.github/workflows/publish_docker_image.yml
