@@ -17,9 +17,8 @@ from task_queue import config, logger
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 
-api_settings = config.TaskQueueApiSettings()
+api_settings = config.get_task_queue_settings(config.TaskQueueApiSettings)
 logger.setLevel(api_settings.LOGGER_LEVEL)
-logger.info(f"Logger level set to {logger.level}")
 api_settings.log_settings()
 app = FastAPI()
 
