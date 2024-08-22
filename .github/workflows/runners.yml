@@ -39,14 +39,14 @@ jobs:
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
-      - name: Result
-        run: echo "$PUBLISH_DOCKER_IMAGE"
-      - name: Condition
-        run: echo ${{ (github.ref != 'refs/heads/main') }}
-      - name: Condition 2
-        env:
-           CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
-        run: echo "$CREATE_DOCKER_IMAGE" >> $GITHUB_ENV
+      # - name: Result
+      #   run: echo "$PUBLISH_DOCKER_IMAGE"
+      # - name: Condition
+      #   run: echo ${{ (github.ref != 'refs/heads/main') }}
+      # - name: Condition 2
+      #   env:
+      #      CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
+      #   run: echo "$CREATE_DOCKER_IMAGE" >> $GITHUB_ENV
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
@@ -61,7 +61,7 @@ jobs:
   publish-docker-image:
     needs: [publish-image-check]
     env:
-       CREATE_DOCKER_IMAGE: ${{ env.CREATE_DOCKER_IMAGE }}
+       CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
     if: ${{ (github.ref != 'refs/heads/main') && ("$CREATE_DOCKER_IMAGE") }}
     permissions:
       packages: write
