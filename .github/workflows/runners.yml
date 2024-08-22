@@ -46,9 +46,9 @@ jobs:
         run: echo ${{ (github.ref != 'refs/heads/main') }}
       - name: Condition 2
         run: |
-            echo is_valid="$PUBLISH_DOCKER_IMAGE"
-            echo compare_to="$PUBLISH_DOCKER_IMAGE_VALID"
-            echo ${{ is_valid=compare_to }}
+            echo "${{PUBLISH_DOCKER_IMAGE}}"
+            echo "${{PUBLISH_DOCKER_IMAGE_VALID}}"
+            echo ${{ "${{PUBLISH_DOCKER_IMAGE}}"=="${{PUBLISH_DOCKER_IMAGE_VALID}}" }}
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
