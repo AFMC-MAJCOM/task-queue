@@ -45,7 +45,9 @@ jobs:
         id: export
         env:
           result: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
-        run: echo "create_docker_image=$result" >> "$GITHUB_OUTPUT"
+        run: |
+            echo "create_docker_image=$result" >> "$GITHUB_OUTPUT"
+            echo "$result"
       # - name: Result
       #   run: echo "$PUBLISH_DOCKER_IMAGE"
       # - name: Condition
