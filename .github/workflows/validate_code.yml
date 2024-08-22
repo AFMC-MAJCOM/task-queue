@@ -32,15 +32,6 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install minio
-      run: |
-        wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20230518000536.0.0_amd64.deb -O minio.deb
-        sudo dpkg -i minio.deb
-    - name: Launch minio
-      continue-on-error: true
-      run: |
-        mkdir ~/minio
-        minio server ~/minio --console-address :9090 &!
 
     - name: Install dependencies
       run: |
