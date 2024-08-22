@@ -16,11 +16,6 @@ warnings.filterwarnings(
                     module=r'.*work_queue_api_client'
                 )
 
-warnings.filterwarnings(
-                    "always",
-                    category=UserWarning,
-                    module=r'.*work_queue_api_client'
-                )
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
