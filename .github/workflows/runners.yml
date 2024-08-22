@@ -33,12 +33,19 @@ jobs:
   publish-image-check:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
+    outputs:
+       CREATE_DOCKER_IMAGE: ${{ steps.export.outputs.create_docker_image }}
     steps:
       - uses: actions/checkout@v3
       - name: Main Version
         run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
+      - name: Export Results
+        id: export
+        env:
+          result: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
+        run: echo "create_docker_image=$result" >> "$GITHUB_OUTPUT"
       # - name: Result
       #   run: echo "$PUBLISH_DOCKER_IMAGE"
       # - name: Condition
@@ -60,9 +67,7 @@ jobs:
 
   publish-docker-image:
     needs: [publish-image-check]
-    # env:
-    #    CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
-    if: " (github.ref != 'refs/heads/main') && '$PUBLISH_DOCKER_IMAGE' == '$PUBLISH_DOCKER_IMAGE_VALID') "
+    if: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
     permissions:
       packages: write
     uses: ./.github/workflows/publish_docker_image.yml
