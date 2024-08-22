@@ -60,12 +60,16 @@ jobs:
 
   publish-docker-image:
     needs: [publish-image-check]
-    env:
-       CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
-    if: ${{ (github.ref != 'refs/heads/main') && ("$CREATE_DOCKER_IMAGE") }}
     permissions:
       packages: write
-    uses: ./.github/workflows/publish_docker_image.yml
+    steps:
+      - name: Check to Publish
+        env:
+           CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
+        run:
+           if: ${{ (github.ref != 'refs/heads/main') && ("$CREATE_DOCKER_IMAGE") }}
+      - name: Publishing Image
+        uses: ./.github/workflows/publish_docker_image.yml
 
   create-git-tag:
     needs: [validate]
