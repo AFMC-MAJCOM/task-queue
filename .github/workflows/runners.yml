@@ -34,7 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     outputs:
-       # CREATE_DOCKER_IMAGE: ${{ steps.export.outputs.create_docker_image }}
        PUBLISH_DOCKER_IMAGE: ${{ steps.export.outputs.publish }}
        PUBLISH_DOCKER_IMAGE_VALID: ${{ steps.export.outputs.valid }}
     steps:
@@ -51,38 +50,14 @@ jobs:
         run: |
             echo "publish=$publish_result" >> "$GITHUB_OUTPUT"
             echo "valid=$valid_check" >> "$GITHUB_OUTPUT"
-      # - name: Result
-      #   run: echo "$PUBLISH_DOCKER_IMAGE"
-      # - name: Condition
-      #   run: echo ${{ (github.ref != 'refs/heads/main') }}
-      # - name: Condition 2
-      #   env:
-      #      CREATE_DOCKER_IMAGE: ${{ env.PUBLISH_DOCKER_IMAGE == env.PUBLISH_DOCKER_IMAGE_VALID }}
-      #   run: echo "$CREATE_DOCKER_IMAGE" >> $GITHUB_ENV
-      # - name: Successful Version Check
-      #   if: success()
-      #   run: echo "Publishing docker image"
-      #   env:
-      #      PUBLISH_DOCKER_IMAGE: ${{true}}
-      # - name: Failed Version Check
-      #   if: failure()
-      #   run: echo "Not publishing docker image"
-      #   env:
-      #      PUBLISH_DOCKER_IMAGE: ${{false}}
 
   publish-docker-image:
     needs: [publish-image-check]
     runs-on: ubuntu-latest
     if: needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE == needs.publish-image-check.outputs.PUBLISH_DOCKER_IMAGE_VALID
-    steps:
-      - name: Print
-        # env:
-        #    test: ${{ needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE }}
-        #    test2: ${{ (github.ref != 'refs/heads/main') && (needs.publish-image-check.outputs.CREATE_DOCKER_IMAGE) }}
-        run: echo "This should happen"
-    # permissions:
-    #   packages: write
-    # uses: ./.github/workflows/publish_docker_image.yml
+    permissions:
+      packages: write
+    uses: ./.github/workflows/publish_docker_image.yml
 
   create-git-tag:
     needs: [validate]
