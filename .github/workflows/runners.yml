@@ -32,7 +32,6 @@ jobs:
 
   publish-image-check:
     runs-on: ubuntu-latest
-    continue-on-error: true
     if: github.ref != 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +44,10 @@ jobs:
       - name: Condition
         run: echo ${{ (github.ref != 'refs/heads/main') }}
       - name: Condition 2
-        run: echo ${{ (${PUBLISH_DOCKER_IMAGE}==${PUBLISH_DOCKER_IMAGE_VALID}) }}
+        env:
+           publish_docker_image: ${{PUBLISH_DOCKER_IMAGE}}
+           publish_docker_image_valid: ${{PUBLISH_DOCKER_IMAGE_VALID}}
+        run: echo ${{"$publish_docker_image" == "$publish_docker_image_valid" }}
       # - name: Successful Version Check
       #   if: success()
       #   run: echo "Publishing docker image"
