@@ -106,7 +106,24 @@ class ApiClient(QueueBase):
         ------------
         Returns the number of Items in that stage of the Queue as an integer.
         """
-        return 0
+        response = requests.get(f"{self.api_base_url}size/"
+                                f"{queue_item_stage.name}",
+                                timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
+
+    @validate_call
+    def sizes(self) -> QueueGetSizesModel:
+        """Gets the number of Items in each Stage of the Queue.
+
+        Returns:
+        Returns a dictionary where the key is the name of the stage and the
+        value is the number of Items currently in that Stage.
+        """
+        response = requests.get(f"{self.api_base_url}sizes",
+                               timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     @validate_call
     def lookup_status(self, queue_item_id:str) -> QueueItemStage:
@@ -198,18 +215,5 @@ class ApiClient(QueueBase):
         """
         response = requests.get(f"{self.api_base_url}describe",
                                 timeout=self.timeout)
-        response.raise_for_status()
-        return response.json()
-
-    @validate_call
-    def get_queue_sizes(self) -> QueueGetSizesModel:
-        """Gets the number of Items in each Stage of the Queue.
-
-        Returns:
-        Returns a dictionary where the key is the name of the stage and the
-        value is the number of Items currently in that Stage.
-        """
-        response = requests.get(f"{self.api_base_url}sizes",
-                               timeout=self.timeout)
         response.raise_for_status()
         return response.json()
