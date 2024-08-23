@@ -296,6 +296,8 @@ def requeue(item_ids:Union[str,list[str]]) -> None:
         queue.requeue(item_ids)
         if len(warn) > 0:
             warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
+            for warning in warnings_list:
+                logger.warning(warning)
             raise HTTPException(status_code=200,
                             detail=warnings_list)
 
@@ -310,4 +312,12 @@ async def put(items:Dict[str,QueueItemBodyType]) -> None:
         pair, where key is the item ID and value is the queue item body.
         The item ID must be a string and the item body must be serializable.
     """
-    queue.put(items)
+    with warnings.catch_warnings(record=True) as warn:
+        queue.put(items)
+        # warn
+        if len(warn) > 0:
+            warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
+            for warning in warnings_list:
+                logger.warning(warning)
+            raise HTTPException(status_code=200,
+                            detail=warnings_list)
