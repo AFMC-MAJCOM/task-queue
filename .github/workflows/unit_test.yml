@@ -1,0 +1,33 @@
+# This workflow will run all pytests based on their marking.
+
+name: Python Unit Tests
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install .
+    - name: Test with pytest
+      run: |
+        export SQL_QUEUE_NAME=test
+        export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
+        export SQL_QUEUE_POSTGRES_USER=postgres
+        export SQL_QUEUE_POSTGRES_PASSWORD=postgres
+        export SQL_QUEUE_POSTGRES_DATABASE=postgres
+        export SQL_QUEUE_POSTGRES_PORT=5432
+        pytest -vv -m unit
