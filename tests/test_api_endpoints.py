@@ -47,6 +47,39 @@ def clean_queue():
         )
 
 @pytest.mark.unit
+def test_v1_queue_size():
+    """Tests the size endpoint for all 4 stages.
+    """
+    queue.put(default_items)
+
+    proc, succ, fail = queue.get(3)
+
+    queue.success(succ[0])
+    queue.fail(fail[0])
+
+    wait_actual_size = 17
+    proc_actual_size = 1
+    succ_actual_size = 1
+    fail_actual_size = 1
+
+    wait_response_size = client.get("/api/v1/queue/size/WAITING")
+    proc_response_size = client.get("/api/v1/queue/size/PROCESSING")
+    succ_response_size = client.get("/api/v1/queue/size/SUCCESS")
+    fail_response_size = client.get("/api/v1/queue/size/FAIL")
+
+    assert wait_response_size.status_code == 200
+    assert wait_response_size.json() == wait_actual_size
+
+    assert proc_response_size.status_code == 200
+    assert proc_response_size.json() == proc_actual_size
+
+    assert succ_response_size.status_code == 200
+    assert succ_response_size.json() == succ_actual_size
+
+    assert fail_response_size.status_code == 200
+    assert fail_response_size.json() == fail_actual_size
+
+@pytest.mark.unit
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
     """
