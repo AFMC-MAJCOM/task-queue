@@ -112,6 +112,7 @@ def test_push_multiple(default_work_queue):
 
     assert len(set(first_ids).intersection((set(second_ids)))) == 0
 
+@pytest.mark.unit
 def test_delete_jobs(default_work_queue):
     """Tests that the work queue is deleting jobs when they terminate.
     """

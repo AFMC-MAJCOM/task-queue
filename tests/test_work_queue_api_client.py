@@ -109,15 +109,18 @@ def test_client_size(mock_get):
     response = test_client.size(QueueItemStage.WAITING)
     assert isinstance(response, dict)
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests_fail)
 def test_client_size_fail(mock_get):
     with pytest.raises(RequestException):
         test_client.size(QueueItemStage.WAITING)
 
+@pytest.mark.unit
 def test_client_size_invalid_parameter():
     with pytest.raises(ValidationError):
         test_client.size("BAD_STAGE")
 
+@pytest.mark.unit
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_sizes(mock_get):
     """Tests that Client sizes hits the correct endpoint."""
