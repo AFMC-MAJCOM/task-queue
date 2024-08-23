@@ -54,6 +54,9 @@ def mocked_requests(*args, **kwargs):
     if "WAITING" in route:
         route = re.sub('WAITING','{queue_item_stage}',route)
 
+    if '/put' in route:
+        return MockResponse(None,200)
+
     if route in api_routes:
         return MockResponse({"good":"dictionary"},200)
 

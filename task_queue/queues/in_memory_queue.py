@@ -79,6 +79,7 @@ class InMemoryQueue(QueueBase):
             serializable.
         """
         # Filter out IDs that already exist in the index
+        items = self._put(items)
         filtered_items = {
             k:v
             for k,v in items.items()

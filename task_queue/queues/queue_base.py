@@ -13,10 +13,47 @@ class QueueItemStage(Enum):
     SUCCESS = 2
     FAIL = 3
 
+warnings.filterwarnings(
+                "always",
+                category=UserWarning,
+                module=r'.*queue_base'
+            )
 
 class QueueBase(ABC):
     """Abstract Base Class for Queue.
     """
+
+    def _put(self, items):
+        """Remove Item from items if the Item ID exists in the queue.
+
+        Parameters:
+        ------------
+        items: dict
+            Dictionary of Queue Items where Item is a key:value pair, where key
+            is the item ID and value is the queue item body.
+            The item ID must be a string and the item body must be
+            serializable.
+
+        Returns:
+        ------------
+        Returns a dictionary of items.
+        """
+        # Get all IDs in queue
+        queue_ids = (self.lookup_state(QueueItemStage.FAIL)
+        + self.lookup_state(QueueItemStage.SUCCESS)
+        + self.lookup_state(QueueItemStage.WAITING)
+        + self.lookup_state(QueueItemStage.PROCESSING))
+
+        item_ids = items.keys()
+        duplicate_ids = list(set(item_ids).intersection(set(queue_ids)))
+
+        for id_ in duplicate_ids:
+            warnings.warn(f"Item {id_} already in queue. Skipping.")
+
+        no_duplicate_items = items.copy()
+        for k in duplicate_ids:
+            no_duplicate_items.pop(k)
+        return no_duplicate_items
 
     @abstractmethod
     def put(self, items):
@@ -178,11 +215,6 @@ class QueueBase(ABC):
         failed_ids = self.lookup_state(QueueItemStage.FAIL)
         missing_ids = list(set(item_ids) - set(failed_ids))
         for id_ in missing_ids:
-            warnings.filterwarnings(
-                "always",
-                category=UserWarning,
-                module=r'.*queue_base'
-            )
             warnings.warn(f"Item {id_} not in a FAIL state. Skipping.")
 
         item_ids = [id_ for id_ in item_ids if id_ in failed_ids]

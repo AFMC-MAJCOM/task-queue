@@ -10,12 +10,12 @@ from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 from ..queues.queue_base import QueueBase, QueueItemStage
 
-
 warnings.filterwarnings(
                     "always",
                     category=UserWarning,
                     module=r'.*work_queue_api_client'
                 )
+
 
 class ApiClient(QueueBase):
     """Class for the ApiClient initialization and supporting functions.
@@ -47,6 +47,10 @@ class ApiClient(QueueBase):
         response = requests.post(f"{self.api_base_url}put", json=items, \
                                  timeout=self.timeout)
         response.raise_for_status()
+        # Notify user if there were any items skipped.
+        if response.json():
+            for er in response.json()['detail']:
+                warnings.warn(er)
 
     @validate_call
     def get(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
