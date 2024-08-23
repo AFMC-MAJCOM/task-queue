@@ -149,11 +149,11 @@ def handle_queue_implementation_choice(cli_settings):
             raise AttributeError("Expected SqlEventStore instance, got None")
 
         queue = queue_with_events(
-                    queue,
-                    store,
-                    add_event_name=cli_settings.add_to_queue_event_name,
-                    move_event_name=cli_settings.move_queue_event_name
-                )
+            queue,
+            store,
+            add_event_name=cli_settings.add_to_queue_event_name,
+            move_event_name=cli_settings.move_queue_event_name
+        )
 
     return queue
 
