@@ -80,6 +80,23 @@ class QueueBase(ABC):
         Returns the number of Items in that stage of the Queue as an integer.
         """
 
+    def sizes(self):
+        """Determines how many Items are in each stage of the Queue.
+
+        Returns:
+        ------------
+        Returns the number of Items in each stage of the Queue as an integer.
+        """
+        waiting_size = self.size(QueueItemStage.WAITING)
+        processing_size = self.size(QueueItemStage.PROCESSING)
+        success_size = self.size(QueueItemStage.SUCCESS)
+        fail_size = self.size(QueueItemStage.FAIL)
+
+        sizes_dict = {"WAITING": waiting_size, "PROCESSING": processing_size,
+                      "SUCCESS": success_size, "FAIL": fail_size}
+
+        return sizes_dict
+
     @abstractmethod
     def lookup_status(self, queue_item_id):
         """Lookup which stage in the Queue Item is currently in.
