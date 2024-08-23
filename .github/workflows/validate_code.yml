@@ -28,12 +28,7 @@ jobs:
         pip install .
     - name: Test with pytest
       run: |
-        export SQL_QUEUE_NAME=test
-        export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
-        export SQL_QUEUE_POSTGRES_USER=postgres
-        export SQL_QUEUE_POSTGRES_PASSWORD=postgres
-        export SQL_QUEUE_POSTGRES_DATABASE=postgres
-        export SQL_QUEUE_POSTGRES_PORT=5432
+        export QUEUE_IMPLEMENTATION=in-memory
         pytest -vv -m unit
 
   pytest-linux:
