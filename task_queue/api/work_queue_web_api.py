@@ -161,6 +161,27 @@ queue_settings = queue_settings_from_env()
 queue = queue_settings.make_queue()
 
 
+@app.get("/api/v1/queue/size/{queue_item_stage}")
+async def get_queue_size(queue_item_stage:str) -> int:
+    """Determines how many Items are in some stage of the Queue.
+
+    Parameters:
+    -----------
+    queue_item_stage: str
+        Desired Queue Item Stage (i.e. WAITING, FAIL)
+
+    Returns:
+    ------------
+    Returns the number of Items in that stage of the Queue as an integer.
+    """
+    try:
+        queue_item_stage_enum = QueueItemStage[queue_item_stage]
+        result = queue.size(queue_item_stage_enum)
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=400,
+              detail=f"{queue_item_stage} not a Queue Item Stage") from exc
+
 @app.get("/api/v1/queue/sizes")
 async def get_queue_sizes() -> QueueGetSizesModel:
     """API endpoint to get the number of jobs in each stage.
@@ -169,10 +190,7 @@ async def get_queue_sizes() -> QueueGetSizesModel:
     ----------
     Returns the number of jobs in each stage of the queue.
     """
-    return {
-        s.name : queue.size(s)
-        for s in QueueItemStage
-    }
+    return queue.sizes()
 
 @app.get("/api/v1/queue/status/{item_id}")
 async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
