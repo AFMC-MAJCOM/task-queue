@@ -279,7 +279,7 @@ def requeue(item_ids:Union[str,list[str]]) -> None:
         if len(warn) > 0:
             warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
             for warning in warnings_list:
-                logger.warn(warning)
+                logger.warning(warning)
             raise HTTPException(status_code=200,
                             detail=warnings_list)
 
@@ -300,6 +300,6 @@ async def put(items:Dict[str,QueueItemBodyType]) -> None:
         if len(warn) > 0:
             warnings_list = [warn[i].message.args[0] for i in range(len(warn))]
             for warning in warnings_list:
-                logger.warn(warning)
+                logger.warning(warning)
             raise HTTPException(status_code=200,
                             detail=warnings_list)
