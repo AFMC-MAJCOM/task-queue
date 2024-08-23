@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install .
-    uses: ./.github/workflows/unit_test.yml
+      uses: ./.github/workflows/unit_test.yml
 
   pytest-linux:
     runs-on: ubuntu-latest
