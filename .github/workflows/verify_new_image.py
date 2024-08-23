@@ -1,4 +1,5 @@
 import sys
+import os
 
 
 def verify_new_image(version: str) -> bool:
@@ -29,4 +30,11 @@ if __name__=="__main__":
     print(f" Version: {version}")
 
     new_release = verify_new_image(version)
-    sys.exit(new_release)
+    env_file = os.getenv('GITHUB_ENV')
+
+    with open(env_file, "a") as myfile:
+        myfile.write("PUBLISH_DOCKER_IMAGE_VALID=1\n")
+        if new_release:
+            myfile.write("PUBLISH_DOCKER_IMAGE=1\n")
+        else:
+            myfile.write("PUBLISH_DOCKER_IMAGE=0\n")
