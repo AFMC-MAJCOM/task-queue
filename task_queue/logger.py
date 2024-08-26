@@ -1,3 +1,5 @@
+"""This file provides the construction and configuration of the logger
+"""
 import logging
 import sys
 import datetime
