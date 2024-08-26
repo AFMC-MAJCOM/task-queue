@@ -310,5 +310,6 @@ def test_handle_queue_implementation_choice_fail():
 
     settings = config.TaskQueueCliSettings()
 
-    with pytest.raises(AttributeError, match="Expected SqlEventStore instance, got None"):
+    with pytest.raises(AttributeError,
+                       match="Expected SqlEventStore instance, got None"):
         handle_queue_implementation_choice(settings)
