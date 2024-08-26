@@ -12,6 +12,7 @@ jobs:
       project_root: task_queue
 
   unit-test:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
