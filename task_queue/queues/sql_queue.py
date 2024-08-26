@@ -87,7 +87,7 @@ class SQLQueue(QueueBase):
             session.commit()
 
         if len(db_items) != len(items):
-            logger.error("Error writing at least one queue object to SQL: %s"\
+            logger.error("Error writing at least one queue object to SQL: %s",\
                         fail_items)
             raise BaseException(
                 "Error writing at least one queue object to SQL:",
