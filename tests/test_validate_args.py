@@ -3,7 +3,8 @@
 import sys
 import pytest
 
-from task_queue.cli.work_queue_service_cli import validate_args, handle_queue_implementation_choice
+from task_queue.cli.work_queue_service_cli import (validate_args,
+                                            handle_queue_implementation_choice)
 from task_queue.config import config
 
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
@@ -291,7 +292,10 @@ def test_handle_queue_implementation_choice_fail():
         database = environ_settings['SQL_QUEUE_POSTGRES_DATABASE']
 
 
-        connection_string = f"postgresql://{user}:{password}@{hostname}:{port}/{database}"
+        connection_string = (
+            f"postgresql://{user}:{password}"
+            f"@{hostname}:{port}/{database}"
+        )
 
     else:
         connection_string = environ_settings['SQL_QUEUE_CONNECTION_STRING']
