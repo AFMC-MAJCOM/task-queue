@@ -34,6 +34,7 @@ jobs:
     #     export SQL_QUEUE_POSTGRES_PORT=5432
     - name: Pytest unit tests
       uses: ./.github/actions/unit-test
+      run: pytest -vv -m unit
 # unit-test:
   #   runs-on: ubuntu-latest
   #   steps:

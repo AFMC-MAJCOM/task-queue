@@ -11,5 +11,4 @@ runs:
         export SQL_QUEUE_POSTGRES_PASSWORD=postgres
         export SQL_QUEUE_POSTGRES_DATABASE=postgres
         export SQL_QUEUE_POSTGRES_PORT=5432
-        pytest -vv -m unit
     shell: bash
