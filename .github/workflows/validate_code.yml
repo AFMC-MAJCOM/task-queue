@@ -33,8 +33,8 @@ jobs:
         export SQL_QUEUE_POSTGRES_DATABASE=postgres
         export SQL_QUEUE_POSTGRES_PORT=5432
     - name: Pytest unit tests
-      uses: ./.github/actions/action-a.yml
-  # unit-test:
+      uses: ./.github/actions/unit-test
+# unit-test:
   #   runs-on: ubuntu-latest
   #   steps:
   #   - uses: actions/checkout@v3
