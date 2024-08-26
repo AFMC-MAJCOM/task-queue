@@ -5,10 +5,17 @@ runs:
   - uses: actions/checkout@v3
   - name: Run Pytests
     env:
-        SQL_QUEUE_NAMEt: est
+        SQL_QUEUE_NAMEt: test
         SQL_QUEUE_POSTGRES_HOSTNAME: localhost
         SQL_QUEUE_POSTGRES_USER: postgres
         SQL_QUEUE_POSTGRES_PASSWORD: postgres
         SQL_QUEUE_POSTGRES_DATABASE: postgres
         SQL_QUEUE_POSTGRES_PORT: 5432
+    run: |
+        echo $SQL_QUEUE_NAME
+        echo $SQL_QUEUE_POSTGRES_HOSTNAME
+        echo $SQL_QUEUE_POSTGRES_USER
+        echo $SQL_QUEUE_POSTGRES_PASSWORD
+        echo $SQL_QUEUE_POSTGRES_DATABASE
+        echo $SQL_QUEUE_POSTGRES_PORT
     shell: bash
