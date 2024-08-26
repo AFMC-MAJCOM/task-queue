@@ -2,7 +2,7 @@
 """
 import os
 
-from task_queue.logger import get_log_fp, create_logger
+from task_queue.logger import get_log_fp
 
 
 def assert_log_fp(fp):
