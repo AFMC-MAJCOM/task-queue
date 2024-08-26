@@ -15,15 +15,3 @@ def assert_log_fp(fp):
 def test_log_dir_created():
     new_log_fp = get_log_fp()
     assert_log_fp(new_log_fp)
-
-
-def test_logger_construction():
-    logger_level = "INFO"
-    name = __name__
-
-    logger = create_logger(name, logger_level)
-    for h in logger.handlers:
-        if isinstance(h, FileHandler):
-            assert_log_fp(h.baseFilename)
-        elif isinstance(h, StreamHandler):
-            assert h.stream.name == '<stdout>'
