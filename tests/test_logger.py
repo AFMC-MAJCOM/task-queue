@@ -1,7 +1,6 @@
 """Test the functionality of the logger
 """
 import os
-from logging import FileHandler, StreamHandler
 
 from task_queue.logger import get_log_fp, create_logger
 
