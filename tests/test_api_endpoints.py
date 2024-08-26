@@ -79,6 +79,7 @@ def test_v1_queue_size():
     assert fail_response_size.status_code == 200
     assert fail_response_size.json() == fail_actual_size
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.

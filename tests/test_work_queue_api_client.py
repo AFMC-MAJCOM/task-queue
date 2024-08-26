@@ -62,10 +62,11 @@ def mocked_requests(*args, **kwargs):
 
     return MockResponse("Bad URL", 404)
 
+@pytest.mark.integration
 def test_constructor():
     """Tests that the Client constructor buils a proper base url."""
     assert test_client.api_base_url == f"{url}/api/v1/queue/"
-
+@pytest.mark.end2end
 @mock.patch('requests.get', side_effect=mocked_requests)
 def test_client_lookup_status(mock_get):
     """Tests that lookup_status hits the correct endpoint."""
