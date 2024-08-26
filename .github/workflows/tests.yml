@@ -25,6 +25,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -vv -m unit
-  integration-test:
+  # integration-test:
 
-  end-to-end-test:
+  # end-to-end-test:
