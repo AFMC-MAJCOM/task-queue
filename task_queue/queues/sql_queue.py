@@ -203,7 +203,7 @@ class SQLQueue(QueueBase):
             item = session.exec(statement).first()
 
             if item is None:
-                logger.error(f"Item does not exist %s", queue_item_id)
+                logger.error("Item does not exist %s", queue_item_id)
                 raise KeyError(queue_item_id)
 
             return QueueItemStage(item)
