@@ -1,6 +1,9 @@
 """Tests for validating input arguments passed to the CLI
 """
-from task_queue.cli.work_queue_service_cli import validate_args
+import sys
+import pytest
+
+from task_queue.cli.work_queue_service_cli import validate_args, handle_queue_implementation_choice
 from task_queue.config import config
 
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
@@ -272,3 +275,36 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
     assert  "event_store_implementation must be set to "\
            f"{SQL_EVENT_STORE_CLI_CHOICE}"\
            in error_string
+
+def test_handle_queue_implementation_choice_fail():
+    sql_settings = config.get_task_queue_settings(
+                setting_class=config.TaskQueueSqlSettings
+            )
+    environ_settings = sql_settings.model_dump()
+
+    if environ_settings['SQL_QUEUE_CONNECTION_STRING'] is None:
+        # Build the connection string
+        user = environ_settings['SQL_QUEUE_POSTGRES_USER']
+        password = environ_settings['SQL_QUEUE_POSTGRES_PASSWORD']
+        hostname = environ_settings['SQL_QUEUE_POSTGRES_HOSTNAME']
+        port = environ_settings['SQL_QUEUE_POSTGRES_PORT']
+        database = environ_settings['SQL_QUEUE_POSTGRES_DATABASE']
+
+
+        connection_string = f"postgresql://{user}:{password}@{hostname}:{port}/{database}"
+
+    else:
+        connection_string = environ_settings['SQL_QUEUE_CONNECTION_STRING']
+
+    sys.argv = ['example.py',
+                '--worker_interface', 'argo-workflows',
+                '--queue_implementation', 'sql-json',
+                '--with-queue-events', 'True',
+                '--event_store_implementation', 'none',
+                '--connection-string', connection_string,
+                '--queue-name', 'dummyqueuename']
+
+    settings = config.TaskQueueCliSettings()
+
+    with pytest.raises(AttributeError, match="Expected SqlEventStore instance, got None"):
+        handle_queue_implementation_choice(settings)
