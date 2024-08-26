@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Unit Comp test
     steps:
-    - uses: actions/checkout@v
+    - uses: actions/checkout@v3
     - uses: ./.github/workflows/composite-action
   # unit-test:
   #   runs-on: ubuntu-latest
