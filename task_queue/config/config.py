@@ -54,16 +54,23 @@ class TaskQueueBaseSetting(BaseSettings):
         env_file_encoding='utf-8',
         extra='ignore'
     )
-    LOGGER_LEVEL: str = 'DEBUG'
+    logger_level: str = 'DEBUG'
 
     @property
-    def LOGGER_LEVEL(self):
+    def logger_level(self):
+        """Property for logger level which converts and validates
+        string representations to integers.
+
+        Returns
+        -----------
+        The integer representation of the logger level
+        """
         try:
-            return getattr(logging, self.LOGGER_LEVEL)
+            return getattr(logging, self.logger_level)
         except AttributeError:
             logger.info("Given logger level is invalid defaulting to DEBUG")
-            self.LOGGER_LEVEL = 'DEBUG'
-            return getattr(logging, self.LOGGER_LEVEL)
+            self.logger_level = 'DEBUG'
+            return getattr(logging, self.logger_level)
 
     def log_settings(self):
         """Log configuration parameters"""

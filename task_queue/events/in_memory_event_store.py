@@ -1,9 +1,9 @@
 """Wherein is contained the implementation of the In Memory Event Store.
 """
 from typing import List, Dict
+from task_queue import logger
 from .event import Event
 from .event_store_interface import EventStoreInterface
-from task_queue import logger
 
 
 class InMemoryEventStore(EventStoreInterface):

@@ -218,8 +218,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
-            logger.warn("Couldn't submit tasks")
-            logger.warn(request_body)
+            logger.warning("Couldn't submit tasks")
+            logger.warning(request_body)
             raise e
 
     def delete_job(self, queue_item_id):

@@ -35,7 +35,7 @@ def base_command(subcmd, *main_args, concurrency=None, other_arguments=None):
 
     cmd = ["s5cmd", subcmd] + list(main_args) + args
 
-    logger.info(f"Running s5cmd command {cmd}")
+    logger.info("Running s5cmd command %s", cmd)
     subprocess.run(cmd, check=True)
 
 cp = partial(base_command, "cp")

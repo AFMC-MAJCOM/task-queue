@@ -5,8 +5,8 @@ from typing import Dict, Any
 import itertools
 import json
 
-from .queue_base import QueueBase, QueueItemStage
 from task_queue import logger
+from .queue_base import QueueBase, QueueItemStage
 
 
 @dataclass
@@ -181,7 +181,7 @@ class InMemoryQueue(QueueBase):
             if queue_item_id in dict_for_stage:
                 return item_stage
 
-        logger.error(f"Item id not found {queue_item_id}")
+        logger.error("Item id not found %s", queue_item_id)
         raise KeyError(queue_item_id)
 
     def lookup_state(self, queue_item_stage):
@@ -273,7 +273,7 @@ def is_json_serializable(o):
     try:
         json.dumps(o)
     except Exception:
-        logger.warning(f"Object {o} is not JSON serializable")
+        logger.warning("Object %s is not JSON serializable", o)
         return False
     return True
 

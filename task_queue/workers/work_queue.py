@@ -58,8 +58,8 @@ class WorkQueue():
                 self._interface.send_job(queue_item_id, queue_item_body)
             except Exception:
                 # Error in submission -> fail
-                logger.warn(f"Item {queue_item_id} failed on submission")
-                logger.warn(f"Moving {queue_item_id} to failed")
+                logger.warning("Item %s failed on submission", queue_item_id)
+                logger.warning("Moving %s to failed", queue_item_id)
                 self._queue.fail(queue_item_id)
 
         return next_items

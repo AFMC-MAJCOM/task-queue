@@ -5,11 +5,11 @@ API.
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le
+import warnings
 
 from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
-import warnings
 
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue.queues.s3_queue import json_s3_queue
@@ -20,7 +20,7 @@ from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 
 api_settings = config.get_task_queue_settings(config.TaskQueueApiSettings)
-logger.setLevel(api_settings.LOGGER_LEVEL)
+logger.setLevel(api_settings.logger_level)
 api_settings.log_settings()
 app = FastAPI()
 

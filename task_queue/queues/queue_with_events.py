@@ -4,9 +4,9 @@ from typing import Dict
 
 import pydantic
 
+from task_queue import logger
 from task_queue.events.event import Event
 from .queue_base import QueueBase, QueueItemStage
-from task_queue import logger
 
 
 class QueueAddEventData(pydantic.BaseModel):
