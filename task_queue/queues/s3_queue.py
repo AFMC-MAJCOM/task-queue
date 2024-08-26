@@ -4,8 +4,8 @@ import json
 import os
 from functools import reduce
 
-from task_queue import logger
 import s3fs
+from task_queue import logger
 
 from .queue_base import QueueBase
 from .. import s5fs
