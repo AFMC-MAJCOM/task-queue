@@ -2,6 +2,7 @@ name: Unit-Test
 runs:
   using: "composite"
   steps:
+  - uses: actions/checkout@v2
   - name: Running Pytest
     run: |
       pytest -vv -m unit
