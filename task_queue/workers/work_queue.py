@@ -1,6 +1,8 @@
 """Wherein is contained the WorkQueue class.
 """
 from task_queue.queues.queue_base import QueueItemStage
+from task_queue import logger
+
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
@@ -56,7 +58,8 @@ class WorkQueue():
                 self._interface.send_job(queue_item_id, queue_item_body)
             except Exception as e:
                 # Error in submission -> fail
-                print(e)
+                logger.warn(f"Item {queue_item_id} failed on submission")
+                logger.warn(f"Moving {queue_item_id} to failed")
                 self._queue.fail(queue_item_id)
 
         return next_items
@@ -71,7 +74,7 @@ class WorkQueue():
         """
         statuses = self._interface.poll_all_status()
 
-        print("Processing new statuses from worker interface")
+        logger.info("Processing new statuses from worker interface")
         for queue_item_id, status in statuses.items():
             # Not in processing -> don't care
             if self._queue.lookup_status(queue_item_id) != \

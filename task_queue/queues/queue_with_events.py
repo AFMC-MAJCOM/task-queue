@@ -6,6 +6,7 @@ import pydantic
 
 from task_queue.events.event import Event
 from .queue_base import QueueBase, QueueItemStage
+from task_queue import logger
 
 
 class QueueAddEventData(pydantic.BaseModel):
@@ -135,6 +136,7 @@ class QueueWithEvents(QueueBase):
         out = self.queue.put(filtered_items)
 
         if exc is not None:
+            logger.error(exc)
             raise exc
 
         return out

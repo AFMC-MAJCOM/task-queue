@@ -4,6 +4,8 @@ import subprocess
 from functools import partial
 import shutil
 
+from task_queue import logger
+
 
 S5CMD_EXE = "s5cmd"
 
@@ -33,7 +35,7 @@ def base_command(subcmd, *main_args, concurrency=None, other_arguments=None):
 
     cmd = ["s5cmd", subcmd] + list(main_args) + args
 
-    print(f"Running s5cmd command {cmd}")
+    logger.info(f"Running s5cmd command {cmd}")
     subprocess.run(cmd, check=True)
 
 cp = partial(base_command, "cp")

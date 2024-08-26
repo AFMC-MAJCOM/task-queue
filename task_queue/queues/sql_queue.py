@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import Engine
 
 from .queue_base import QueueBase, QueueItemStage
+from task_queue import logger
 
 
 class SqlQueue(SQLModel, table=True):
@@ -74,7 +75,7 @@ class SQLQueue(QueueBase):
                     ).model_dump(exclude_unset=True)
                 )
             except BaseException as e:
-                print(e)
+                logger.error(e)
 
         with Session(self.engine) as session:
             statement = (insert(SqlQueue).values(db_items) \
@@ -84,6 +85,7 @@ class SQLQueue(QueueBase):
             session.commit()
 
         if len(db_items) != len(items):
+            logger.error(f"Error writing at least one queue object to S3: {fail_items}")
             raise BaseException(
                 "Error writing at least one queue object to S3:",
                 fail_items)
@@ -198,6 +200,7 @@ class SQLQueue(QueueBase):
             item = session.exec(statement).first()
 
             if item is None:
+                logger.error(f"Item does not exist {queue_item_id}")
                 raise KeyError(queue_item_id)
 
             return QueueItemStage(item)

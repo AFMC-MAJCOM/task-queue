@@ -6,6 +6,7 @@ import itertools
 import json
 
 from .queue_base import QueueBase, QueueItemStage
+from task_queue import logger
 
 
 @dataclass
@@ -179,6 +180,7 @@ class InMemoryQueue(QueueBase):
             if queue_item_id in dict_for_stage:
                 return item_stage
 
+        logger.error(f"Item id not found {queue_item_id}")
         raise KeyError(queue_item_id)
 
     def lookup_state(self, queue_item_stage):
@@ -270,7 +272,7 @@ def is_json_serializable(o):
     try:
         json.dumps(o)
     except Exception as e:
-        print(e)
+        logger.warning(f"Object {o} is not JSON serializable")
         return False
     return True
 

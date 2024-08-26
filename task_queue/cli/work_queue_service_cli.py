@@ -194,10 +194,10 @@ def main(periodic_functions, work_queue, period_sec=10):
         Number of seconds to wait between running periodic functions.
     """
     while True:
-        print("Updating job statuses")
+        logger.info("Updating job statuses")
         work_queue.update_job_status()
 
-        print("Running periodic functions")
+        logger.info("Running periodic functions")
         for fn in periodic_functions:
             fn()
 
@@ -218,6 +218,7 @@ if __name__ == "__main__":
     success, error_string = validate_args(settings.model_dump())
 
     if not success:
+        logger.error(error_string)
         raise ValueError("\n" + error_string)
 
     unique_worker_interface = handle_worker_interface_choice(
