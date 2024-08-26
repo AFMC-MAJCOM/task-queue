@@ -95,7 +95,8 @@ class JsonS3Queue(QueueBase):
                 for item, success in zip(items_to_add, queue_write_success)
                 if not success
             ]
-            logger.error(f"Error writing at least one queue object to S3:{fail_items}")
+            logger.error("Error writing at least one queue object to S3: "\
+                        f"{fail_items}")
             raise BaseException(
                 "Error writing at least one queue object to S3:",
                 fail_items
@@ -510,7 +511,7 @@ def maybe_write_s3_json(s3_path, json_data):
     try:
         with fs.open(s3_path, "wt") as f:
             json.dump(json_data, f, indent=4)
-    except Exception as e:
+    except Exception:
         logger.warn(f"Item {json_data} is not serializable")
         # What was written to the S3 file before the exception will still show
         # Up in S3, so let's just delete that

@@ -60,8 +60,8 @@ class TaskQueueBaseSetting(BaseSettings):
     def LOGGER_LEVEL(self):
         try:
             return getattr(logging, self.LOGGER_LEVEL)
-        except AttributeError as e:
-            log.info("Given logger level is invalid defaulting to DEBUG")
+        except AttributeError:
+            logger.info("Given logger level is invalid defaulting to DEBUG")
             self.LOGGER_LEVEL = 'DEBUG'
             return getattr(logging, self.LOGGER_LEVEL)
 

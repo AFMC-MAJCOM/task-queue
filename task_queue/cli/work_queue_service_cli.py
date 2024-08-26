@@ -82,7 +82,7 @@ def validate_args(cli_args):
 
     if cli_args['logger_level']:
         log_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
-        if not cli_args['logger_level'] in log_levels:
+        if cli_args['logger_level'] not in log_levels:
             errors_found = f"logger_level must be {log_levels}"
             validation_success = False
 

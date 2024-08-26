@@ -56,7 +56,7 @@ class WorkQueue():
         for queue_item_id, queue_item_body in next_items:
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
-            except Exception as e:
+            except Exception:
                 # Error in submission -> fail
                 logger.warn(f"Item {queue_item_id} failed on submission")
                 logger.warn(f"Moving {queue_item_id} to failed")

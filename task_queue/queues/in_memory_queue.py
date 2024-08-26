@@ -272,7 +272,7 @@ def is_json_serializable(o):
     """
     try:
         json.dumps(o)
-    except Exception as e:
+    except Exception:
         logger.warning(f"Object {o} is not JSON serializable")
         return False
     return True

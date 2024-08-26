@@ -87,7 +87,8 @@ class SQLQueue(QueueBase):
             session.commit()
 
         if len(db_items) != len(items):
-            logger.error(f"Error writing at least one queue object to S3: {fail_items}")
+            logger.error("Error writing at least one queue object to SQL: "\
+                        f"{fail_items}")
             raise BaseException(
                 "Error writing at least one queue object to SQL:",
                 fail_items)
