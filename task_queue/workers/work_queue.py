@@ -83,7 +83,9 @@ class WorkQueue():
 
             if status == QueueItemStage.SUCCESS:
                 self._queue.success(queue_item_id)
+                self._interface.delete_job(queue_item_id)
             elif status == QueueItemStage.FAIL:
                 self._queue.fail(queue_item_id)
+                self._interface.delete_job(queue_item_id)
 
         return statuses

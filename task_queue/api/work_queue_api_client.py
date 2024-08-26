@@ -1,12 +1,20 @@
 """Wherein is contained the ApiClient class.
 """
 from typing import Dict, Any, Union, List, Tuple
+import warnings
+
 from pydantic import validate_call, PositiveInt
 import requests
 
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 from ..queues.queue_base import QueueBase, QueueItemStage
+
+warnings.filterwarnings(
+                    "always",
+                    category=UserWarning,
+                    module=r'.*work_queue_api_client'
+                )
 
 
 class ApiClient(QueueBase):
@@ -39,6 +47,10 @@ class ApiClient(QueueBase):
         response = requests.post(f"{self.api_base_url}put", json=items, \
                                  timeout=self.timeout)
         response.raise_for_status()
+        # Notify user if there were any items skipped.
+        if response.json():
+            for er in response.json()['detail']:
+                warnings.warn(er)
 
     @validate_call
     def get(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
@@ -94,7 +106,24 @@ class ApiClient(QueueBase):
         ------------
         Returns the number of Items in that stage of the Queue as an integer.
         """
-        return 0
+        response = requests.get(f"{self.api_base_url}size/"
+                                f"{queue_item_stage.name}",
+                                timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
+
+    @validate_call
+    def sizes(self) -> QueueGetSizesModel:
+        """Gets the number of Items in each Stage of the Queue.
+
+        Returns:
+        Returns a dictionary where the key is the name of the stage and the
+        value is the number of Items currently in that Stage.
+        """
+        response = requests.get(f"{self.api_base_url}sizes",
+                               timeout=self.timeout)
+        response.raise_for_status()
+        return response.json()
 
     @validate_call
     def lookup_status(self, queue_item_id:str) -> QueueItemStage:
@@ -171,6 +200,10 @@ class ApiClient(QueueBase):
                                json=item_ids
                               )
         response.raise_for_status()
+        # Notify user if there were any items skipped.
+        if response.json():
+            for er in response.json()['detail']:
+                warnings.warn(er)
 
     @validate_call
     def description(self) -> Dict[str, Union[str, Dict[str,Any]]]:
@@ -182,18 +215,5 @@ class ApiClient(QueueBase):
         """
         response = requests.get(f"{self.api_base_url}describe",
                                 timeout=self.timeout)
-        response.raise_for_status()
-        return response.json()
-
-    @validate_call
-    def get_queue_sizes(self) -> QueueGetSizesModel:
-        """Gets the number of Items in each Stage of the Queue.
-
-        Returns:
-        Returns a dictionary where the key is the name of the stage and the
-        value is the number of Items currently in that Stage.
-        """
-        response = requests.get(f"{self.api_base_url}sizes",
-                               timeout=self.timeout)
         response.raise_for_status()
         return response.json()
