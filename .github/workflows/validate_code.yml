@@ -33,7 +33,7 @@ jobs:
         export SQL_QUEUE_POSTGRES_DATABASE=postgres
         export SQL_QUEUE_POSTGRES_PORT=5432
     - name: Call unit tests
-      uses: ./.github/workflows/tests.yml
+      uses: ./composite-actions
   # unit-test:
   #   runs-on: ubuntu-latest
   #   steps:

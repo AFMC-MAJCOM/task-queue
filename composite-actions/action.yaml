@@ -1,0 +1,6 @@
+name: Unit Tests
+runs:
+  using: "composite"
+  steps:
+    run: |
+        pytest -vv -m unit
