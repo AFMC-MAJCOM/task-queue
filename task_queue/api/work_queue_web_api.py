@@ -2,10 +2,10 @@
 API.
 """
 
+import warnings
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
 from annotated_types import Ge, Le
-import warnings
 
 from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException

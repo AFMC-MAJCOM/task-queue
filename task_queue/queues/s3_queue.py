@@ -346,7 +346,6 @@ def safe_s3fs_ls(filesystem, path, *args, **kwargs):
             return filesystem.ls(path, *args, **kwargs)
         except FileNotFoundError:
             logger.warning("file %s not found", path)
-            pass
     return []
 
 if s5fs.HAS_S5CMD:
