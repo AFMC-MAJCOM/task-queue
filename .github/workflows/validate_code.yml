@@ -14,6 +14,8 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
+    - name: Run
+      uses: ./.github/workflows/tests.yml
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
@@ -32,8 +34,8 @@ jobs:
         export SQL_QUEUE_POSTGRES_PASSWORD=postgres
         export SQL_QUEUE_POSTGRES_DATABASE=postgres
         export SQL_QUEUE_POSTGRES_PORT=5432
-    - name: Run
-      uses: ./.github/workflows/tests.yml
+    # - name: Run
+    #   uses: ./.github/workflows/tests.yml
   # unit-test:
   #   runs-on: ubuntu-latest
   #   steps:
