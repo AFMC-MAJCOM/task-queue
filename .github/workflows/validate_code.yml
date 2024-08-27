@@ -27,10 +27,9 @@ jobs:
         pip install .
 
   unit-test:
-    needs: [setup-pytest]
     uses: ./.github/workflows/unit-test.yaml
     with:
-      project_root: task_queue
+      project_root: /.github/actions/unit-test
     # - name: Pytest unit tests
     #   uses: ./.github/actions/unit-test
     # - name: Run Pytest
