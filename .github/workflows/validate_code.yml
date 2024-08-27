@@ -27,7 +27,7 @@ jobs:
 
   unit-test:
     needs: [setup-pytest]
-    uses: ./.github/workflows/unit-test
+    uses: ./.github/workflows/unit-test.yaml
     # - name: Pytest unit tests
     #   uses: ./.github/actions/unit-test
     # - name: Run Pytest
