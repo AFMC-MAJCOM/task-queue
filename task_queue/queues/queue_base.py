@@ -4,6 +4,8 @@ import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
 
+from task_queue import logger
+
 
 class QueueItemStage(Enum):
     """The different stages that a queue item can be in.
@@ -48,6 +50,7 @@ class QueueBase(ABC):
         duplicate_ids = list(set(item_ids).intersection(set(queue_ids)))
 
         for id_ in duplicate_ids:
+            logger.warning("Item %s already in queue. Skipping.", id_)
             warnings.warn(f"Item {id_} already in queue. Skipping.")
 
         no_duplicate_items = items.copy()
@@ -215,6 +218,7 @@ class QueueBase(ABC):
         failed_ids = self.lookup_state(QueueItemStage.FAIL)
         missing_ids = list(set(item_ids) - set(failed_ids))
         for id_ in missing_ids:
+            logger.warning("Item %s not in a FAIL state. Skipping.", id_)
             warnings.warn(f"Item {id_} not in a FAIL state. Skipping.")
 
         item_ids = [id_ for id_ in item_ids if id_ in failed_ids]

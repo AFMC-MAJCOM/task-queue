@@ -1,10 +1,10 @@
 """Wherein is contained the functions concerning the Work Queue Service CLI.
 """
-import logging
 import time
 
 from sqlalchemy import create_engine
 
+from task_queue.logger import logger, set_logger_level
 from task_queue.config import config
 from task_queue.workers.work_queue import WorkQueue
 from task_queue.workers.argo_workflows_queue_worker import (
@@ -14,10 +14,6 @@ from task_queue.queues.sql_queue import json_sql_queue
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
-
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def validate_args(cli_args):
@@ -82,6 +78,12 @@ def validate_args(cli_args):
             errors_found += f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
                             f"{config.EventStoreChoices.SQL_JSON.value}"
+            validation_success = False
+
+    if cli_args['logger_level']:
+        log_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        if cli_args['logger_level'] not in log_levels:
+            errors_found = f"logger_level must be {log_levels}"
             validation_success = False
 
     return validation_success, errors_found
@@ -175,8 +177,8 @@ def start_jobs_with_processing_limit(max_processing_limit,
     to_start = max(to_start, 0)
 
     started_jobs = work_queue.push_next_jobs(to_start)
-    print(f"start_jobs_with_processing_limit: Started \
-        {len(started_jobs)} jobs")
+    logger.info("start_jobs_with_processing_limit: Started %s jobs", \
+                len(started_jobs))
 
 
 def main(periodic_functions, work_queue, period_sec=10):
@@ -192,10 +194,10 @@ def main(periodic_functions, work_queue, period_sec=10):
         Number of seconds to wait between running periodic functions.
     """
     while True:
-        print("Updating job statuses")
+        logger.info("Updating job statuses")
         work_queue.update_job_status()
 
-        print("Running periodic functions")
+        logger.info("Running periodic functions")
         for fn in periodic_functions:
             fn()
 
@@ -208,6 +210,7 @@ if __name__ == "__main__":
     settings = config.get_task_queue_settings(
         setting_class=config.TaskQueueCliSettings
     )
+    set_logger_level(settings.logger_level)
     settings.log_settings()
 
     # Check if dependent arguments were provided
@@ -215,6 +218,7 @@ if __name__ == "__main__":
     success, error_string = validate_args(settings.model_dump())
 
     if not success:
+        logger.error(error_string)
         raise ValueError("\n" + error_string)
 
     unique_worker_interface = handle_worker_interface_choice(
