@@ -6,5 +6,6 @@ permissions:
 
 jobs:
   unit-test:
+    steps:
     - name: Run Pytest
       run: pytest -vv -m unit
