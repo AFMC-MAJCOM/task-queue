@@ -28,7 +28,7 @@ jobs:
         run: |
           echo ${{ job.inputs.owner }}
           echo ${{ github.event.inputs.owner }}
-          echo ${{ jobs.inputs.owner }}
+          echo ${{ runner.inputs.owner }}
           echo ${{ steps.inputs.owner }}
       # - name: Run
       #   uses: ${{job.inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
