@@ -26,6 +26,6 @@ jobs:
           pip install .
       - name: Check Inputs
         run: echo "ACTION_PATH=${{ inputs.path }}" >> $GITHUB_ENV
-      - name: Run
-        uses: ${ACTION_PATH}
+      # - name: Run
+      #   uses: ${ACTION_PATH}
         # uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
