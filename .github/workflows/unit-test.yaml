@@ -3,9 +3,10 @@ name: Python Unit Test
 on:
   workflow_call:
     inputs:
-      project_root:
+      owner:
         required: true
         type: string
+    
 
 permissions:
   contents: read
@@ -24,7 +25,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           pip install .
-      - name: Print tunit tests with pytest
-        run: echo ${{ inputs.project_root }}
       - name: Run
-        uses: "${{ inputs.project_root }}"
+        uses: AFMC-MAJCOM/task_queue/.github/actions/unit-test@OPAL-668v2
