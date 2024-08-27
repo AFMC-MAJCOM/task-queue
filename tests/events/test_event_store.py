@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from task_queue.events.in_memory_event_store import InMemoryEventStore
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.events.event import Event
-from ..utils import test_sql_engine
+from ..utils import PytestSqlEngine
 
 test_event_names = [
     "test-event-store-1",
@@ -87,7 +87,8 @@ def new_empty_store(request):
     if request.param == "memory":
         yield InMemoryEventStore()
     if request.param == "sql":
-        yield SqlEventStore(test_sql_engine)
+        test_sql_engine = PytestSqlEngine()
+        yield SqlEventStore(test_sql_engine.create_test_engine)
 
 
 @pytest.mark.parametrize("new_empty_store",
