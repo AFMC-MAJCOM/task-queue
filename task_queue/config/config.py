@@ -1,6 +1,5 @@
 """Contains functions and classes concerning configuration management.
 """
-import logging
 import os
 from enum import Enum
 from typing import Optional
@@ -56,21 +55,6 @@ class TaskQueueBaseSetting(BaseSettings):
     )
     logger_level: str = 'DEBUG'
 
-    @property
-    def logger_level(self):
-        """Property for logger level which converts and validates
-        string representations to integers.
-
-        Returns
-        -----------
-        The integer representation of the logger level
-        """
-        try:
-            return getattr(logging, self.logger_level)
-        except AttributeError:
-            logger.info("Given logger level is invalid defaulting to DEBUG")
-            self.logger_level = 'DEBUG'
-            return getattr(logging, self.logger_level)
 
     def log_settings(self):
         """Log configuration parameters"""

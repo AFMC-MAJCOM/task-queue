@@ -4,7 +4,7 @@ import time
 
 from sqlalchemy import create_engine
 
-from task_queue.logger import logger
+from task_queue.logger import logger, set_logger_level
 from task_queue.config import config
 from task_queue.workers.work_queue import WorkQueue
 from task_queue.workers.argo_workflows_queue_worker import (
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     settings = config.get_task_queue_settings(
         setting_class=config.TaskQueueCliSettings
     )
-    logger.setLevel(settings.logger_level)
+    logger.set_logger_level(settings.logger_level)
     settings.log_settings()
 
     # Check if dependent arguments were provided

@@ -13,7 +13,7 @@ def create_logger(module_name: str, logger_level=logging.DEBUG):
     module_name: str
        The module name that will be logged
     logger_level: str | int
-        The level that the logger will output to file and stream  
+        The level that the logger will output to file and stream
 
     Returns:
     -----------
@@ -53,6 +53,25 @@ def get_log_fp():
     if not os.path.isdir(log_dir):
         os.mkdir(log_dir)
     return os.path.join(log_dir, log)
+
+
+def set_logger_level(logger_level):
+    """Verifies that the logger level providied is a valid logger level and
+    then sets the logger to that level.
+
+    Parameters:
+    -----------
+    logger_level: str | int
+        The level that the logger will output to file and stream
+    """
+    if not isinstance(logger_level, int):
+        try:
+            logger_level = getattr(logging, logger_level)
+        except AttributeError:
+            logger.error("Incorrect logger level %s, defaulting to DEBUG",\
+                         logger_level)
+            return
+    logger.setLevel(logger_level)
 
 
 logger = create_logger(__name__)
