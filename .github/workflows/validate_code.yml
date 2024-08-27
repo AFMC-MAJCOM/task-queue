@@ -29,7 +29,7 @@ jobs:
   unit-test:
     uses: ./.github/workflows/unit-test.yaml
     with:
-      owner: ./.github/actions/unit-test
+      owner: AFMC-MAJCOM
     # - name: Pytest unit tests
     #   uses: ./.github/actions/unit-test
     # - name: Run Pytest
