@@ -26,6 +26,6 @@ jobs:
           pip install .
       - name: Check Inputs
         run: |
-          echo ${{ inputs.inputs.owner }}
-      # - name: Run
-      #   uses: ${{job.inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
+          echo ${{ inputs.owner }}
+      - name: Run
+        uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
