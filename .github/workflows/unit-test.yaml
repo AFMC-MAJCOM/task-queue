@@ -24,6 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           pip install .
-      - name: Unit tests with pytest
+      - name: Print tunit tests with pytest
         run: echo ${{ inputs.project_root }}/.github/actions/unit-test
+      - name: Run
         uses: ${{ inputs.project_root }}/.github/actions/unit-test
