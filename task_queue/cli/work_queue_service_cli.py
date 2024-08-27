@@ -210,7 +210,7 @@ if __name__ == "__main__":
     settings = config.get_task_queue_settings(
         setting_class=config.TaskQueueCliSettings
     )
-    logger.set_logger_level(settings.logger_level)
+    set_logger_level(settings.logger_level)
     settings.log_settings()
 
     # Check if dependent arguments were provided

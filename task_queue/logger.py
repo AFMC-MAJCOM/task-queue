@@ -29,7 +29,7 @@ def create_logger(module_name: str, logger_level=logging.DEBUG):
     # Add handlers to logger
     _logger.addHandler(stream_handler)
     _logger.addHandler(file_handler)
-    # set log level
+    # Set log level
     _logger.setLevel(logger_level)
     return _logger
 
