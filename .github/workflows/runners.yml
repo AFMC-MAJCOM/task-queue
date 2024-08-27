@@ -25,6 +25,8 @@ jobs:
     - name: Main Version
       run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Merge Version
       run: |
           pip install -q setuptools_scm
@@ -40,6 +42,8 @@ jobs:
        PUBLISH_DOCKER_IMAGE_VALID: ${{ steps.export.outputs.valid }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Main Version
         run: |
           pip install -q setuptools_scm
@@ -71,6 +75,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create and push tag
         run: |
           pip install -q setuptools_scm
