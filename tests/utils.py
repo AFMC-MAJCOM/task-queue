@@ -7,7 +7,7 @@ from task_queue import config
 class PytestSqlEngine():
     """Class to create a SQL engine used for testing."""
 
-    def __init__():
+    def __init__(self):
         """Initializing PytestSqlEngine object from envrironemnt variables."""
         settings = config.TaskQueueSqlSettings()
 
@@ -19,7 +19,7 @@ class PytestSqlEngine():
         self.query = {}
         self.port = settings.SQL_QUEUE_POSTGRES_PORT
 
-    def create_test_engine():
+    def create_test_engine(self):
         """Create and return SQL engine to use for testing."""
         test_sql_engine = sqla.create_engine(sqla.engine.url.URL(
                     self.drivername,
