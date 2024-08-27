@@ -11,7 +11,7 @@ jobs:
     with:
       project_root: task_queue
 
-  unit-test:
+  setup-pytest:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -24,16 +24,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install .
-    # - name: Test with pytest
-    #   run: |
-    #     export SQL_QUEUE_NAME=test
-    #     export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
-    #     export SQL_QUEUE_POSTGRES_USER=postgres
-    #     export SQL_QUEUE_POSTGRES_PASSWORD=postgres
-    #     export SQL_QUEUE_POSTGRES_DATABASE=postgres
-    #     export SQL_QUEUE_POSTGRES_PORT=5432
-    - name: Pytest unit tests
-      uses: ./.github/actions/unit-test
+
+  unit-test:
+    needs: [setup-pytest]
+    uses: ./.github/workflows/unit-test
+    # - name: Pytest unit tests
+    #   uses: ./.github/actions/unit-test
     # - name: Run Pytest
     #   run: pytest -vv -m unit
 # unit-test:
