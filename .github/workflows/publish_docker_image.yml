@@ -18,6 +18,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: build image
         run: |
+          pip install -q setuptools_scm
           version=$(python -m setuptools_scm)
           echo "Task Queue Version = ${version}"
           docker build . -t ghcr.io/afmc-majcom/task-queue/task-queue:latest

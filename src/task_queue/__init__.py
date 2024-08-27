@@ -10,4 +10,6 @@ except ModuleNotFoundError:
 __all__ = [
     "get_task_queue_settings",
     "config",
+    "__version__",
+    "__version_tuple__",
 ]
