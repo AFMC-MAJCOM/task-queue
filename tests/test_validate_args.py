@@ -132,7 +132,7 @@ def test_validate_args_worker_interface_success():
     assert error_string == ''
 
 def test_validate_args_worker_interface_missing_id():
-    """Ensure worker_interface_id is provided when using 
+    """Ensure worker_interface_id is provided when using
        argo workflows worker interface
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -214,7 +214,7 @@ def test_validate_args_event_store_implementation_success():
     assert error_string == ''
 
 def test_validate_args_event_store_implementation_missing_add_name():
-    """Ensure add_to_queue_event_name is provided when  
+    """Ensure add_to_queue_event_name is provided when
        event_store_implementation is set to sql-json
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -235,7 +235,7 @@ def test_validate_args_event_store_implementation_missing_add_name():
            in error_string
 
 def test_validate_args_event_store_implementation_missing_move_name():
-    """Ensure move_queue_event_name is provided when  
+    """Ensure move_queue_event_name is provided when
        event_store_implementation is set to sql-json
     """
     args_dict = {'worker_interface': 'argo-workflows',
@@ -256,8 +256,8 @@ def test_validate_args_event_store_implementation_missing_move_name():
            in error_string
 
 def test_validate_args_event_store_implementation_sql_json_only_option():
-    """Ensure sql-json is selected for event_store_implementation if 
-       with_queue_events is set 
+    """Ensure sql-json is selected for event_store_implementation if
+       with_queue_events is set
     """
     args_dict = {'worker_interface': 'argo-workflows',
             'queue_implementation': 'sql-json',
@@ -278,6 +278,9 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
            in error_string
 
 def test_handle_queue_implementation_choice_fail():
+    """Checks that the handle_queue_implementation_choice will raise
+       the correct error if the wrong combination of settings are used
+    """
     sql_settings = config.get_task_queue_settings(
                 setting_class=config.TaskQueueSqlSettings
             )
