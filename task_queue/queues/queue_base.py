@@ -4,6 +4,8 @@ import warnings
 from abc import ABC, abstractmethod
 from enum import Enum
 
+from task_queue import logger
+
 
 class QueueItemStage(Enum):
     """The different stages that a queue item can be in.

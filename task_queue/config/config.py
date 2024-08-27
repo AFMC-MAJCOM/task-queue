@@ -83,7 +83,7 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
             return v
         for key, value in values.data.items():
             if value is None:
-                logger.error(f"SQL Queue parameter %s must be supplied"\
+                logger.error("SQL Queue parameter %s must be supplied"\
                              "when SQL_QUEUE_CONNECTION_STRING is None.", key)
                 raise ValueError(
                     f"SQL Queue parameter {key} must be supplied when "
