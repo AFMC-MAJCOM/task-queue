@@ -3,10 +3,6 @@ requires = ["setuptools>=61", "setuptools_scm[toml]"]
 build-backend = "setuptools.build_meta"
 
 
-[tool.setuptools_scm]
-write_to = "src/task_queue/_version.py"
-
-
 [project]
 name = "task_queue"
 dependencies = [
@@ -20,3 +16,11 @@ dependencies = [
     "sqlmodel",
 ]
 dynamic = ["version"]
+
+
+[tool.pylint.main]
+ignore = ["_version.py"]
+
+
+[tool.setuptools_scm]
+write_to = "src/task_queue/_version.py"
