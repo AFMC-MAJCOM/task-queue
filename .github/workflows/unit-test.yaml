@@ -26,7 +26,6 @@ jobs:
           pip install .
       - name: Check Inputs
         run: |
-          echo ${{ jobs.steps.run.inputs.owner }}
           echo ${{ steps.run.inputs.owner }}
           echo ${{ jobs.steps.inputs.owner }}
       # - name: Run
