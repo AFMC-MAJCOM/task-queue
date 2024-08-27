@@ -1,7 +1,7 @@
 """Wherein is contained the functions and classes concering the Work Queue Web
 API.
 """
-import logging
+
 import warnings
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
@@ -11,18 +11,17 @@ from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine
 
+from task_queue.logger import set_logger_level
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue.queues.s3_queue import json_s3_queue
 from task_queue.queues.sql_queue import json_sql_queue
 from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue import config
+from task_queue import config, logger
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-api_settings = config.TaskQueueApiSettings()
+api_settings = config.get_task_queue_settings(config.TaskQueueApiSettings)
+set_logger_level(api_settings.logger_level)
 api_settings.log_settings()
 app = FastAPI()
 
@@ -179,6 +178,7 @@ async def get_queue_size(queue_item_stage:str) -> int:
         result = queue.size(queue_item_stage_enum)
         return result
     except Exception as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
@@ -208,6 +208,7 @@ async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
     try:
         return queue.lookup_status(item_id)
     except KeyError as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
@@ -229,6 +230,7 @@ async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
         result = queue.lookup_state(queue_item_stage_enum)
         return result
     except Exception as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
@@ -250,6 +252,7 @@ async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
         response = queue.lookup_item(item_id)
         return response
     except KeyError as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
