@@ -27,4 +27,4 @@ jobs:
       - name: Print tunit tests with pytest
         run: echo ${{ inputs.project_root }}
       - name: Run
-        uses: ${{ inputs.project_root }}
+        uses: "${{ inputs.project_root }}"
