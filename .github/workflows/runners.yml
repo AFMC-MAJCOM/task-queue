@@ -28,7 +28,7 @@ jobs:
     - name: Merge Version
       run: |
           pip install -q setuptools_scm
-          echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+          echo "MERGE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
 
