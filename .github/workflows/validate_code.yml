@@ -29,7 +29,7 @@ jobs:
   unit-test:
     uses: ./.github/workflows/unit-test.yaml
     with:
-      project_root: ./.github/actions/unit-test
+      owner: ./.github/actions/unit-test
     # - name: Pytest unit tests
     #   uses: ./.github/actions/unit-test
     # - name: Run Pytest
