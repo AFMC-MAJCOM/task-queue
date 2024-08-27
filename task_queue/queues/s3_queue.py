@@ -5,6 +5,7 @@ import os
 from functools import reduce
 
 import s3fs
+from task_queue import logger
 
 from .queue_base import QueueBase
 from .. import s5fs
@@ -39,9 +40,9 @@ class JsonS3Queue(QueueBase):
         )
 
         if s5fs.HAS_S5CMD:
-            print("S3 Queue is using S5CMD")
+            logger.info("S3 Queue is using S5CMD")
         else:
-            print("S3 Queue is using S3FS")
+            logger.info("S3 Queue is using S3FS")
 
     # BaseExeption is used to tell the user the failed items
     # pylint: disable=broad-exception-raised
@@ -94,6 +95,8 @@ class JsonS3Queue(QueueBase):
                 for item, success in zip(items_to_add, queue_write_success)
                 if not success
             ]
+            logger.error("Error writing at least one queue object to S3: %s",\
+                         fail_items)
             raise BaseException(
                 "Error writing at least one queue object to S3:",
                 fail_items
@@ -209,6 +212,7 @@ class JsonS3Queue(QueueBase):
             if queue_item_id in item_ids:
                 return s
 
+        logger.error("Item not found %s", queue_item_id)
         raise KeyError(queue_item_id)
 
     def lookup_state(self,
@@ -341,7 +345,7 @@ def safe_s3fs_ls(filesystem, path, *args, **kwargs):
         try:
             return filesystem.ls(path, *args, **kwargs)
         except FileNotFoundError:
-            pass
+            logger.warning("file %s not found", path)
     return []
 
 if s5fs.HAS_S5CMD:
@@ -506,8 +510,8 @@ def maybe_write_s3_json(s3_path, json_data):
     try:
         with fs.open(s3_path, "wt") as f:
             json.dump(json_data, f, indent=4)
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.warning("Item %s is not serializable", json_data)
         # What was written to the S3 file before the exception will still show
         # Up in S3, so let's just delete that
         fs.rm(s3_path)

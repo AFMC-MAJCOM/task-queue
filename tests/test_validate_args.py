@@ -24,7 +24,8 @@ def test_validate_args_s3_success():
             'queue_name': None,
             's3_base_path': 'dummypath',
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
@@ -43,7 +44,8 @@ def test_validate_args_s3_missing_base_path():
             'queue_name': None,
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'when queue-implementation is set to {JSON_S3_QUEUE_CLI_CHOICE}'\
@@ -63,7 +65,8 @@ def test_validate_args_sql_success():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
@@ -82,7 +85,8 @@ def test_validate_args_sql_missing_queue_name():
             'queue_name': None,
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
@@ -102,7 +106,8 @@ def test_validate_args_sql_missing_connection_string():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'queue-implementation is set to {JSON_SQL_QUEUE_CLI_CHOICE}'\
@@ -122,7 +127,8 @@ def test_validate_args_worker_interface_success():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
@@ -142,7 +148,8 @@ def test_validate_args_worker_interface_missing_id():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
@@ -163,7 +170,8 @@ def test_validate_args_worker_interface_missing_endpoint():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
@@ -184,7 +192,8 @@ def test_validate_args_worker_interface_missing_namespace():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'worker-interface is set to {ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE}'\
@@ -204,7 +213,8 @@ def test_validate_args_event_store_implementation_success():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': 'dummyeventname',
-            'move_queue_event_name': 'dummyeventname2'}
+            'move_queue_event_name': 'dummyeventname2',
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
@@ -224,7 +234,8 @@ def test_validate_args_event_store_implementation_missing_add_name():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': None,
-            'move_queue_event_name': 'dummyeventname2'}
+            'move_queue_event_name': 'dummyeventname2',
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
@@ -245,7 +256,8 @@ def test_validate_args_event_store_implementation_missing_move_name():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': 'dummyevent',
-            'move_queue_event_name': None}
+            'move_queue_event_name': None,
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
@@ -266,9 +278,51 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
             'queue_name': 'dummyqueuename',
             's3_base_path': None,
             'add_to_queue_event_name': 'dummyeventname',
-            'move_queue_event_name': 'dummyeventname2'}
+            'move_queue_event_name': 'dummyeventname2',
+            'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
     assert  "event_store_implementation must be set to "\
            f"{SQL_EVENT_STORE_CLI_CHOICE}"\
            in error_string
+
+def test_validate_args_logger_success():
+    """Test valid arguments for the S3 queue
+    """
+    args_dict = {'worker_interface': None,
+            'queue_implementation': None,
+            'event_store_implementation': 'none',
+            'with_queue_events': None,
+            'worker_interface_id': None,
+            'endpoint': None,
+            'namespace': None,
+            'connection_string': None,
+            'queue_name': None,
+            's3_base_path': None,
+            'add_to_queue_event_name': None,
+            'move_queue_event_name': None,
+            'logger_level': 'DEBUG'}
+    success, error_string = validate_args(args_dict)
+    print(error_string)
+    assert success
+    assert error_string == ''
+
+def test_validate_args_logger_fail():
+    """Test valid arguments for the S3 queue
+    """
+    args_dict = {'worker_interface': None,
+            'queue_implementation': None,
+            'event_store_implementation': 'none',
+            'with_queue_events': None,
+            'worker_interface_id': None,
+            'endpoint': None,
+            'namespace': None,
+            'connection_string': None,
+            'queue_name': None,
+            's3_base_path': None,
+            'add_to_queue_event_name': None,
+            'move_queue_event_name': None,
+            'logger_level': 'INVALID'}
+    success, error_string = validate_args(args_dict)
+    assert not success
+    assert 'logger_level' in error_string
