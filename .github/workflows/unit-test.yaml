@@ -6,6 +6,7 @@ permissions:
 
 jobs:
   unit-test:
+    runs-on: ubuntu-latest
     steps:
     - name: Run Pytest
       run: pytest -vv -m unit
