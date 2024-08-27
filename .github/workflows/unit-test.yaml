@@ -25,6 +25,10 @@ jobs:
           pip install pytest
           pip install .
       - name: Check Inputs
-        run: echo ${{ unit-test.inputs.owner }}
-      - name: Run
-        uses: ${{ unit-test.inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
+        run: |
+          echo ${{ job.inputs.owner }}
+          echo ${{ github.event.inputs.owner }}
+          echo ${{ jobs.inputs.owner }}
+          echo ${{ steps.inputs.owner }}
+      # - name: Run
+      #   uses: ${{job.inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
