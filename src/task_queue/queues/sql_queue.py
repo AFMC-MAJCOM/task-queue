@@ -7,6 +7,7 @@ from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
 from sqlalchemy.dialects.postgresql import insert, JSONB, Any
 from sqlalchemy import Engine, Column
 
+from task_queue import logger
 from .queue_base import QueueBase, QueueItemStage
 
 
@@ -75,7 +76,7 @@ class SQLQueue(QueueBase):
                     ).model_dump(exclude_unset=True)
                 )
             except BaseException as e:
-                print(e)
+                logger.warning(e)
 
 
         with Session(self.engine) as session:
@@ -86,6 +87,8 @@ class SQLQueue(QueueBase):
             session.commit()
 
         if len(db_items) != len(items):
+            logger.error("Error writing at least one queue object to SQL: %s",\
+                        fail_items)
             raise BaseException(
                 "Error writing at least one queue object to SQL:",
                 fail_items)
@@ -200,6 +203,7 @@ class SQLQueue(QueueBase):
             item = session.exec(statement).first()
 
             if item is None:
+                logger.error("Item does not exist %s", queue_item_id)
                 raise KeyError(queue_item_id)
 
             return QueueItemStage(item)
