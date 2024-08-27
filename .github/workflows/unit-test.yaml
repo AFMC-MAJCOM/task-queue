@@ -13,6 +13,8 @@ permissions:
 jobs:
   unit-test:
       runs-on: ubuntu-latest
+      outputs:
+       ACTION_PATH: ${{ inputs.path }}
       steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
@@ -25,7 +27,7 @@ jobs:
           pip install pytest
           pip install .
       - name: Check Inputs
-        run: echo "ACTION_PATH=${{ inputs.path }}" >> $GITHUB_ENV
-      # - name: Run
-      #   uses: ${ACTION_PATH}
+        run: echo ${{ env.ACTION_PATH }}
+      - name: Run
+        uses: ${{ env.ACTION_PATH }}
         # uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
