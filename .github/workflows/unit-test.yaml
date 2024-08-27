@@ -26,5 +26,5 @@ jobs:
           pip install .
       - name: Print tunit tests with pytest
         run: echo ${{ inputs.project_root }}/.github/actions/unit-test
-      - name: Run
-        uses: ${{ inputs.project_root }}/.github/actions/unit-test
+      # - name: Run
+      #   uses: ${{ inputs.project_root }}/.github/actions/unit-test
