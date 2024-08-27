@@ -26,4 +26,4 @@ jobs:
           pip install pytest
           pip install .
       - name: Run
-        uses: AFMC-MAJCOM/task_queue/.github/actions/unit-test@OPAL-668v2
+        uses: AFMC-MAJCOM/task-queue/.github/actions/unit-test@OPAL-668v2
