@@ -68,7 +68,10 @@ def new_sql_queue(request):
     """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
     test_sql_engine = PytestSqlEngine()
-    return sqlq.json_sql_queue(test_sql_engine.create_test_engine(), queue_name)
+    return sqlq.json_sql_queue(
+        test_sql_engine.test_sql_engine,
+        queue_name
+    )
 
 
 ALL_QUEUE_TYPES = [

@@ -91,7 +91,7 @@ def new_empty_store(request):
         yield InMemoryEventStore()
     if request.param == "sql":
         test_sql_engine = PytestSqlEngine()
-        yield SqlEventStore(test_sql_engine.create_test_engine)
+        yield SqlEventStore(test_sql_engine.test_sql_engine)
 
 
 @pytest.mark.parametrize("new_empty_store",
