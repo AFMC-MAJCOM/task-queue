@@ -76,7 +76,7 @@ class SQLQueue(QueueBase):
                     ).model_dump(exclude_unset=True)
                 )
             except BaseException as e:
-                logger.error(e)
+                logger.warning(e)
 
 
         with Session(self.engine) as session:

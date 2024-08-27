@@ -190,7 +190,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             return None
 
         except requests.exceptions.RequestException as e:
-            print(f"Exception: {e}")
+            logger.error(e)
             raise e
 
     def send_job(self, item_id, queue_item_body):
@@ -235,10 +235,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         delete_url = self._argo_workflows_delete_url(name)
         response = requests.delete(delete_url, timeout = 10)
         try:
-            print(f"Deleting workflow {name}")
+            logger.info("Deleting workflow %s", name)
             response.raise_for_status()
         except requests.HTTPError as e:
-            print(f"Couldn't delete workflow {name}")
+            logger.error("Couldn't delete workflow %s", name)
             raise e
 
     def _construct_poll_query(self):

@@ -178,6 +178,7 @@ async def get_queue_size(queue_item_stage:str) -> int:
         result = queue.size(queue_item_stage_enum)
         return result
     except Exception as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
@@ -207,6 +208,7 @@ async def lookup_queue_item_status(item_id:str)->Annotated[int, Ge(0), Le(3)]:
     try:
         return queue.lookup_status(item_id)
     except KeyError as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
@@ -228,6 +230,7 @@ async def lookup_queue_item_state(queue_item_stage: str) -> List[str]:
         result = queue.lookup_state(queue_item_stage_enum)
         return result
     except Exception as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
               detail=f"{queue_item_stage} not a Queue Item Stage") from exc
 
@@ -249,6 +252,7 @@ async def lookup_queue_item(item_id:str) -> LookupQueueItemModel:
         response = queue.lookup_item(item_id)
         return response
     except KeyError as exc:
+        logger.error(exc)
         raise HTTPException(status_code=400,
                             detail=f"{item_id} not in Queue") from exc
 
