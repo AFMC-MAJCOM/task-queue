@@ -3,7 +3,7 @@ name: Python Unit Test
 on:
   workflow_call:
     inputs:
-      owner:
+      path:
         required: true
         type: string
 
@@ -25,8 +25,7 @@ jobs:
           pip install pytest
           pip install .
       - name: Check Inputs
-        run: |
-          echo ${{ inputs.owner }}
+        run: echo "ACTION_PATH=${{ inputs.path }}" >> $GITHUB_ENV
       - name: Run
-        uses: ${{ inputs.owner }}
+        uses: ${ACTION_PATH}
         # uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
