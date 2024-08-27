@@ -166,7 +166,7 @@ This step is necessary for testing or if you want a local postgres server runnin
 
 ```
 docker pull postgres
-docker run --name my-postgres -e SQL_QUEUE_POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
+docker run --name my-postgres -e POSTGRES_PASSWORD=my_password -d -p 5432:5432 postgres
 ```
 
 You can modify the ports, passwords, and name to what you would like them to be but make sure the next steps reflect those changes.
@@ -184,13 +184,13 @@ SQL_QUEUE_NAME=queue_name
 The container can then be spun up using the below command.
 
 ```
-docker run --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 (Optional) If you started your own local postgres server and are using a linux machine run this command instead.
 
 ```
-docker run --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 ### Running the CLI
