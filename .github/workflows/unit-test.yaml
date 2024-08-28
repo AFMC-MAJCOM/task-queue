@@ -10,11 +10,14 @@ on:
 permissions:
   contents: read
 
+env:
+  ACTION_PATH: ${{ inputs.path }}
+
 jobs:
   unit-test:
       runs-on: ubuntu-latest
-      env:
-       ACTION_PATH: ${{ inputs.path }}
+      # env:
+      #  ACTION_PATH: ${{ inputs.path }}
       steps:
       # - uses: actions/checkout@v3
       # - name: Set up Python 3.10
