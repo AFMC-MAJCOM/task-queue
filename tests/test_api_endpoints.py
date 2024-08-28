@@ -226,7 +226,7 @@ def test_v1_queue_requeue_invalid():
     queue.put(default_items)
 
     expected_dict = {
-        "detail":['Item bad-item-id not in a FAIL state. Skipping.']
+        "detail":['Item \'bad-item-id\' not in a FAIL state. Skipping.']
     }
 
     # Check that it does not fail when input is invalid but informs the user
