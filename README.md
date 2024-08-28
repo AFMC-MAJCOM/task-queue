@@ -181,16 +181,16 @@ SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.intern
 SQL_QUEUE_NAME=queue_name
 ```
 
-The container can then be spun up using the below command. ```<name>``` in the command is whatever you would like to call the volume where the logs will be stored. The most likely path of where the logs are actually written to on your machine is `/var/lib/docker/volumes/<name>/_data`.
+The container can then be spun up using the below command. `<volume_name>` in the command is whatever you would like to call the volume where the logs will be stored. The most likely path of where the logs are actually written to on your machine is `/var/lib/docker/volumes/<volume_name>/_data`.
 
 ```
-docker run -ti --rm -p 8001:8001 --env-file ./env.list -v <name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --rm -p 8001:8001 --env-file ./env.list -v <volume_name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 (Optional) If you started your own local postgres server and are using a linux machine run this command instead.
 
 ```
-docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list -v <name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list -v <volume_name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 ### Running the CLI
@@ -198,7 +198,7 @@ docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --
 Run the following command to output help from CLI
 
 ```
-docker run --rm -v <name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
+docker run --rm -v <volume_name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
 ```
 
 # Running tests
