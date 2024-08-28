@@ -13,7 +13,7 @@ permissions:
 jobs:
   unit-test:
       runs-on: ubuntu-latest
-      outputs:
+      env:
        ACTION_PATH: ${{ inputs.path }}
       steps:
       - uses: actions/checkout@v3
