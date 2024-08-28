@@ -5,4 +5,4 @@ runs:
   - uses: actions/checkout@v3
   - name: Run Pytests
     run: pytest -vv -m unit
-    shell: python
+    shell: bash
