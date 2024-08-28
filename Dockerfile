@@ -3,5 +3,6 @@ RUN useradd -ms /bin/bash default
 WORKDIR /home/default
 COPY --chown=default:default . ./
 USER default
+RUN mkdir /home/default/logs
 RUN pip install .
 ENTRYPOINT ["/bin/bash", "./start_services.sh"]
