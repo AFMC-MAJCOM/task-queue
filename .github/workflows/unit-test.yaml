@@ -31,6 +31,6 @@ jobs:
       #     pip install .
       - name: Check Inputs
         run: echo ${{ env.ACTION_PATH }}
-      # - name: Run
-      #   uses: ${{ env.ACTION_PATH }}
+      - name: Run
+        uses: ${{ env.ACTION_PATH }}
         # uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
