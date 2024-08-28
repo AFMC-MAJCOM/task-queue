@@ -4,6 +4,7 @@ from typing import Dict
 
 import pydantic
 
+from task_queue import logger
 from task_queue.events.event import Event
 from .queue_base import QueueBase, QueueItemStage
 
@@ -135,6 +136,7 @@ class QueueWithEvents(QueueBase):
         out = self.queue.put(filtered_items)
 
         if exc is not None:
+            logger.error(exc)
             raise exc
 
         return out

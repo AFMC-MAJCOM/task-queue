@@ -1,7 +1,5 @@
 """Contains functions and classes concerning configuration management.
 """
-
-import logging
 import os
 from enum import Enum
 from typing import Optional
@@ -11,9 +9,8 @@ from pydantic import (
     Field,
     field_validator,
 )
+from task_queue import logger
 
-
-logger = logging.getLogger(__name__)
 
 
 def get_config_file_path() -> str:
@@ -56,6 +53,8 @@ class TaskQueueBaseSetting(BaseSettings):
         env_file_encoding='utf-8',
         extra='ignore'
     )
+    logger_level: str = 'DEBUG'
+
 
     def log_settings(self):
         """Log configuration parameters"""
@@ -84,6 +83,8 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
             return v
         for key, value in values.data.items():
             if value is None:
+                logger.error("SQL Queue parameter %s must be supplied"\
+                             "when SQL_QUEUE_CONNECTION_STRING is None.", key)
                 raise ValueError(
                     f"SQL Queue parameter {key} must be supplied when "
                     "SQL_QUEUE_CONNECTION_STRING is None."
@@ -103,6 +104,7 @@ class TaskQueueS3Settings(TaskQueueBaseSetting):
     def validate_s3_path(cls, v: str) -> str:
         """Validate the s3 path begins with s3://"""
         if not v.startswith("s3://"):
+            logger.error("S3_QUEUE_BASE_PATH must start with s3://")
             raise ValueError("S3_QUEUE_BASE_PATH must start with s3://")
         return v
 

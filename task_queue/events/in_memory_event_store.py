@@ -1,8 +1,10 @@
 """Wherein is contained the implementation of the In Memory Event Store.
 """
 from typing import List, Dict
+from task_queue import logger
 from .event import Event
 from .event_store_interface import EventStoreInterface
+
 
 class InMemoryEventStore(EventStoreInterface):
     """Class for the InMemoryEventStore.
@@ -31,7 +33,7 @@ class InMemoryEventStore(EventStoreInterface):
             else:
                 for e in self.events[event.name]:
                     if e.name == event.name and e.data == event.data:
-                        print('duplicate caught')
+                        logger.info('duplicate caught')
                         duplicate = True
                 if not duplicate:
                     event.id = len(self.events[event.name])
