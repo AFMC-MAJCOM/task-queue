@@ -147,6 +147,9 @@ def handle_queue_implementation_choice(cli_settings):
             store = SqlEventStore(
                 create_engine(cli_settings.connection_string)
             )
+        else:
+            raise AttributeError("SQL_JSON is the only implemented event store"
+                                  " that works with with_queue_events")
 
         queue = queue_with_events(
             queue,
@@ -154,6 +157,7 @@ def handle_queue_implementation_choice(cli_settings):
             add_event_name=cli_settings.add_to_queue_event_name,
             move_event_name=cli_settings.move_queue_event_name
         )
+
     return queue
 
 
