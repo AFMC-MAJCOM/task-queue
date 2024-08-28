@@ -290,10 +290,18 @@ async def get(n_items:PositiveInt=1) ->  List[Tuple[str, Any]]:
 def requeue(item_ids:Union[str,list[str]]) -> None:
     """API endpoint to move input queue items from FAILED to WAITING.
 
+    If an input queue item is not in the FAIL stage, it will be skipped. If an
+    item has been skipped, this endpoint will return a list of all skipped
+    items, otherwise it will return nothing.
+
     Parameters:
     -----------
     item_ids: [str]
         ID of Queue Item
+
+    Returns:
+    -----------
+    Returns a list of skipped items or nothing.
     """
     with warnings.catch_warnings(record=True) as warn:
         queue.requeue(item_ids)
@@ -308,12 +316,20 @@ def requeue(item_ids:Union[str,list[str]]) -> None:
 async def put(items:Dict[str,QueueItemBodyType]) -> None:
     """API endpoint to add items to the Queue.
 
+    If an input queue item is alread in the queue, it will be skipped. If an
+    item has been skipped, this endpoint will return a list of all skipped
+    items, otherwise it will return nothing.
+
     Parameters:
     -----------
     items: dict
         Dictionary of Queue Items to add Queue, where Item is a key:value
         pair, where key is the item ID and value is the queue item body.
         The item ID must be a string and the item body must be serializable.
+
+    Returns:
+    -----------
+    List of skipped items or nothing.
     """
     with warnings.catch_warnings(record=True) as warn:
         queue.put(items)
