@@ -181,7 +181,7 @@ SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.intern
 SQL_QUEUE_NAME=queue_name
 ```
 
-The container can then be spun up using the below command. `<volume_name>` in the command is whatever you would like to call the volume where the logs will be stored. The most likely path of where the logs are actually written to on your machine is `/var/lib/docker/volumes/<volume_name>/_data`.
+The container can then be spun up using the below command. `<volume_name>` in the command is whatever you would like to call the volume where the logs will be stored. The most likely path of where the logs are actually written to on your machine is `/var/lib/docker/volumes/<volume_name>/_data`, however, you can check by running ```docker volume inspect <volume_name>```
 
 ```
 docker run -ti --rm -p 8001:8001 --env-file ./env.list -v <volume_name>:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
