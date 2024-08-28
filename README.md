@@ -181,16 +181,23 @@ SQL_QUEUE_CONNECTION_STRING=postgresql://postgres:my_password@host.docker.intern
 SQL_QUEUE_NAME=queue_name
 ```
 
+Before spinning up the controller or the server you must configure the output file for the logger. By running the following command the logger will have permissions to write to a log file outside of the docker image.
+
+```
+mkdir logs
+chmod -R 777 logs
+```
+
 The container can then be spun up using the below command.
 
 ```
-docker run -ti --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --rm -p 8001:8001 --env-file ./env.list -v ${PWD}/logs:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 (Optional) If you started your own local postgres server and are using a linux machine run this command instead.
 
 ```
-docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list ghcr.io/afmc-majcom/task-queue/task-queue:latest server
+docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --env-file ./env.list -v ${PWD}/logs:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest server
 ```
 
 ### Running the CLI
@@ -198,7 +205,7 @@ docker run -ti --add-host=host.docker.internal:host-gateway --rm -p 8001:8001 --
 Run the following command to output help from CLI
 
 ```
-docker run --rm ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
+docker run --rm -v ${PWD}/logs:/home/default/logs ghcr.io/afmc-majcom/task-queue/task-queue:latest controller --help
 ```
 
 # Running tests
