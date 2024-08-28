@@ -6,6 +6,7 @@ import pandas as pd
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
+from task_queue import logger
 
 
 class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
@@ -189,7 +190,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             return None
 
         except requests.exceptions.RequestException as e:
-            print(f"Exception: {e}")
+            logger.error(e)
             raise e
 
     def send_job(self, item_id, queue_item_body):
@@ -217,8 +218,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         try:
             response.raise_for_status()
         except requests.HTTPError as e:
-            print("Couldn't submit tasks")
-            print(request_body)
+            logger.warning("Couldn't submit tasks")
+            logger.warning(request_body)
             raise e
 
     def delete_job(self, queue_item_id):
@@ -234,10 +235,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         delete_url = self._argo_workflows_delete_url(name)
         response = requests.delete(delete_url, timeout = 10)
         try:
-            print(f"Deleting workflow {name}")
+            logger.info("Deleting workflow %s", name)
             response.raise_for_status()
         except requests.HTTPError as e:
-            print(f"Couldn't delete workflow {name}")
+            logger.error("Couldn't delete workflow %s", name)
             raise e
 
     def _construct_poll_query(self):
@@ -373,7 +374,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         # item ID if we have retried an item that has already been run. We can
         # handle this case by only taking the most recent one.
 
-        print("Filtering results")
+        logger.info("Filtering results")
         results = {}
         completed_times = {}
 
@@ -396,7 +397,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Returns Dict[Any, QueueItemStage]
         """
-        print("Getting status from Argo Workflows")
+        logger.info("Getting status from Argo Workflows")
         request_url = self._argo_workflows_list_url
         request_params = self._construct_poll_query()
 
@@ -406,7 +407,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             timeout=10
         )
 
-        print("Got response from Argo")
+        logger.info("Got response from Argo")
 
         response.raise_for_status()
 
