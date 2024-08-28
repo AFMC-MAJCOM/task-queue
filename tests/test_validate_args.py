@@ -300,6 +300,7 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
            f"{SQL_EVENT_STORE_CLI_CHOICE}"\
            in error_string
 
+@pytest.mark.unit
 def test_validate_args_logger_success():
     """Test valid arguments for the S3 queue
     """
@@ -321,6 +322,7 @@ def test_validate_args_logger_success():
     assert success
     assert error_string == ''
 
+@pytest.mark.unit
 def test_validate_args_logger_fail():
     """Test valid arguments for the S3 queue
     """
