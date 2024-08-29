@@ -10,8 +10,8 @@ on:
 permissions:
   contents: read
 
-# env:
-#   ACTION_PATH: ${{ inputs.path }}
+env:
+  ACTION_PATH: ${{ inputs.path }}
 
 jobs:
   unit-test:
@@ -30,7 +30,7 @@ jobs:
       #     pip install pytest
       #     pip install .
       - name: Check Inputs
-        run: echo ${{ github.events.inputs.path }}
+        run: echo ${{ env.ACTION_PATH }}
       # - name: Run
       #   # uses: ${{ env.ACTION_PATH }}
       #   uses: ./.github/actions/unit-test
