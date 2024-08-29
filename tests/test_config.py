@@ -3,6 +3,8 @@
 import os
 import tempfile
 
+import pytest
+
 from task_queue import get_task_queue_settings
 from task_queue import config
 
@@ -15,6 +17,7 @@ class TaskQueueTestSettings(config.TaskQueueApiSettings):
     UNIT_TEST_QUEUE_BASE: str = "s3://unit-tests/queue/queue_"
 
 
+@pytest.mark.unit
 def test_config_parameter_order():
     """Test parameter preference order"""
     environ = os.environ.copy()
@@ -44,6 +47,7 @@ def test_config_parameter_order():
     assert settings.UNIT_TEST_QUEUE_BASE == "s3://unit-tests/queue/queue_"
 
 
+@pytest.mark.unit
 def test_config_file_rerouting():
     """Test the configuration importing file paths"""
 
@@ -67,6 +71,7 @@ def test_config_file_rerouting():
     assert settings.UNIT_TEST_QUEUE_BASE == new_test_val
 
 
+@pytest.mark.unit
 def test_setting_class():
     """Test the setting_class argument returns the indicated class."""
 

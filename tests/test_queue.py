@@ -13,7 +13,7 @@ import task_queue.queues.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
 from .test_config import TaskQueueTestSettings
-from .utils import test_sql_engine
+from .utils import PytestSqlEngine
 
 
 UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
@@ -67,10 +67,19 @@ def new_sql_queue(request):
     """Returns an SQL queue.
     """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
-    return sqlq.json_sql_queue(test_sql_engine, queue_name)
+    test_sql_engine = PytestSqlEngine()
+    return sqlq.json_sql_queue(
+        test_sql_engine.test_sql_engine,
+        queue_name
+    )
 
 
-ALL_QUEUE_TYPES = ["memory", "sql", "s3", "with_events"]
+ALL_QUEUE_TYPES = [
+    pytest.param("memory", marks=pytest.mark.unit),
+    pytest.param("sql", marks=pytest.mark.integration),
+    pytest.param("s3", marks=pytest.mark.integration),
+    pytest.param("with_events", marks=pytest.mark.unit)
+]
 @pytest.fixture
 def new_empty_queue(request):
     """Fixture to create an empty queue of one given type.
