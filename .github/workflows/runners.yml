@@ -19,14 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: 'main'
     - name: Main Version
       run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Merge Version
-      run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+      run: |
+          pip install -q setuptools_scm
+          echo "MERGE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
 
@@ -38,8 +42,12 @@ jobs:
        PUBLISH_DOCKER_IMAGE_VALID: ${{ steps.export.outputs.valid }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Main Version
-        run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+        run: |
+          pip install -q setuptools_scm
+          echo "MAIN_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Export Results
@@ -67,9 +75,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create and push tag
         run: |
-          version=$(python setup.py --version)
+          pip install -q setuptools_scm
+          version=$(python -m setuptools_scm)
           echo "Task Queue Version = ${version}"
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"

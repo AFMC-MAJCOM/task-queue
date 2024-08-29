@@ -1,40 +1,31 @@
-import sys
+#! /usr/bin/env python
+"""Determine if a new docker image should be published for the version."""
+
+import argparse
 import os
+import sys
+
+from packaging.version import Version  # 3rd-party, may need to pip install
 
 
-def verify_new_image(version: str) -> bool:
-    """Verify that if a new docker image should be
-    published based on the version.
-
-    Parameters
-    ----------
-    version: string
-        The version being pushed to main.
-
-    Outputs
-    ----------
-    new_release: bool
-        True if a new docker image should be released, False otherwise.
-    """
-    version = [int(v) for v in version.split('.')]
-    if version[2] == 0:
-        # If the last version number is 0 it indicates that there was a minor
-        # or a major release
-        return True
-    return False
+parser = argparse.ArgumentParser(usage=__doc__)
+parser.add_argument('version', type=Version)
 
 
 if __name__=="__main__":
-    assert len(sys.argv) == 2
-    version = sys.argv[1]
-    print(f" Version: {version}")
+    args = parser.parse_args()
+    print(f" Version: {args.version}")
 
-    new_release = verify_new_image(version)
-    env_file = os.getenv('GITHUB_ENV')
+    new_release = 0 \
+            if args.version.is_devrelease \
+            or args.version.is_prerelease \
+            or args.version.is_postrelease \
+            else 1
+    if env_file := os.getenv('GITHUB_ENV'):
+        with open(env_file, "a", encoding='utf-8') as myfile:
+            myfile.write("PUBLISH_DOCKER_IMAGE_VALID=1\n")
+            myfile.write(f"PUBLISH_DOCKER_IMAGE={new_release}\n")
+    else:
+        sys.stdout.write("PUBLISH_DOCKER_IMAGE_VALID=1\n")
+        sys.stdout.write(f"PUBLISH_DOCKER_IMAGE={new_release}\n")
 
-    with open(env_file, "a") as myfile:
-        myfile.write("PUBLISH_DOCKER_IMAGE_VALID=1\n")
-        if new_release:
-            myfile.write("PUBLISH_DOCKER_IMAGE=1\n")
-        else:
-            myfile.write("PUBLISH_DOCKER_IMAGE=0\n")

@@ -4,7 +4,7 @@
 ## Repository Organization
 
 ### Root
-<p>The root folder contains all of the necessary information about task-queue, including a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/README.md">README</a> and a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/setup.py">setup.py</a> file to setup the current version of task-queue</p>
+<p>The root folder contains all of the necessary information about task-queue, including a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/README.md">README</a> and a [pyproject.toml](https://github.com/AFMC-MAJCOM/task-queue/blob/main/pyproject.toml) file to configure the current version of task-queue</p>
 
 ### .github/workflows
 <p>The <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/.github/workflows">.github/workflows</a> folder contains the workflow for task-queue and will run tests.</p>
@@ -21,7 +21,7 @@
 ## Coding Standards
 <p>There are four tests run in the task-queue CI/CD workflow: pytest-linux, ruff, pylint, and version_check.</p>
 
-<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been updated in <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/task_queue/__init__.py">task_queue/__init__.py</a>.</p>
+<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been incremented appropriately.</p>
 
 <p>When a pull request is created, the code must pass the four checks in the task-queue CI/CD workflow explained in the <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/CONTRIBUTING.md#githubworkflows">.github/workflows</a> folder. This helps ensures that the code follows our repository style guidelines.</p>
 
@@ -170,11 +170,23 @@ List of some helpful, frequent errors:
 Custom errors or warnings are still applicable for specific errors that need to be shown.
 
 ### Version Number
-<p>Version numbers in a codebase consistent of three segments: major, minor, and patch. The major number (X.0.0) signifies significant changes potentially requiring adaptation, while the minor number (0.X.0) indicates new features or enhancements that maintain compatibility. The patch number (0.0.X) reflects bug fixes and security updates to ensure stability. This versioning scheme facilitates communication about changes between releases, aiding decision-making and promoting efficient development. Importantly, when a number is incremented, the lower-order numbers reset to zero.</p>
+<p>Version numbers in a codebase are described by the <a href="https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers">Python PAckaging User Guide</a>, implementing the <a href="https://peps.python.org/pep-0440/#final-releases">PEP-440</a> version scheme.
+
+Per <a href="https://semver.org/">Semantic Versioning</a>,
+
+> Given a version number MAJOR.MINOR.PATCH, increment the:
+> 
+> MAJOR version when you make incompatible API changes
+> MINOR version when you add functionality in a backward compatible manner
+> PATCH version when you make backward compatible bug fixes
+>
+> Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+This versioning scheme facilitates communication about changes between releases, aiding decision-making and promoting efficient development. Importantly, when a number is incremented, the lower-order numbers reset to zero.</p>
 
 <p>Example: 1.5.7 → 1.6.0 → 2.0.0</p>
 
-<p>Additional info on <a href="https://peps.python.org/pep-0440/#final-releases">version numbers</a>.</p>
+<p>Additional info on <a href=>version numbers</a>.</p>
 
 ### Whitespace
 <p>Eliminate any trailing whitespace and ensure a consistent formatting practice. Maintain a clear demarcation between top level classes and functions by inserting two blank lines, and similarly, separate other functions and methods with a single blank line.</p>

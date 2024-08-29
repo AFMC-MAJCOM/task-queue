@@ -1,42 +1,27 @@
+#! /usr/bin/env python
+"""Compare two versions. Exits non-zero if the new version is not higher."""
+
+import argparse
 import sys
 
+from packaging.version import Version  # 3rd-party, may need to pip install
 
-def verify_version(old_vers: str, new_vers: str) -> bool:
-    """Verify the new version is valid.
-
-    Parameters
-    ----------
-    old_vers: string
-        Existing version number, likely from main.
-    new_vers: string
-        New version number from current branch.
-
-    Outputs
-    ----------
-    validity: bool
-        Validity of the new version number.
-    """
-    old_vers = [int(v) for v in old_vers.split('.')]
-    valids = [
-        [old_vers[0]+1, 0, 0],
-        [old_vers[0], old_vers[1]+1, 0],
-        [old_vers[0], old_vers[1], old_vers[2]+1],
-    ]
-
-    valids = [('.').join([str(v) for v in valid]) for valid in valids]
-
-    if new_vers in valids:
-        return True
-    print(f"New version not valid. Valid version increments: {valids}")
-    return False
-
+parser = argparse.ArgumentParser(usage=__doc__)
+parser.add_argument('old', type=Version)
+parser.add_argument('new', type=Version)
 
 if __name__=="__main__":
-    assert len(sys.argv) == 3
-    old_version = sys.argv[1]
-    new_version = sys.argv[2]
-    print(f"Old Version: {old_version}")
-    print(f"New Version: {new_version}")
+    args = parser.parse_args()
+    
+    print(f"Old Version: {args.old}")
+    print(f"New Version: {args.new}")
+    if args.new > args.old:
+        print('Ok')
+        sys.exit(0)
 
-    valid = verify_version(old_version, new_version)
-    sys.exit(not valid)
+    url = "https://packaging.python.org/en/latest/specifications/version-specifiers/"
+    print(
+        f"{args.new!s} is not higher than {args.old!s}.",
+        f"Read the docs at {url} for details.",
+    )
+    sys.exit(1)
