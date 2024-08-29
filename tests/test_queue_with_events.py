@@ -32,6 +32,7 @@ def queue_with_events_fixture():
         move_event_name=MOVE_EVENT_NAME
     )
 
+@pytest.mark.unit
 def test_event_queue_add(queue_with_events_fixture):
     """Tests that every event was added to the queue and every item has an
     event.
@@ -51,7 +52,7 @@ def test_event_queue_add(queue_with_events_fixture):
     # Make sure every item has an event
     assert len(add_events) == len(default_items)
 
-
+@pytest.mark.unit
 def test_event_queue_lifecycle(queue_with_events_fixture):
     """Test event queue lifestyle works as expected.
     """

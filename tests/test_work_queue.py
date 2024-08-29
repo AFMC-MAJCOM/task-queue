@@ -23,6 +23,7 @@ def default_work_queue() -> work_queue.WorkQueue:
     interface = DummyWorkerInterface()
     return work_queue.WorkQueue(queue, interface)
 
+@pytest.mark.unit
 def test_push_job(default_work_queue):
     """Test pushing jobs to the work queue pushes the correct number of jobs.
     """
@@ -43,6 +44,7 @@ def test_push_job(default_work_queue):
     # Assert there are `n_jobs` more items in `processing`
     assert n_processing_second - n_processing_first == n_jobs
 
+@pytest.mark.unit
 def test_job_success(default_work_queue):
     """Test that jobs are moved after succeeding.
     """
@@ -62,6 +64,7 @@ def test_job_success(default_work_queue):
     n_processing = default_work_queue._queue.size(QueueItemStage.PROCESSING)
     assert n_processing == n_jobs - n_success
 
+@pytest.mark.unit
 def test_job_fail(default_work_queue):
     """Test that job is moved after failing.
     """
@@ -81,6 +84,7 @@ def test_job_fail(default_work_queue):
     n_processing = default_work_queue._queue.size(QueueItemStage.PROCESSING)
     assert n_processing == n_jobs - n_fail
 
+@pytest.mark.unit
 def test_idempotent_update(default_work_queue):
     """Test the idempotent is updated.
     """
@@ -93,6 +97,7 @@ def test_idempotent_update(default_work_queue):
     default_work_queue.update_job_status()
     default_work_queue.update_job_status()
 
+@pytest.mark.unit
 def test_push_multiple(default_work_queue):
     """Test that no job is added to the work queue twice.
     """
@@ -107,6 +112,7 @@ def test_push_multiple(default_work_queue):
 
     assert len(set(first_ids).intersection((set(second_ids)))) == 0
 
+@pytest.mark.unit
 def test_delete_jobs(default_work_queue):
     """Tests that the work queue is deleting jobs when they terminate.
     """

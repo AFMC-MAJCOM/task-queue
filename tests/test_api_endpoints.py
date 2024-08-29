@@ -46,6 +46,7 @@ def clean_queue():
             item
         )
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_size():
     """Tests the size endpoint for all 4 stages.
@@ -79,6 +80,7 @@ def test_v1_queue_size():
     assert fail_response_size.status_code == 200
     assert fail_response_size.json() == fail_actual_size
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_sizes():
     """Tests the sizes endpoint.
@@ -101,6 +103,7 @@ def test_v1_queue_sizes():
     assert response.status_code == 200
     assert response.json() == sizes
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_status():
     """Tests the status/{item_id} endpoint.
@@ -128,6 +131,7 @@ def test_v1_queue_status():
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
 
+@pytest.mark.unit
 def test_v1_queue_describe():
     """Tests the describe endpoint.
     """
@@ -138,6 +142,7 @@ def test_v1_queue_describe():
     assert response.status_code == 200
     assert response.json() == desc
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_lookup_state():
     """Tests the lookup_state endpoint.
@@ -179,6 +184,7 @@ def test_v1_queue_lookup_state():
     assert response.status_code == 200
     assert sorted(response.json()) == sorted(fail_id_list)
 
+@pytest.mark.unit
 def test_v1_queue_lookup_state_fail():
     """Tests the lookup_state endpoint failure.
     """
@@ -186,6 +192,7 @@ def test_v1_queue_lookup_state_fail():
     assert response.status_code == 400
     assert response.json() == {"detail": "bad-stage not a Queue Item Stage"}
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_requeue_list():
     """Tests the requeue endpoint works when given a list.
@@ -202,6 +209,7 @@ def test_v1_queue_requeue_list():
     assert queue.size(QueueItemStage.FAIL) == 0
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_requeue_str():
     """Tests the requeue endpoint works when given a string.
@@ -218,6 +226,7 @@ def test_v1_queue_requeue_str():
     assert queue.size(QueueItemStage.FAIL) == 0
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_requeue_invalid():
     """Tests the requeue endpoint works when given an invalid input.
@@ -233,6 +242,7 @@ def test_v1_queue_requeue_invalid():
     assert response.status_code == 200
     assert response.json() == expected_dict
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_lookup_item():
     """Tests the lookup_item endpoint.
@@ -256,6 +266,7 @@ def test_v1_queue_lookup_item():
     assert response.status_code == 400
     assert response.json() == {"detail":"bad-item-id not in Queue"}
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_get_success():
     """Test getting n_items successfully
@@ -269,12 +280,14 @@ def test_get_success():
     assert len(response.json()) == n
     assert n == processing
 
+@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_put_valid_items():
     response = client.post("/api/v1/queue/put", json=default_items)
     assert queue.size(QueueItemStage.WAITING) == len(default_items)
     assert response.status_code == 200
 
+@pytest.mark.unit
 def test_put_invalid_items():
     total_items_before = queue.size(QueueItemStage.WAITING)
 
@@ -284,6 +297,7 @@ def test_put_invalid_items():
     total_items_after = queue.size(QueueItemStage.WAITING)
     assert total_items_before == total_items_after
 
+@pytest.mark.unit
 def test_put_partial_invalid_items():
     bad_item = object()
     with pytest.raises(TypeError):
