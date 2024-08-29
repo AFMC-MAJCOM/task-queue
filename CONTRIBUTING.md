@@ -21,7 +21,7 @@
 ## Coding Standards
 <p>There are four tests run in the task-queue CI/CD workflow: pytest-linux, ruff, pylint, and version_check.</p>
 
-<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been incremented appropriately, per the [Python Packaging User Guide](https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers).</p>
+<p>Pytest ensures that all of the pytests created in the repository pass. Ruff will statically analyze your code. Pylint will check if your code follows the <a href="https://pep8.org">PEP-8 style guide</a>, which is the style guide that we follow for this repository. Version_check will check that the task-queue version has been incremented appropriately.</p>
 
 <p>When a pull request is created, the code must pass the four checks in the task-queue CI/CD workflow explained in the <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/CONTRIBUTING.md#githubworkflows">.github/workflows</a> folder. This helps ensures that the code follows our repository style guidelines.</p>
 
@@ -170,16 +170,16 @@ List of some helpful, frequent errors:
 Custom errors or warnings are still applicable for specific errors that need to be shown.
 
 ### Version Number
-<p>Version numbers in a codebase are described by the [Python Packaging Authority](https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers), implementing the [PEP-440](https://peps.python.org/pep-0440/#final-releases) version scheme.
+<p>Version numbers in a codebase are described by the <a href="https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers">Python PAckaging User Guide</a>, implementing the <a href="https://peps.python.org/pep-0440/#final-releases">PEP-440</a> version scheme.
 
-Per [Semantic Versioning](https://semver.org/),
+Per <a href="https://semver.org/">Semantic Versioning</a>,
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
 > 
 > MAJOR version when you make incompatible API changes
 > MINOR version when you add functionality in a backward compatible manner
 > PATCH version when you make backward compatible bug fixes
-
+>
 > Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 
 This versioning scheme facilitates communication about changes between releases, aiding decision-making and promoting efficient development. Importantly, when a number is incremented, the lower-order numbers reset to zero.</p>
