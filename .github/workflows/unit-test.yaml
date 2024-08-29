@@ -32,6 +32,6 @@ jobs:
       - name: Check Inputs
         run: echo ${{ env.ACTION_PATH }}
       - name: Run
-        uses: ${{ env.ACTION_PATH }}
+        uses: ${{ env.ACTION_PATH }}@OPAL-668v2
       #   uses: ./.github/actions/unit-test
-        # uses: ${{ inputs.owner }}/task-queue/.github/actions/unit-test@OPAL-668v2
+        # uses: AFMC-MAJCOM/task-queue/.github/actions/unit-test@OPAL-668v2
