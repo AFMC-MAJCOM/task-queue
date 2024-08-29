@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""Compare two versions. Exists non-zero if the new version is not higher."""
+"""Compare two versions. Exits non-zero if the new version is not higher."""
 
 import argparse
 import sys
