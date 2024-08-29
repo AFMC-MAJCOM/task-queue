@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Run Pytest Setup
-      uses: AFMC-MAJCOM/task-queue/.github/actions/pytest-generic
+      uses: ./.github/actions/pytest-generic
     # - name: Run unit test
     #   uses: AFMC-MAJCOM/ci_python/.github/actions/unit-test
     # with:
