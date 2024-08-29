@@ -5,6 +5,26 @@ import sys
 import datetime
 import os
 
+
+def assign_handlers(_logger):
+    """Assigns the file output and stream out put to a logger.
+
+    Parameters:
+    -----------
+    _logger: Logger
+        The logger that will have its handlers assigned.
+    """
+    file_handler = logging.FileHandler(get_log_fp())
+    stream_handler = logging.StreamHandler(sys.stdout)
+    # Add formatting to the statements
+    fmt = logging.Formatter(fmt="%(asctime)s [%(levelname)s]: %(message)s")
+    stream_handler.setFormatter(fmt)
+    file_handler.setFormatter(fmt)
+    # Add handlers to logger
+    _logger.addHandler(stream_handler)
+    _logger.addHandler(file_handler)
+
+
 def create_logger(module_name: str, logger_level=logging.DEBUG):
     """Constructs and setups a logger for the task_queue module
 
@@ -20,15 +40,7 @@ def create_logger(module_name: str, logger_level=logging.DEBUG):
     The logger for the module
     """
     _logger = logging.getLogger(module_name)
-    file_handler = logging.FileHandler(get_log_fp())
-    stream_handler = logging.StreamHandler(sys.stdout)
-    # Add formatting to the statements
-    fmt = logging.Formatter(fmt="%(asctime)s [%(levelname)s]: %(message)s")
-    stream_handler.setFormatter(fmt)
-    file_handler.setFormatter(fmt)
-    # Add handlers to logger
-    _logger.addHandler(stream_handler)
-    _logger.addHandler(file_handler)
+    assign_handlers(_logger)
     # Set log level
     _logger.setLevel(logger_level)
     return _logger
