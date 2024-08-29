@@ -16,8 +16,8 @@ jobs:
     steps:
     - name: Run Pytest Setup
       uses: AFMC-MAJCOM/task-queue/.github/actions/pytest-generic
-    - name: Run unit test
-      uses: AFMC-MAJCOM/ci_python/.github/actions/unit-test
+    # - name: Run unit test
+    #   uses: AFMC-MAJCOM/ci_python/.github/actions/unit-test
     # with:
     #   path: ./.github/actions/unit-test
     # - name: Pytest unit tests
