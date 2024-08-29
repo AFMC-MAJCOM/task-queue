@@ -28,3 +28,12 @@ jobs:
       uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
     - name: Run integration tests
       uses: ./.github/actions/integration-test
+
+  end2end-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run pytest setup
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
+    - name: Run integration tests
+      uses: ./.github/actions/end2end-test
