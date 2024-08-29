@@ -1,8 +1,0 @@
-pendulum
-s3fs
-pandas
-pyarrow
-sqlmodel
-psycopg2-binary
-requests
-fastapi[all]
