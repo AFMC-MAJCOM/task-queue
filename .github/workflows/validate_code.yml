@@ -14,6 +14,7 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
     - name: Run Pytest Setup
       uses: ./.github/actions/pytest-generic
     # - name: Run unit test
