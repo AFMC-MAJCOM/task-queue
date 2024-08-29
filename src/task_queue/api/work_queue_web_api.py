@@ -1,7 +1,6 @@
 """Wherein is contained the functions and classes concering the Work Queue Web
 API.
 """
-
 import warnings
 from dataclasses import dataclass, asdict
 from typing import Dict, Any, Annotated, Union, Tuple, List
