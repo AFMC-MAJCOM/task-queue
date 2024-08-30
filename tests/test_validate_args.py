@@ -307,7 +307,9 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
            f"{SQL_EVENT_STORE_CLI_CHOICE}"\
            in error_string
 
-@pytest.mark.unit
+# This pytest is marked as integration because it relies on env variables only
+# used in integration tests
+@pytest.mark.integration
 def test_handle_queue_implementation_choice_pass():
     """Checks that the handle_queue_implementation_choice will return the
        correct queue given the right cli settings
@@ -366,7 +368,9 @@ def test_handle_queue_implementation_choice_pass():
 
     assert queue.description() == test_queue.description()
 
-@pytest.mark.unit
+# This pytest is marked as integration because it relies on env variables only
+# used in integration tests
+@pytest.mark.integration
 def test_handle_queue_implementation_choice_fail():
     """Checks that the handle_queue_implementation_choice will raise
        the correct error if the wrong combination of settings are used
