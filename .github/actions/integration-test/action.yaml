@@ -25,7 +25,7 @@ runs:
   #     kubectl apply -n pivot -f resources/test_workflow_template.yaml
   #     kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
   #     kubectl port-forward -n pivot service/argo-server 2746:2746 &
-    shell: bash
+    # shell: bash
   - name: Run Pytests
     run: |
       export SQL_QUEUE_NAME=test
