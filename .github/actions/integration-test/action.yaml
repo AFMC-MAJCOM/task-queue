@@ -7,11 +7,13 @@ runs:
     run: |
       wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20230518000536.0.0_amd64.deb -O minio.deb
       sudo dpkg -i minio.deb
+    shell: bash
   - name: Launch minio
     continue-on-error: true
     run: |
       mkdir ~/minio
       minio server ~/minio --console-address :9090 &!
+    shell: bash
   - name: Setup Minikube
     id: minikube
     uses: medyagh/setup-minikube@latest
@@ -23,6 +25,7 @@ runs:
       kubectl apply -n pivot -f resources/test_workflow_template.yaml
       kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
       kubectl port-forward -n pivot service/argo-server 2746:2746 &
+    shell: bash
   - name: Run Pytests
     run: |
       export RUN_ARGO_TESTS=True
@@ -36,4 +39,4 @@ runs:
       export AWS_SECRET_ACCESS_KEY=minioadmin
       export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
       pytest -vv -m integration
-  shell: bash
+    shell: bash
