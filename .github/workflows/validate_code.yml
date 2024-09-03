@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
     - name: Run unit tests
       uses: ./.github/actions/unit-test
 
@@ -38,7 +38,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
     - name: Run integration tests
       uses: ./.github/actions/integration-test
 
@@ -48,6 +48,6 @@ jobs:
   #   steps:
   #   - uses: actions/checkout@v3
   #   - name: Run pytest setup
-  #     uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
+  #     uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
   #   - name: Run integration tests
   #     uses: ./.github/actions/end2end-test
