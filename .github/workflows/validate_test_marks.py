@@ -13,9 +13,7 @@ def extract_selected_tests_count(output):
         return None
 
 def verify_unmarked_tests(selected_tests):
-    if selected_tests > 0:
-        return False
-    return True
+    assert selected_tests == 0
 
 # Retrieve pytest output from the environment variable
 pytest_output = os.getenv('pytest_output')
