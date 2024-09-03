@@ -13,12 +13,8 @@ jobs:
 
   unmarked-test:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
-    - name: Validate test marks
-      uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests@Opal-756
+    name: Validate test marks
+    uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests@Opal-756
 
   # unit-test:
   #   runs-on: ubuntu-latest
