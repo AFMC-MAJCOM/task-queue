@@ -1,0 +1,8 @@
+name: Unit Tests
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v3
+  - name: Run Pytests
+    run: pytest -vv -m unit
+    shell: bash

@@ -11,7 +11,16 @@ jobs:
     with:
       project_root: task_queue
 
-  pytest-linux:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run pytest setup
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+    - name: Run unit tests
+      uses: ./.github/actions/unit-test
+
+  integration-test:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -28,46 +37,17 @@ jobs:
           - 5432:5432
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install minio
-      run: |
-        wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20230518000536.0.0_amd64.deb -O minio.deb
-        sudo dpkg -i minio.deb
-    - name: Launch minio
-      continue-on-error: true
-      run: |
-        mkdir ~/minio
-        minio server ~/minio --console-address :9090 &!
-    - name: Setup Minikube
-      id: minikube
-      uses: medyagh/setup-minikube@latest
-    - name: Prepare for Argo Tests
-      run: |
-        minikube start
-        kubectl create namespace pivot
-        kubectl apply -n pivot -f resources/quick-start-minimal.yaml
-        kubectl apply -n pivot -f resources/test_workflow_template.yaml
-        kubectl wait -n pivot --timeout=300s --for=condition=Ready --all pods
-        kubectl port-forward -n pivot service/argo-server 2746:2746 &
+    - name: Run pytest setup
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+    - name: Run integration tests
+      uses: ./.github/actions/integration-test
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        pip install .
-    - name: Test with pytest
-      run: |
-        export RUN_ARGO_TESTS=True
-        export SQL_QUEUE_NAME=test
-        export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
-        export SQL_QUEUE_POSTGRES_USER=postgres
-        export SQL_QUEUE_POSTGRES_PASSWORD=postgres
-        export SQL_QUEUE_POSTGRES_DATABASE=postgres
-        export SQL_QUEUE_POSTGRES_PORT=5432
-        export AWS_ACCESS_KEY_ID=minioadmin
-        export AWS_SECRET_ACCESS_KEY=minioadmin
-        export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
-        pytest -vv
+  # end2end not yet implemented in this repo
+  # end2end-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Run pytest setup
+  #     uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+  #   - name: Run integration tests
+  #     uses: ./.github/actions/end2end-test

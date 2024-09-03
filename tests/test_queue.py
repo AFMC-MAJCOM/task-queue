@@ -19,20 +19,22 @@ from .utils import PytestSqlEngine
 UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
 
 
-
 @pytest.fixture(scope="session", autouse=True)
-def setup_s3_bucket():
-    """Create a 'unit-tests' S3 bucket for testing purposes.
+def setup_s3_bucket(request):
+    """Create a 'integration-tests' S3 bucket for testing purposes.
     """
-    fs = s3fs.S3FileSystem()
+    if 'integration' in request.keywords:
+        fs = s3fs.S3FileSystem()
 
-    test_bucket_name = 'unit-tests'
-    if fs.exists(test_bucket_name):
-        fs.rm(test_bucket_name, recursive=True)
-    fs.mkdir(test_bucket_name)
+        test_bucket_name = 'integration-tests'
+        if fs.exists(test_bucket_name):
+            fs.rm(test_bucket_name, recursive=True)
+        fs.mkdir(test_bucket_name)
 
-    yield
-    cleanup_bucket(test_bucket_name, fs)
+        yield
+        cleanup_bucket(test_bucket_name, fs)
+    else:
+        yield None
 
 
 def cleanup_bucket(test_bucket_name, fs):
