@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 def extract_selected_tests_count(output):
     # Regex to find the final summary line with test counts
@@ -15,7 +16,8 @@ def extract_selected_tests_count(output):
         return None
 
 def verify_unmarked_tests(unmarked_tests):
-    assert unmarked_tests == 0
+
+    sys.exit(unmarked_tests != 0)
 
 # Retrieve pytest output from the environment variable
 pytest_output = os.getenv('pytest_output')
