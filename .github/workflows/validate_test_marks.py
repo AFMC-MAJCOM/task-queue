@@ -23,7 +23,7 @@ pytest_output = os.getenv('pytest_output')
 if pytest_output:
     unmarked_tests = extract_selected_tests_count(pytest_output)
     result = verify_unmarked_tests(unmarked_tests)
-    print(f"Selected tests count: {unmarked_tests}")
-    print(f"Unmarked tests count: {result}")
+    print(f"Selected tests: {unmarked_tests}")
+    print(f"Unmarked tests: {result}")
 else:
     print("Error: pytest_output environment variable not set")
