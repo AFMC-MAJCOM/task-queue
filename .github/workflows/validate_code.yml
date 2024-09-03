@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@OPAL-668 # remove version tag after ci_python merge to main
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
     - name: Run unit tests
       uses: ./.github/actions/unit-test
 
@@ -38,7 +38,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@OPAL-668 # remove version tag after ci_python merge to main
+      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup
     - name: Run integration tests
       uses: ./.github/actions/integration-test
 
