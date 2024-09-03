@@ -309,7 +309,7 @@ def test_validate_args_event_store_implementation_sql_json_only_option():
 
 # This pytest is marked as integration because it relies on env variables only
 # used in integration tests
-@pytest.mark.integration
+# @pytest.mark.integration
 def test_handle_queue_implementation_choice_pass():
     """Checks that the handle_queue_implementation_choice will return the
        correct queue given the right cli settings
