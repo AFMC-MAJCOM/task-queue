@@ -4,6 +4,8 @@ import re
 def extract_selected_tests_count(output):
     # Regex to find the final summary line with test counts
     match = re.search(r'(\d+)/(\d+) tests collected \((\d+) deselected\)', output)
+    if match == None:
+        return 0
     if match:
         # Extract the number of selected tests
         selected_tests = int(match.group(1))
