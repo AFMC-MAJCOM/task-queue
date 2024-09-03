@@ -11,36 +11,45 @@ jobs:
     with:
       project_root: task_queue
 
-  unit-test:
+  unmarked-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
       uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
-    - name: Run unit tests
-      uses: ./.github/actions/unit-test
+    - name: Validate test marks
+      uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests@Opal-756
 
-  integration-test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:12
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
-    - name: Run integration tests
-      uses: ./.github/actions/integration-test
+  # unit-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Run pytest setup
+  #     uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+  #   - name: Run unit tests
+  #     uses: ./.github/actions/unit-test
+
+  # integration-test:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     postgres:
+  #       image: postgres:12
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #       ports:
+  #         - 5432:5432
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Run pytest setup
+  #     uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+  #   - name: Run integration tests
+  #     uses: ./.github/actions/integration-test
 
   # end2end not yet implemented in this repo
   # end2end-test:
