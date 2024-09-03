@@ -12,16 +12,16 @@ def extract_selected_tests_count(output):
         print("Error: Unable to parse pytest output")
         return None
 
-def verify_unmarked_tests(selected_tests):
-    assert selected_tests == 0
+def verify_unmarked_tests(unmarked_tests):
+    assert unmarked_tests == 0
 
 # Retrieve pytest output from the environment variable
 pytest_output = os.getenv('pytest_output')
 
 if pytest_output:
-    selected_tests = extract_selected_tests_count(pytest_output)
-    result = verify_unmarked_tests(selected_tests)
-    print(f"Selected tests count: {selected_tests}")
+    unmarked_tests = extract_selected_tests_count(pytest_output)
+    result = verify_unmarked_tests(unmarked_tests)
+    print(f"Selected tests count: {unmarked_tests}")
     print(f"Unmarked tests: {result}")
 else:
     print("Error: pytest_output environment variable not set")
