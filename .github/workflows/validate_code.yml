@@ -16,7 +16,7 @@ jobs:
     # name: Validate test marks
     uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests.yaml@OPAL-756 #change this to main before merge
     with:
-      project_root: task_queue
+      project_root: task-queue
 
   # unit-test:
   #   runs-on: ubuntu-latest
