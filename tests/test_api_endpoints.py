@@ -46,7 +46,6 @@ def clean_queue():
             item
         )
 
-@pytest.mark.unit
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 def test_v1_queue_size():
     """Tests the size endpoint for all 4 stages.
