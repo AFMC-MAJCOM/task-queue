@@ -13,8 +13,6 @@ jobs:
 
   unmarked-test:
     uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests.yaml@OPAL-756 #dont merge until this is switched to main
-    with:
-      project_root: task_queue
 
   unit-test:
     runs-on: ubuntu-latest
