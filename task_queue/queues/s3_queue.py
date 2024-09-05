@@ -153,6 +153,7 @@ class JsonS3Queue(QueueBase):
             os.path.join(self.processing_path, id_to_fname(queue_item_id)),
             self.success_path
         )
+        logger.info("Job %s successfully completed", queue_item_id)
 
     def fail(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to FAIL.
@@ -166,6 +167,7 @@ class JsonS3Queue(QueueBase):
             os.path.join(self.processing_path, id_to_fname(queue_item_id)),
             self.fail_path
         )
+        logger.info("Job %s failed", queue_item_id)
 
     def size(self, queue_item_stage):
         """Determines how many items are in some stage of the queue.

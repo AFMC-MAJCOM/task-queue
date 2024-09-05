@@ -192,6 +192,7 @@ class QueueWithEvents(QueueBase):
         )
 
         self.queue.success(queue_item_id)
+        logger.info("Job %s successfully completed", queue_item_id)
 
     def fail(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to FAIL and logs the Event.
@@ -208,6 +209,7 @@ class QueueWithEvents(QueueBase):
         )
 
         self.queue.fail(queue_item_id)
+        logger.info("Job %s failed", queue_item_id)
 
     def size(self, queue_item_stage):
         """Determines how many items are in some stage of the queue.
