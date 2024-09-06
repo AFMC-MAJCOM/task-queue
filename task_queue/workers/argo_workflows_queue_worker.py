@@ -124,6 +124,19 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             workflow_name
         )
 
+    def _argo_workflows_logs_url(self, workflow_name, log_container):
+        """Returns the URL to the argo workflows server to capture a log
+        for a specific job.
+        """
+        return self.urlconcat(
+                self._argo_workflows_endpoint,
+                "api",
+                "v1",
+                "workflows",
+                self._namespace,
+                workflow_name,
+                f"log?logOptions.container={log_container}"
+        )
 
     def _construct_submit_body(self, item_id, queue_item_body):
         """Creates body for the submit URL.
@@ -240,6 +253,30 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         except requests.HTTPError as e:
             logger.error("Couldn't delete workflow %s", name)
             raise e
+
+    def get_logs(self, queue_item_id):
+        """Retrieves the logs of a specific argo workflow.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Queue Item ID of the job we are looking for
+
+        Returns:
+        ---------
+        maybe implemented later
+        """
+        workflow_name = self._get_workflow_name(queue_item_id)
+        log_types = ["main","wait","init"]
+        for container in log_types:
+            log_url = self._argo_workflows_logs_url(workflow_name,container)
+            response = requests.get(log_url, timeout=10)
+            try: 
+                response.raise_for_status
+                print(response.text)
+            except requests.HTTPError as e:
+                logger.error(f"Couldn't find {container} logs for {queue_item_id}")
+                raise e
 
     def _construct_poll_query(self):
         """Creates a dictionary used to ping Argo for information regarding all
