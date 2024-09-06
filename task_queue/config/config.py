@@ -44,6 +44,7 @@ class EventStoreChoices(str, Enum):
 class WorkerInterfaceChoices(str, Enum):
     """Enum options for the available worker interfaces choices."""
     ARGO_WORKFLOWS = 'argo-workflows'
+    PROCESS = 'process'
 
 
 class TaskQueueBaseSetting(BaseSettings):
@@ -179,6 +180,12 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
         description="Kubernetes namespace where ARGO Workflows is "
                     "running. Required when worker-interface is set "
                     f"to {WorkerInterfaceChoices.ARGO_WORKFLOWS.value}"
+    )
+    path_to_scripts : Optional[str] = Field(
+        default=None,
+        description="Path to python scripts stored outside of task queue "
+                    "source code. Required when worker-interface is set "
+                    f"to {WorkerInterfaceChoices.PROCESS.value}"
     )
     connection_string : Optional[str] = Field(
         default=None,

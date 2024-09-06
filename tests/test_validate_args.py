@@ -15,6 +15,7 @@ from task_queue.queues.queue_with_events import queue_with_events
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
 JSON_SQL_QUEUE_CLI_CHOICE=config.QueueImplementations.SQL_JSON.value
 ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE=config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
+PROCESS_INTERFACE_CLI_CHOICE=config.WorkerInterfaceChoices.PROCESS.value
 NO_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.NO_EVENTS.value
 SQL_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.SQL_JSON.value
 
@@ -454,3 +455,48 @@ def test_validate_args_logger_fail():
     success, error_string = validate_args(args_dict)
     assert not success
     assert 'logger_level' in error_string
+
+@pytest.mark.unit
+def test_validate_args_process_success():
+    """Test valid arguments for the process worker interface
+    """
+    args_dict = {'worker_interface': 'process',
+            'queue_implementation': 's3-json',
+            'event_store_implementation': 'none',
+            'with_queue_events': False,
+            'worker_interface_id': 'dummy-id',
+            'endpoint': 'dummy-endpoint',
+            'namespace': 'dummy-namespace',
+            'path_to_scripts':'dummy/path',
+            'connection_string': None,
+            'queue_name': None,
+            's3_base_path': 'dummypath',
+            'add_to_queue_event_name': None,
+            'move_queue_event_name': None,
+            'logger_level': None}
+    success, error_string = validate_args(args_dict)
+    assert success
+    assert error_string == ''
+
+@pytest.mark.unit
+def test_validate_args_process_missing_path():
+    """Test valid arguments for the process worker interface
+    """
+    args_dict = {'worker_interface': 'process',
+            'queue_implementation': 's3-json',
+            'event_store_implementation': 'none',
+            'with_queue_events': False,
+            'worker_interface_id': 'dummy-id',
+            'endpoint': 'dummy-endpoint',
+            'namespace': 'dummy-namespace',
+            'path_to_scripts': None,
+            'connection_string': None,
+            'queue_name': None,
+            's3_base_path': 'dummypath',
+            'add_to_queue_event_name': None,
+            'move_queue_event_name': None,
+            'logger_level': None}
+    success, error_string = validate_args(args_dict)
+    assert not success
+    assert f'worker-interface is set to {PROCESS_INTERFACE_CLI_CHOICE}'\
+           in error_string

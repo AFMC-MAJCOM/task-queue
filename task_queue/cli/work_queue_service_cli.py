@@ -44,6 +44,16 @@ def validate_args(cli_args):
                             f"{value}\n"
             validation_success = False
 
+    elif cli_args['worker_interface'] \
+        == config.WorkerInterfaceChoices.PROCESS:
+        required_args = ['path_to_scripts']
+        if not all(cli_args[i] is not None for i in required_args):
+            value = config.WorkerInterfaceChoices.PROCESS.value
+            errors_found += f"{required_args} arguments required when " \
+                             "worker-interface is set to " \
+                            f"{value}\n"
+            validation_success = False
+
     if cli_args['queue_implementation'] \
         == config.QueueImplementations.SQL_JSON:
         required_args = ['connection_string', 'queue_name']
@@ -108,6 +118,9 @@ def handle_worker_interface_choice(cli_settings):
             cli_settings.endpoint,
             cli_settings.namespace
         )
+    elif cli_settings.worker_interface \
+        == config.WorkerInterfaceChoices.PROCESS:
+        return ProcessWorkerInterface(cli_settings.path_to_scripts)
     return None
 
 def handle_queue_implementation_choice(cli_settings):
