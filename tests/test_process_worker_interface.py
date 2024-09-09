@@ -32,7 +32,7 @@ def temp_script_bad(temp_dir):
     return temp_file
 
 
-def make_queue_item():
+def make_queue_item(fail=False):
     """Creates a random queue item for testing.
 
     Returns:
@@ -41,10 +41,16 @@ def make_queue_item():
     """
     queue_item_id = f"test-item-{random.randint(0, 9999999)}"
 
-    queue_item_body = {
-        "file_name" : "my_script.py",
-        "args": ['arg1','arg2']
-        }
+    if not fail:
+        queue_item_body = {
+            "file_name" : "my_script.py",
+            "args": ['arg1','arg2']
+            }
+    else:
+        queue_item_body = {
+            "file_name" : "my_bad_script.py",
+            "args": ['arg1','arg2']
+            }
 
     return (queue_item_id, queue_item_body)
 
@@ -101,8 +107,7 @@ def test_process_worker_success_no_arg(process_worker, temp_script_good):
 @pytest.mark.unit
 def test_process_worker_fail(process_worker, temp_script_bad):
     """Tests job failure."""
-    queue_item_id, _ = make_queue_item()
-    queue_item_body = {'file_name':'my_bad_script.py'}
+    queue_item_id, queue_item_body = make_queue_item(fail=True)
     process_worker.send_job(
         queue_item_id,
         queue_item_body
@@ -139,8 +144,7 @@ def test_process_rerun_item(process_worker, temp_script_good, temp_script_bad):
     """Tests process can rerun a job.
     """
     # Set up the first job to fail
-    queue_item_id, _ = make_queue_item()
-    queue_item_body = {'file_name':'my_bad_script.py'}
+    queue_item_id, queue_item_body = make_queue_item(fail=True)
     process_worker.send_job(queue_item_id, queue_item_body)
     wait_for_finish(process_worker, queue_item_id)
 
@@ -166,11 +170,10 @@ def test_process_worker_end_to_end_concurrent(
     for i in range(n_processes):
         should_fail = i % 3 == 0
 
-        queue_item_id, queue_item_body = make_queue_item()
-
         if should_fail:
             n_fail += 1
-            queue_item_body['file_name'] = 'my_bad_script.py'
+
+        queue_item_id, queue_item_body = make_queue_item(fail=should_fail)
 
         process_worker.send_job(
             queue_item_id,
