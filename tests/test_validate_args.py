@@ -18,7 +18,7 @@ ARGO_WORKFLOWS_INTERFACE_CLI_CHOICE=config.WorkerInterfaceChoices.ARGO_WORKFLOWS
 NO_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.NO_EVENTS.value
 SQL_EVENT_STORE_CLI_CHOICE=config.EventStoreChoices.SQL_JSON.value
 
-# @pytest.mark.unit
+@pytest.mark.unit
 def test_validate_args_s3_success():
     """Test valid arguments for the S3 queue
     """
