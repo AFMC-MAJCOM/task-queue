@@ -2,10 +2,12 @@
 """
 from multiprocessing import Process
 from subprocess import run
+from pydantic import validate_call
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue import logger
+from task_queue.queue_pydantic_models import ProcessInterfaceModel
 
 
 class ProcessWorkerInterface(QueueWorkerInterface):
@@ -28,18 +30,18 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         -----------
         queue_item_body: dict
             Dictionary with contents required to run python scipts. Follows the
-            schema:
+            ProcessInterfaceModel schema:
             {
-                "file_name": <name_of_script>
+                "file_name": 'name_of_script.py'
                 "args": ['list','of','args'] or None
             }
         """
-        filepath = f"{self.path_to_scripts}/{queue_item_body['file_name']}"
+        filepath = f"{self.path_to_scripts}/{queue_item_body.file_name}"
         try:
             # Run python script found at filepath with 0+ args
             command = ['python3', filepath]
-            if queue_item_body["args"]:
-                command += (queue_item_body["args"])
+            if queue_item_body.args:
+                command += (queue_item_body.args)
             result = run(
                 command,
                 capture_output=True,
@@ -55,8 +57,8 @@ class ProcessWorkerInterface(QueueWorkerInterface):
                 )
         except Exception as e:
             raise e
-
-    def send_job(self, item_id, queue_item_body):
+    @validate_call
+    def send_job(self, item_id, queue_item_body:ProcessInterfaceModel):
         """Starts a job from queue item.
 
         Parameters:
@@ -64,7 +66,11 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         item_id: str
             Queue Item ID
         queue_item_body: dict
-            Dictionary that must contain a key:value pair where INSERT HERE
+            Dictionary that must match the ProcessInterfaceModel schema:
+            {
+                "file_name": 'name_of_script.py'
+                "args": ['list','of','args'] or None
+            }
         """
         p = Process(target=self.start_job, args=(queue_item_body,))
         self._active_processes[item_id] = p
@@ -97,4 +103,3 @@ class ProcessWorkerInterface(QueueWorkerInterface):
             else:
                 statuses[id_] = QueueItemStage.FAIL
         return statuses
-

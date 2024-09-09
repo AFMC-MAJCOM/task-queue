@@ -3,6 +3,7 @@
 import random
 import pytest
 import time
+from pydantic import ValidationError
 
 from task_queue.workers.process_queue_worker import ProcessWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
@@ -31,13 +32,8 @@ def temp_script_bad(temp_dir):
     return temp_file
 
 
-def make_queue_item(fail=False):
+def make_queue_item():
     """Creates a random queue item for testing.
-
-    Paramters:
-    ----------
-    fail: boolean (default=false)
-        Allows fail to be forced.
 
     Returns:
     ----------
@@ -92,7 +88,7 @@ def test_process_interface_success_with_arg(process_worker, temp_script_good):
 def test_process_interface_success_no_arg(process_worker, temp_script_good):
     """Tests job success with no args."""
     queue_item_id, _ = make_queue_item()
-    queue_item_body = {"file_name" : "my_script.py", "args" : None}
+    queue_item_body = {"file_name" : "my_script.py"}
 
     process_worker.send_job(
         queue_item_id,
@@ -114,3 +110,18 @@ def test_process_interface_fail(process_worker, temp_script_bad):
     status = wait_for_finish(process_worker, queue_item_id)
 
     assert status == QueueItemStage.FAIL
+
+@pytest.mark.unit
+def test_process_invalid_body(process_worker, temp_script_good):
+    """Tests pydantic model catches bad queue_item_body."""
+    queue_item_id, _ = make_queue_item()
+    queue_item_body = {"bad_key" : "bad_value"}
+
+    with pytest.raises(ValidationError):
+        process_worker.send_job(
+            queue_item_id,
+            queue_item_body
+        )
+        status = wait_for_finish(process_worker, queue_item_id)
+
+        assert status == QueueItemStage.FAIL

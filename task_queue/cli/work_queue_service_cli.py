@@ -16,7 +16,8 @@ from task_queue.queues.queue_base import QueueItemStage
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
 
-
+# Pylint does not like how many if/elif branches we have in this function
+# pylint: disable=R0912
 def validate_args(cli_args):
     """Validates input arguments given to the CLI.
 
@@ -124,8 +125,6 @@ def handle_worker_interface_choice(cli_settings):
         return ProcessWorkerInterface(cli_settings.path_to_scripts)
     return None
 
-# Pylint does not like how many if/elif branches we have in this function
-# pylint: disable=R0912
 def handle_queue_implementation_choice(cli_settings):
     """Handles the queue implementation choice.
 
