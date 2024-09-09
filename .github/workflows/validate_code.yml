@@ -10,6 +10,7 @@ jobs:
     uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
     with:
       project_root: task_queue
+      mark_inputs: not unit and not integration
 
   unit-test:
     runs-on: ubuntu-latest
