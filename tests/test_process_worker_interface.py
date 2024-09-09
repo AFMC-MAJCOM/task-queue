@@ -75,6 +75,7 @@ def wait_for_finish(worker, queue_item_id):
     worker.delete_job(queue_item_id)
     return status
 
+@pytest.mark.unit
 def test_process_interface_success_with_arg(process_worker, temp_script_good):
     """Tests job success with at least one arg."""
     queue_item_id, queue_item_body = make_queue_item()
@@ -87,6 +88,7 @@ def test_process_interface_success_with_arg(process_worker, temp_script_good):
 
     assert status == QueueItemStage.SUCCESS
 
+@pytest.mark.unit
 def test_process_interface_success_no_arg(process_worker, temp_script_good):
     """Tests job success with no args."""
     queue_item_id, _ = make_queue_item()
@@ -100,6 +102,7 @@ def test_process_interface_success_no_arg(process_worker, temp_script_good):
 
     assert status == QueueItemStage.SUCCESS
 
+@pytest.mark.unit
 def test_process_interface_fail(process_worker, temp_script_bad):
     """Tests job failure."""
     queue_item_id, queue_item_body = make_queue_item()

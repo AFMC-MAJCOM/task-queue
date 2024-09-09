@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from task_queue.logger import logger, set_logger_level
 from task_queue.config import config
 from task_queue.workers.work_queue import WorkQueue
+from task_queue.workers.process_queue_worker import ProcessWorkerInterface
 from task_queue.workers.argo_workflows_queue_worker import (
                                                     ArgoWorkflowsQueueWorker)
 from task_queue.queues.s3_queue import json_s3_queue
