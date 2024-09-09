@@ -480,7 +480,8 @@ def test_validate_args_process_success():
 
 @pytest.mark.unit
 def test_validate_args_process_missing_path():
-    """Test valid arguments for the process worker interface
+    """Ensure path_to_scripts is provided when worker_interface is set to
+    process.
     """
     args_dict = {'worker_interface': 'process',
             'queue_implementation': 's3-json',

@@ -19,15 +19,15 @@ def temp_script_good(temp_dir):
     """Create python script used for testing."""
     # Create a file inside the temporary directory
     temp_file = temp_dir / "my_script.py"
-    temp_file.write_text("def dummy_script(dummy_input):\n    pass\ndummy_script(input_data)")
+    temp_file.write_text("import sys\ndef do_nothing():\n    pass")
     return temp_file
 
 @pytest.fixture(scope="module")
 def temp_script_bad(temp_dir):
-    """Create python script used for testing."""
+    """Create python script used for testing with a syntax error."""
     # Create a file inside the temporary directory
     temp_file = temp_dir / "my_script.py"
-    temp_file.write_text("def dummy_script(dummy_param)print('this has a syntax error')")
+    temp_file.write_text("syntax error")
     return temp_file
 
 
@@ -47,7 +47,7 @@ def make_queue_item(fail=False):
 
     queue_item_body = {
         "file_name" : "my_script.py",
-        "parameters": fail
+        "args": ['arg1','arg2']
         }
 
     return (queue_item_id, queue_item_body)
@@ -75,9 +75,22 @@ def wait_for_finish(worker, queue_item_id):
     worker.delete_job(queue_item_id)
     return status
 
-def test_process_interface_success(process_worker, temp_script_good):
-    """Tests job success."""
+def test_process_interface_success_with_arg(process_worker, temp_script_good):
+    """Tests job success with at least one arg."""
     queue_item_id, queue_item_body = make_queue_item()
+
+    process_worker.send_job(
+        queue_item_id,
+        queue_item_body
+    )
+    status = wait_for_finish(process_worker, queue_item_id)
+
+    assert status == QueueItemStage.SUCCESS
+
+def test_process_interface_success_no_arg(process_worker, temp_script_good):
+    """Tests job success with no args."""
+    queue_item_id, _ = make_queue_item()
+    queue_item_body = {"file_name" : "my_script.py", "args" : None}
 
     process_worker.send_job(
         queue_item_id,
@@ -90,6 +103,7 @@ def test_process_interface_success(process_worker, temp_script_good):
 def test_process_interface_fail(process_worker, temp_script_bad):
     """Tests job failure."""
     queue_item_id, queue_item_body = make_queue_item()
+
     process_worker.send_job(
         queue_item_id,
         queue_item_body
