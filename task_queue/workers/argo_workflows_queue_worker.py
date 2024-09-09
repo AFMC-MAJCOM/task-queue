@@ -275,16 +275,18 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         workflow_name = self._get_workflow_name(queue_item_id)
         log_types = ["main","wait","init"]
-        logs = dict()
+        logs = {}
         for container in log_types:
             log_url = self._argo_workflows_logs_url(workflow_name,container)
             response = requests.get(log_url, timeout=10)
-            try: 
+            try:
                 response.raise_for_status()
                 logs[container] = response.text
             except requests.HTTPError:
-                logger.warning("Couldn't find %s logs for %s", container, queue_item_id)
-                logs[container] = f"Couldn't find {container} logs for {queue_item_id}"
+                logger.warning("Couldn't find %s logs for %s",
+                               container, queue_item_id)
+                logs[container] = f"Couldn't find {container}" +\
+                                    f"logs for {queue_item_id}"
         return logs
 
     def _construct_poll_query(self):
