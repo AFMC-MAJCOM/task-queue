@@ -247,7 +247,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         logs = self.get_logs(queue_item_id)
         for container, log in logs.items():
-            logger.info("Item {} container {}: {}".format(queue_item_id, container, pformat(log)))
+            logger.info("Item: {} Container: {}: {}".format(queue_item_id, container, pformat(log)))
 
         name = self._get_workflow_name(queue_item_id)
         delete_url = self._argo_workflows_delete_url(name)
