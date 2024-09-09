@@ -247,7 +247,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         logs = self.get_logs(queue_item_id)
         for container, log in logs.items():
-            logger.info("Item: {} Container: {}: {}".format(queue_item_id, container, pformat(log)))
+            logger.info("Item: {} Container: {}: {}"\
+                        .format(queue_item_id, container, pformat(log)))
 
         name = self._get_workflow_name(queue_item_id)
         delete_url = self._argo_workflows_delete_url(name)
@@ -281,7 +282,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                 response.raise_for_status()
                 logs[container] = response.text
             except requests.HTTPError:
-                logger.warning("Couldn't find {} logs for {}".format(container, queue_item_id))
+                logger.warning("Couldn't find {} logs for {}"\
+                               .format(container, queue_item_id))
                 logs[container] = f"Couldn't find {container} logs for {queue_item_id}"
         return logs
 
