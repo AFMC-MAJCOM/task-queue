@@ -44,6 +44,7 @@ class ProcessWorkerInterface(QueueWorkerInterface):
                 command,
                 capture_output=True,
                 text=True,
+                check=False
             )
             # Catch error that occured when running script
             if len(result.stderr) > 0:

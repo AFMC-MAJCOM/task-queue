@@ -125,7 +125,7 @@ def handle_worker_interface_choice(cli_settings):
     return None
 
 # Pylint does not like how many if/elif branches we have in this function
-# pylint: disable=too-many-branches
+# pylint: disable=R0912
 def handle_queue_implementation_choice(cli_settings):
     """Handles the queue implementation choice.
 
