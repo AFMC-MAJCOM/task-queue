@@ -1,7 +1,8 @@
 """Wherein is contained the class for the Argo Workflow Queue Worker.
 """
-import requests
 from pprint import pformat
+
+import requests
 
 import pandas as pd
 
@@ -247,17 +248,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         logs = self.get_logs(queue_item_id)
         for container, log in logs.items():
-            logger.info("Item: {} Container: {}: {}"\
-                        .format(queue_item_id, container, pformat(log)))
+            logger.info("Item: %s Container: %s: %s"
+                        , queue_item_id, container, pformat(log))
 
         name = self._get_workflow_name(queue_item_id)
         delete_url = self._argo_workflows_delete_url(name)
         response = requests.delete(delete_url, timeout = 10)
         try:
-            logger.info("Deleting workflow {}".format(name))
+            logger.info("Deleting workflow %s", name)
             response.raise_for_status()
         except requests.HTTPError as e:
-            logger.error("Couldn't delete workflow {}".format(name))
+            logger.error("Couldn't delete workflow %s", name)
             raise e
 
     def get_logs(self, queue_item_id):
@@ -282,8 +283,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                 response.raise_for_status()
                 logs[container] = response.text
             except requests.HTTPError:
-                logger.warning("Couldn't find {} logs for {}"\
-                               .format(container, queue_item_id))
+                logger.warning("Couldn't find %s logs for %s", container, queue_item_id)
                 logs[container] = f"Couldn't find {container} logs for {queue_item_id}"
         return logs
 
