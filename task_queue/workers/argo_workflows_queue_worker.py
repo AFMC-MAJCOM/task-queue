@@ -271,7 +271,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         Returns:
         ---------
-        maybe implemented later
+        Dictionary where the key is the container where the log came
+        from and the value is the logs stored in that container.
         """
         workflow_name = self._get_workflow_name(queue_item_id)
         log_types = ["main","wait","init"]
