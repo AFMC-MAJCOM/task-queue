@@ -21,13 +21,11 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         self.path_to_scripts = path_to_scripts
         self._active_processes = {}
 
-    def start_job(self, item_id, queue_item_body):
+    def start_job(self, queue_item_body):
         """Target function to run python script specified in queue item body.
 
         Parameters:
         -----------
-        item_id: str
-            Queue Item ID
         queue_item_body: dict
             Dictionary with contents required to run python scipts. Follows the
             schema:
@@ -49,11 +47,11 @@ class ProcessWorkerInterface(QueueWorkerInterface):
             )
             # Catch error that occured when running script
             if len(result.stderr) > 0:
+                logger.error(result.stderr)
                 raise RuntimeError(
                     f"Error occured while running {filepath}"
                     f"\nError: {result.stderr}"
                 )
-                logger.error(result.stderr)
         except Exception as e:
             raise e
 
@@ -67,7 +65,7 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         queue_item_body: dict
             Dictionary that must contain a key:value pair where INSERT HERE
         """
-        p = Process(target=self.start_job, args=(item_id,queue_item_body,))
+        p = Process(target=self.start_job, args=(queue_item_body,))
         self._active_processes[item_id] = p
         p.start()
 
@@ -77,26 +75,25 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         Parameters:
         -----------
         queue_item_id: str
-            Queue Item ID
+            Queue Item ID to delete from dictionary of active processes
         """
-        # p = queue_item_id.pop('process')
-        # p.close()
+        p = self._active_processes.pop(queue_item_id)
+        p.close()
 
     def poll_all_status(self):
         """Poll status of all jobs sent by the worker interface.
 
         Returns:
         -----------
-        Returns Dict[Any, QueueItemStage] of job statuses.
+        Returns Dict[item_id, QueueItemStage] of job statuses.
         """
         statuses = {}
-        for i in self._active_processes:
-            p = self._active_processes[i]
+        for id_,p in self._active_processes.items():
             if p.exitcode is None:
-                statuses[i] = QueueItemStage.PROCESSING
+                statuses[id_] = QueueItemStage.PROCESSING
             elif p.exitcode == 0:
-                statuses[i] = QueueItemStage.SUCCESS
+                statuses[id_] = QueueItemStage.SUCCESS
             else:
-                statuses[i] = QueueItemStage.FAIL
+                statuses[id_] = QueueItemStage.FAIL
         return statuses
 
