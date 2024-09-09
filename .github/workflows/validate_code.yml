@@ -7,14 +7,11 @@ permissions:
 
 jobs:
   generic-workflow:
-    uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
+    uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@OPAL-756v3
     with:
       project_root: task_queue
+      mark_inputs: not unit and not integration and not end2end
 
-  unmarked-test:
-    uses: AFMC-MAJCOM/ci_python/.github/workflows/unmarked_tests.yaml@main
-    with:
-      mark-inputs: not unit and not integration and not end2end
 
   unit-test:
     runs-on: ubuntu-latest
