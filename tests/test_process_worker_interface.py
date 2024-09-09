@@ -27,7 +27,7 @@ def temp_script_good(temp_dir):
 def temp_script_bad(temp_dir):
     """Create python script used for testing with a syntax error."""
     # Create a file inside the temporary directory
-    temp_file = temp_dir / "my_script.py"
+    temp_file = temp_dir / "my_bad_script.py"
     temp_file.write_text("syntax error")
     return temp_file
 
@@ -72,7 +72,7 @@ def wait_for_finish(worker, queue_item_id):
     return status
 
 @pytest.mark.unit
-def test_process_interface_success_with_arg(process_worker, temp_script_good):
+def test_process_worker_success_with_arg(process_worker, temp_script_good):
     """Tests job success with at least one arg."""
     queue_item_id, queue_item_body = make_queue_item()
 
@@ -85,7 +85,7 @@ def test_process_interface_success_with_arg(process_worker, temp_script_good):
     assert status == QueueItemStage.SUCCESS
 
 @pytest.mark.unit
-def test_process_interface_success_no_arg(process_worker, temp_script_good):
+def test_process_worker_success_no_arg(process_worker, temp_script_good):
     """Tests job success with no args."""
     queue_item_id, _ = make_queue_item()
     queue_item_body = {"file_name" : "my_script.py"}
@@ -99,10 +99,10 @@ def test_process_interface_success_no_arg(process_worker, temp_script_good):
     assert status == QueueItemStage.SUCCESS
 
 @pytest.mark.unit
-def test_process_interface_fail(process_worker, temp_script_bad):
+def test_process_worker_fail(process_worker, temp_script_bad):
     """Tests job failure."""
-    queue_item_id, queue_item_body = make_queue_item()
-
+    queue_item_id, _ = make_queue_item()
+    queue_item_body = {'file_name':'my_bad_script.py'}
     process_worker.send_job(
         queue_item_id,
         queue_item_body
@@ -112,7 +112,7 @@ def test_process_interface_fail(process_worker, temp_script_bad):
     assert status == QueueItemStage.FAIL
 
 @pytest.mark.unit
-def test_process_invalid_body(process_worker, temp_script_good):
+def test_process_invalid_body(process_worker):
     """Tests pydantic model catches bad queue_item_body."""
     queue_item_id, _ = make_queue_item()
     queue_item_body = {"bad_key" : "bad_value"}
@@ -125,3 +125,68 @@ def test_process_invalid_body(process_worker, temp_script_good):
         status = wait_for_finish(process_worker, queue_item_id)
 
         assert status == QueueItemStage.FAIL
+
+@pytest.mark.unit
+def test_process_no_processes(process_worker):
+    """Test poll_all_status with no processes does not break.
+    """
+    statuses = process_worker.poll_all_status()
+
+    assert len(statuses) == 0
+
+@pytest.mark.unit
+def test_process_rerun_item(process_worker, temp_script_good, temp_script_bad):
+    """Tests process can rerun a job.
+    """
+    # Set up the first job to fail
+    queue_item_id, _ = make_queue_item()
+    queue_item_body = {'file_name':'my_bad_script.py'}
+    process_worker.send_job(queue_item_id, queue_item_body)
+    wait_for_finish(process_worker, queue_item_id)
+
+    # And the second job to succeed
+    _, queue_item_body = make_queue_item()
+    process_worker.send_job(queue_item_id, queue_item_body)
+    status = wait_for_finish(process_worker, queue_item_id)
+
+    assert status == QueueItemStage.SUCCESS
+
+@pytest.mark.unit
+def test_process_worker_end_to_end_concurrent(
+    process_worker,
+    temp_script_good,
+    temp_script_bad
+):
+    """Test multiple items running concurrently, with some succeeding and some
+    failing.
+    """
+    n_processes = 10
+    n_fail = 0
+
+    for i in range(n_processes):
+        should_fail = i % 3 == 0
+
+        queue_item_id, queue_item_body = make_queue_item()
+
+        if should_fail:
+            n_fail += 1
+            queue_item_body['file_name'] = 'my_bad_script.py'
+
+        process_worker.send_job(
+            queue_item_id,
+            queue_item_body
+        )
+
+    while True:
+        results = process_worker.poll_all_status()
+
+        statuses = list(results.values())
+
+        if all(s != QueueItemStage.PROCESSING for s in statuses):
+            break
+
+        time.sleep(1)
+
+    assert sum(s == QueueItemStage.SUCCESS for s in statuses) == \
+        n_processes - n_fail
+    assert sum(s == QueueItemStage.FAIL for s in statuses) == n_fail
