@@ -7,7 +7,7 @@ from pydantic import validate_call
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue import logger
-from task_queue.queue_pydantic_models import ProcessInterfaceModel
+from task_queue.queue_pydantic_models import ProcessWorkerModel
 
 
 class ProcessQueueWorker(QueueWorkerInterface):
@@ -61,7 +61,7 @@ class ProcessQueueWorker(QueueWorkerInterface):
             raise e
 
     @validate_call
-    def send_job(self, item_id, queue_item_body:ProcessInterfaceModel):
+    def send_job(self, item_id, queue_item_body:ProcessWorkerModel):
         """Starts a job from queue item.
 
         Parameters:
