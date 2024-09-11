@@ -57,7 +57,7 @@ def make_queue_item(fail=False):
 @pytest.fixture(scope="module")
 def process_worker(temp_dir):
     """Creates process worker interface used for testing."""
-    return ProcessWorkerInterface(temp_dir)
+    return ProcessQueueWorker(temp_dir)
 
 def wait_for_finish(worker, queue_item_id):
     """Runs until item moves out of processing stage.
