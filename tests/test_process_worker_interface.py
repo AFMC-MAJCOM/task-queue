@@ -20,7 +20,7 @@ def temp_script_good(temp_dir):
     """Create python script used for testing."""
     # Create a file inside the temporary directory
     temp_file = temp_dir / "my_script.py"
-    temp_file.write_text("import sys\ndef do_nothing():\n    pass")
+    temp_file.write_text("import sys\ndef do_something():\n    if sys.argv[1] not None and sys.argv[1]!='arg1':        sys.exit(1)\ndo_something()")
     return temp_file
 
 @pytest.fixture(scope="module")
