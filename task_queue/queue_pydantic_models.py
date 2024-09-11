@@ -38,8 +38,8 @@ class LookupQueueItemModel(BaseModel):
     status : QueueItemStage
     item_body : QueueItemBodyType
 
-class ProcessInterfaceModel(BaseModel):
+class ProcessWorkerModel(BaseModel):
     """A Pydantic model representing the requried dictionary for the process
-    worker interface to run properly."""
+    worker to run properly."""
     file_name : str
-    args : Union[None,list[str]] = None
+    args : Union[None,list[str],str] = None

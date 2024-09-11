@@ -5,7 +5,7 @@ import pytest
 import time
 from pydantic import ValidationError
 
-from task_queue.workers.process_queue_worker import ProcessWorkerInterface
+from task_queue.workers.process_queue_worker import ProcessQueueWorker
 from task_queue.queues.queue_base import QueueItemStage
 
 @pytest.fixture(scope="module")

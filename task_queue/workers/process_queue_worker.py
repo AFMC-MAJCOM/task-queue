@@ -10,8 +10,8 @@ from task_queue import logger
 from task_queue.queue_pydantic_models import ProcessInterfaceModel
 
 
-class ProcessWorkerInterface(QueueWorkerInterface):
-    """Process Worker Interface Class
+class ProcessQueueWorker(QueueWorkerInterface):
+    """Process Queue Worker Class
 
     Jobs are completed using processes, steps to be completed for each job are
     stored in python scripts outside of the task-queue package.
@@ -30,7 +30,7 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         -----------
         queue_item_body: dict
             Dictionary with contents required to run python scipts. Follows the
-            ProcessInterfaceModel schema:
+            ProcessWorkerModel schema:
             {
                 "file_name": 'name_of_script.py'
                 "args": ['list','of','args'] or None
@@ -48,6 +48,7 @@ class ProcessWorkerInterface(QueueWorkerInterface):
                 text=True,
                 check=False
             )
+            logger.info(result.stdout)
             # Catch error that occured when running script
             if len(result.stderr) > 0:
                 logger.error(result.stderr)
@@ -56,7 +57,9 @@ class ProcessWorkerInterface(QueueWorkerInterface):
                     f"\nError: {result.stderr}"
                 )
         except Exception as e:
+            logger.error(e)
             raise e
+
     @validate_call
     def send_job(self, item_id, queue_item_body:ProcessInterfaceModel):
         """Starts a job from queue item.
@@ -66,7 +69,7 @@ class ProcessWorkerInterface(QueueWorkerInterface):
         item_id: str
             Queue Item ID
         queue_item_body: dict
-            Dictionary that must match the ProcessInterfaceModel schema:
+            Dictionary that must match the ProcessWorkerModel schema:
             {
                 "file_name": 'name_of_script.py'
                 "args": ['list','of','args'] or None
