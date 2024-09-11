@@ -122,7 +122,7 @@ def handle_worker_interface_choice(cli_settings):
         )
     if cli_settings.worker_interface \
         == config.WorkerInterfaceChoices.PROCESS:
-        return ProcessWorkerInterface(cli_settings.path_to_scripts)
+        return ProcessQueueWorker(cli_settings.path_to_scripts)
     return None
 
 def handle_queue_implementation_choice(cli_settings):
