@@ -20,7 +20,7 @@ def temp_script_good(temp_dir):
     """Create python script used for testing."""
     # Create a file inside the temporary directory
     temp_file = temp_dir / "my_script.py"
-    temp_file.write_text("import sys\ndef do_something():\n    if sys.argv[1] not None and sys.argv[1]!='arg1':        sys.exit(1)\ndo_something()")
+    temp_file.write_text("import sys\ndef do_something():\n    if len(sys.argv) > 1 and sys.argv[1]!='arg1':        sys.exit(1)\ndo_something()")
     return temp_file
 
 @pytest.fixture(scope="module")
@@ -122,7 +122,7 @@ def test_process_invalid_body(process_worker):
     queue_item_id, _ = make_queue_item()
     queue_item_body = {"bad_key" : "bad_value"}
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError, match="1 validation error for send_job\n2.file_name"):
         process_worker.send_job(
             queue_item_id,
             queue_item_body
