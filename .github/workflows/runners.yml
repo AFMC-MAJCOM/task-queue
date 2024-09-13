@@ -25,8 +25,8 @@ jobs:
     - name: Main Version
 
       # Set MAIN_VERSION to the version in pyproject.toml
-      # run: echo "MAIN_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")" >> $GITHUB_ENV
-      run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+      run: echo "MAIN_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")" >> $GITHUB_ENV
+      # run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
 
     - uses: actions/checkout@v3
     - name: Merge Version
@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Main Version
-        run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+        run: echo "MAIN_VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")" >> $GITHUB_ENV
       - name: New Release Version Check
         run: python .github/workflows/verify_new_image.py ${MAIN_VERSION}
       - name: Export Results
