@@ -23,11 +23,13 @@ class ProcessQueueWorker(QueueWorkerInterface):
         self.path_to_scripts = path_to_scripts
         self._active_processes = {}
 
-    def start_job(self, queue_item_body):
+    def start_job(self, item_id, queue_item_body):
         """Target function to run python script specified in queue item body.
 
         Parameters:
         -----------
+        item_id:
+            ID of Queue Item
         queue_item_body: dict
             Dictionary with contents required to run python scipts. Follows the
             ProcessWorkerModel schema:
@@ -53,8 +55,8 @@ class ProcessQueueWorker(QueueWorkerInterface):
             if len(result.stderr) > 0:
                 logger.error(result.stderr)
                 raise RuntimeError(
-                    f"Error occured while running {filepath}"
-                    f"\nError: {result.stderr}"
+                    f"Error occured while running {filepath} for queue item: "
+                    f"{item_id}\nError: {result.stderr}"
                 )
         except Exception as e:
             logger.error(e)
@@ -75,7 +77,7 @@ class ProcessQueueWorker(QueueWorkerInterface):
                 "args": ['list','of','args'] or None
             }
         """
-        p = Process(target=self.start_job, args=(queue_item_body,))
+        p = Process(target=self.start_job, args=(item_id,queue_item_body,))
         self._active_processes[item_id] = p
         p.start()
 
