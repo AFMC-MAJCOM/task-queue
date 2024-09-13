@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task_queue"
+dynamic = ["version"]
+
+dependencies = [
+    "pendulum>=2.1.2",
+    "s3fs>=2023.6.0",
+    "pandas",
+    "pyarrow",
+    "sqlmodel",
+    "psycopg2-binary",
+    "requests",
+    "fastapi[all]",
+    "uvicorn",
+]
+
+# Automatically discover and include Python packages in your project
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = []
+
+# Get the version from the task_queue/__init__.py file
+[tool.setuptools.dynamic]
+version = {attr = "task_queue.__version__"}
