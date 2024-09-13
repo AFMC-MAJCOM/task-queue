@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "task_queue"
 version = "1.7.7"
-# dynamic = ["version"] # Necessary to get version from task_queue/__init__.py
 
 dependencies = [
     "pendulum>=2.1.2",
@@ -24,7 +23,3 @@ dependencies = [
 where = ["."]
 include = ["*"]
 exclude = []
-
-# # Get the version from the task_queue/__init__.py file
-# [tool.setuptools.dynamic]
-# version = {attr = "task_queue.__version__"}
