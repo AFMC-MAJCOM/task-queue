@@ -23,10 +23,12 @@ jobs:
       with:
         ref: 'main'
     - name: Main Version
-      run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+      run: echo "MAIN_VERSION=$(python -c "from importlib.metadata import version; print(version('task_queue'))")" >> $GITHUB_ENV
+      # run: echo "MAIN_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - uses: actions/checkout@v3
     - name: Merge Version
-      run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
+      run: echo "MERGE_VERSION=$(python -c "from importlib.metadata import version; print(version('task_queue'))")" >> $GITHUB_ENV
+      # run: echo "MERGE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
     - name: Version Comparison
       run: python .github/workflows/verify_version.py ${MAIN_VERSION} ${MERGE_VERSION}
 
