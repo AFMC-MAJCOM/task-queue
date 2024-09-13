@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "task_queue"
-version = "1.1.1"
+version = "1.7.7"
 # dynamic = ["version"] # Necessary to get version from task_queue/__init__.py
 
 dependencies = [
