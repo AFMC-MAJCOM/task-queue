@@ -149,7 +149,8 @@ def test_process_rerun_item(process_worker, temp_script_good, temp_script_bad):
     # Set up the first job to fail
     queue_item_id, queue_item_body = make_queue_item(fail=True)
     process_worker.send_job(queue_item_id, queue_item_body)
-    wait_for_finish(process_worker, queue_item_id)
+    status = wait_for_finish(process_worker, queue_item_id)
+    assert status == QueueItemStage.FAIL
 
     # And the second job to succeed
     _, queue_item_body = make_queue_item()

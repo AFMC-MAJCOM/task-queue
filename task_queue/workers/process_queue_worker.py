@@ -18,7 +18,7 @@ class ProcessQueueWorker(QueueWorkerInterface):
     """
 
     def __init__(self, path_to_scripts):
-        """Initializes ProcessWorkerInterface.
+        """Initializes ProcessQueueWorker.
         """
         self.path_to_scripts = path_to_scripts
         self._active_processes = {}
