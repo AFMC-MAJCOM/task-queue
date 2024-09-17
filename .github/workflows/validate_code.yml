@@ -12,7 +12,6 @@ jobs:
       project_root: task_queue
       mark_inputs: not unit and not integration and not end2end
 
-
   unit-test:
     runs-on: ubuntu-latest
     steps:

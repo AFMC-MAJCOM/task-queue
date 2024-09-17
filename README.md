@@ -49,6 +49,8 @@ The work queue is designed to be capable of pushing queue items to a worker and 
     - Starts a job from a queue item
 - poll_all_status :: () -> Dict [(queue_item_id, QueueItemStage)]
     - Gets the status of all of the jobs and associated queue item IDs
+- delete_job :: queue_item_id -> ()
+    - Deletes a job from the specific workflow/process after the job completes and the queue is updated.
 
 ## Queue Worker Implementations
 
@@ -61,6 +63,10 @@ Jobs are stored as a dictionary in memory, and are manually marked as Success or
 [Swagger documentation for argo workflows](https://argo-workflows.readthedocs.io/en/stable/swagger/)
 
 Jobs are created as workflows via the submit API endpoint, and are monitored from the workflows API endpoint. Details are listed below.
+
+### Process Worker
+
+Jobs are created in Python Processes and each process will run a python script provided by the user.
 
 #### Important endpoints
 
@@ -120,6 +126,7 @@ TaskQueueCliSettings: Settings for launching the CLI
 - worker_interface_id
 - endpoint
 - namespace
+- path_to_scripts
 - connection_string
 - queue_name
 - s3_base_path
