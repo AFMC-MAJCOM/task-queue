@@ -4,7 +4,7 @@
 ## Repository Organization
 
 ### Root
-<p>The root folder contains all of the necessary information about task-queue, including a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/README.md">README</a> and a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/setup.py">setup.py</a> file to setup the current version of task-queue</p>
+<p>The root folder contains all of the necessary information about task-queue, including a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/README.md">README</a> and a <a href="https://github.com/AFMC-MAJCOM/task-queue/blob/main/pyproject.toml">pyproject.toml</a> file to setup the current version of task-queue</p>
 
 ### .github/workflows
 <p>The <a href="https://github.com/AFMC-MAJCOM/task-queue/tree/main/.github/workflows">.github/workflows</a> folder contains the workflow for task-queue and will run tests.</p>
