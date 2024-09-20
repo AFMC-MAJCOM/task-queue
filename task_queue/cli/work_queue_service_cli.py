@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from task_queue.logger import logger, set_logger_level
 from task_queue.config import config
 from task_queue.workers.work_queue import WorkQueue
+from task_queue.workers.process_queue_worker import ProcessQueueWorker
 from task_queue.workers.argo_workflows_queue_worker import (
                                                     ArgoWorkflowsQueueWorker)
 from task_queue.queues.s3_queue import json_s3_queue
@@ -15,7 +16,8 @@ from task_queue.queues.queue_base import QueueItemStage
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
 
-
+# Pylint does not like how many if/elif branches we have in this function
+# pylint: disable=R0912
 def validate_args(cli_args):
     """Validates input arguments given to the CLI.
 
@@ -39,6 +41,16 @@ def validate_args(cli_args):
         required_args = ['worker_interface_id', 'endpoint', 'namespace']
         if not all(cli_args[i] is not None for i in required_args):
             value = config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
+            errors_found += f"{required_args} arguments required when " \
+                             "worker-interface is set to " \
+                            f"{value}\n"
+            validation_success = False
+
+    elif cli_args['worker_interface'] \
+        == config.WorkerInterfaceChoices.PROCESS:
+        required_args = ['path_to_scripts']
+        if not all(cli_args[i] is not None for i in required_args):
+            value = config.WorkerInterfaceChoices.PROCESS.value
             errors_found += f"{required_args} arguments required when " \
                              "worker-interface is set to " \
                             f"{value}\n"
@@ -108,6 +120,9 @@ def handle_worker_interface_choice(cli_settings):
             cli_settings.endpoint,
             cli_settings.namespace
         )
+    if cli_settings.worker_interface \
+        == config.WorkerInterfaceChoices.PROCESS:
+        return ProcessQueueWorker(cli_settings.path_to_scripts)
     return None
 
 def handle_queue_implementation_choice(cli_settings):
