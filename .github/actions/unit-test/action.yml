@@ -4,5 +4,14 @@ runs:
   steps:
   - uses: actions/checkout@v3
   - name: Run Pytests
-    run: pytest -vv -m unit
+    run: |
+        export SQL_QUEUE_NAME=test
+        export SQL_QUEUE_POSTGRES_HOSTNAME=localhost
+        export SQL_QUEUE_POSTGRES_USER=postgres
+        export SQL_QUEUE_POSTGRES_PASSWORD=postgres
+        export SQL_QUEUE_POSTGRES_DATABASE=postgres
+        export SQL_QUEUE_POSTGRES_PORT=5432
+        export AWS_ACCESS_KEY_ID=minioadmin
+        export AWS_SECRET_ACCESS_KEY=minioadmin
+        export FSSPEC_S3_ENDPOINT_URL=http://172.17.0.1:9000/
     shell: bash

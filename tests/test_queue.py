@@ -40,7 +40,7 @@ def cleanup_bucket(test_bucket_name, fs):
     if fs.exists(test_bucket_name):
         fs.rm(test_bucket_name)
 
-def new_s3_queue():
+def new_s3_queue(request):
     """Creates a new s3 queue for tests and prints results.
     """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
@@ -102,7 +102,7 @@ def new_empty_queue(request):
     if request.param == "sql":
         yield new_sql_queue()
     elif request.param == "s3":
-        yield from new_s3_queue()
+        yield from new_s3_queue(request)
     elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
