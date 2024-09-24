@@ -63,7 +63,9 @@ def new_in_memory_queue():
 
 @pytest.fixture(scope="session", autouse=True)
 def cleanup_sql_queue():
-    # if request.node.get_closest_marker('integration'):
+    """Deletes the SQL table made during the pytests."""
+    yield
+
     tablename = 'test_sql_queue'
     test_sql_engine = PytestSqlEngine()
     with test_sql_engine.test_sql_engine.connect() as connection:
@@ -104,7 +106,7 @@ def new_empty_queue(request):
     elif request.param == "s3":
         yield from new_s3_queue(request)
     elif request.param == "memory":
-        yield new_in_memory_queue(request)
+        yield new_in_memory_queue()
     elif request.param == "with_events":
         store = InMemoryEventStore()
         queue = in_memory_queue()

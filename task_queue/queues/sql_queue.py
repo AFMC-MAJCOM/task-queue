@@ -15,7 +15,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
 
     Parameters:
     -----------
-    tablename: str (default "sqlname")
+    tablename: str (default "sqlqueue")
         Name for the table used for th SQL Queue
 
     Returns:
