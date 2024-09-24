@@ -50,7 +50,8 @@ class ProcessQueueWorker(QueueWorkerInterface):
                 text=True,
                 check=False
             )
-            logger.info(result.stdout)
+            if result.stdout:
+                logger.info(result.stdout)
             # Catch error that occured when running script
             if len(result.stderr) > 0:
                 logger.error(result.stderr)
