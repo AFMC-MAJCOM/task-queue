@@ -9,7 +9,7 @@ import s3fs
 
 import task_queue.queues.s3_queue as s3q
 from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue.queues.sql_queue import SQLQueue, json_sql_queue
+from task_queue.queues.sql_queue import SQLQueue
 import task_queue.queues.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
@@ -21,10 +21,9 @@ UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_s3_bucket(request):
+def setup_s3_bucket():
     """Create a 'integration-tests' S3 bucket for testing purposes.
     """
-    # if 'integration' in request.keywords:
     fs = s3fs.S3FileSystem()
 
     test_bucket_name = 'integration-tests'
@@ -34,9 +33,6 @@ def setup_s3_bucket(request):
 
     yield
     cleanup_bucket(test_bucket_name, fs)
-    # else:
-    #     yield None
-
 
 def cleanup_bucket(test_bucket_name, fs):
     """Delete the created bucket that was used for testing.
@@ -44,7 +40,7 @@ def cleanup_bucket(test_bucket_name, fs):
     if fs.exists(test_bucket_name):
         fs.rm(test_bucket_name)
 
-def new_s3_queue(request):
+def new_s3_queue():
     """Creates a new s3 queue for tests and prints results.
     """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
@@ -60,13 +56,13 @@ def new_s3_queue(request):
     elif request.node.rep_call.failed:
         print(f"Failed results at {queue_base}")
 
-def new_in_memory_queue(request):
+def new_in_memory_queue():
     """Returns an in-memory queue.
     """
     return in_memory_queue()
 
 @pytest.fixture(scope="session", autouse=True)
-def cleanup_sql_queue(request):
+def cleanup_sql_queue():
     # if request.node.get_closest_marker('integration'):
     tablename = 'test_sql_queue'
     test_sql_engine = PytestSqlEngine()
@@ -74,7 +70,7 @@ def cleanup_sql_queue(request):
         connection.execute(sqla.text(f"DROP TABLE IF EXISTS {tablename};"))
         connection.commit()
 
-def new_sql_queue(request):
+def new_sql_queue():
     """Returns a SQL queue.
     """
     rand_int = str(random.randint(0, 9999999999))
@@ -104,10 +100,9 @@ def new_empty_queue(request):
     each queue type in the list.
     """
     if request.param == "sql":
-        # yield from new_sql_queue(request)
-        yield new_sql_queue(request)
+        yield new_sql_queue()
     elif request.param == "s3":
-        yield from new_s3_queue(request)
+        yield from new_s3_queue()
     elif request.param == "memory":
         yield new_in_memory_queue(request)
     elif request.param == "with_events":
@@ -115,13 +110,11 @@ def new_empty_queue(request):
         queue = in_memory_queue()
         yield eq.queue_with_events(queue, store, "TEST_EVENT_QUEUE")
 
-import time
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):
     """Tests put and get function as expected.
     """
     qtest.test_put_get(new_empty_queue)
-    time.sleep(10)
 
 @pytest.mark.filterwarnings("ignore:Item .* already in queue. Skipping.")
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)

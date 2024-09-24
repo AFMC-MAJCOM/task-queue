@@ -14,7 +14,7 @@ class TaskQueueTestSettings(config.TaskQueueApiSettings):
     # Testing configuration parameters
     TASK_QUEUE_ENV_TEST: bool = False
     run_argo_tests: bool = False
-    UNIT_TEST_QUEUE_BASE: str = "s3://unit-tests/queue/queue_"
+    UNIT_TEST_QUEUE_BASE: str = "s3://integration-tests/queue/queue_"
 
 
 @pytest.mark.unit
@@ -44,7 +44,7 @@ def test_config_parameter_order():
     # 1) Environment variables, 2) Config.json, 3) A default value
     assert settings.run_argo_tests
     assert settings.TASK_QUEUE_ENV_TEST # ENV File
-    assert settings.UNIT_TEST_QUEUE_BASE == "s3://unit-tests/queue/queue_"
+    assert settings.UNIT_TEST_QUEUE_BASE == "s3://integration-tests/queue/queue_"
 
 
 @pytest.mark.unit
