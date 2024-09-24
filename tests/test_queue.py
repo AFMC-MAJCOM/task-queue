@@ -75,16 +75,13 @@ def cleanup_sql_queue():
 def new_sql_queue():
     """Returns a SQL queue.
     """
-    rand_int = str(random.randint(0, 9999999999))
-    queue_name = "TEST_QUEUE_" + rand_int
-    tablename ="test_sql_queue"
-    uc = "_test_queue_name_index_key_uc"
+    queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
     test_sql_engine = PytestSqlEngine()
     return SQLQueue(
         test_sql_engine.test_sql_engine,
         queue_name,
-        tablename,
-        uc
+        "test_sql_queue",
+        "_test_queue_name_index_key_uc"
     )
 
 ALL_QUEUE_TYPES = [
