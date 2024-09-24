@@ -10,32 +10,47 @@ from sqlalchemy import Engine, Column
 from task_queue import logger
 from .queue_base import QueueBase, QueueItemStage
 
+def new_sql_queue_table(tablename:str, constraint_name:str):
+    """Creates a SQL table for the SQL Queue based on the table name provided.
 
-class SqlQueue(SQLModel, table=True):
-    """Class to define the SQL queue table.
+    Parameters:
+    -----------
+    tablename: str (default "sqlname")
+        Name for the table used for th SQL Queue
+
+    Returns:
+    -----------
+    Returns an insteance of the self.SqlQueueTable object for the specific table.
     """
-    # No queue may have duplicate `index_key`s
-    __table_args__ = (
-        UniqueConstraint("queue_name", "index_key",
-                         name="_queue_name_index_key_uc"),
-    )
+    class _SqlQueueTable(SQLModel, table=True):
+        """Class to define the schema for a row in the SQL table.
+        """
+        __tablename__ = tablename
+        # No queue may have duplicate `index_key`s
+        __table_args__ = (
+            UniqueConstraint("queue_name", "index_key",
+                             name=constraint_name),
+            {'extend_existing':True},
+        )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-    json_data: Any = Field(sa_column=Column(JSONB))
-    index_key: str
-    queue_name: str
-
+        id: Optional[int] = Field(default=None, primary_key=True)
+        queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
+        json_data: Any = Field(sa_column=Column(JSONB))
+        index_key: str
+        queue_name: str
+    return _SqlQueueTable
 
 class SQLQueue(QueueBase):
     """Creates the SQL Queue.
     """
-    def __init__(self, engine:Engine, queue_name):
+    def __init__(self, engine:Engine, queue_name, tablename="sqlqueue", constraint_name="_queue_name_index_key_uc"):
         """Initializes the QueueBase class.
         """
+        self.SqlQueueTable = new_sql_queue_table(tablename, constraint_name)
         SQLModel.metadata.create_all(engine)
         self.queue_name = queue_name
         self.engine = engine
+        
 
     # Disabled pylint because BaseException is used to record
     # and keep the program running correctly until the raise
@@ -69,7 +84,7 @@ class SQLQueue(QueueBase):
         for k, v in items.items():
             try:
                 db_items.append(
-                    SqlQueue(
+                    self.SqlQueueTable(
                         json_data=json.dumps(v),
                         index_key=str(k),
                         queue_name=self.queue_name
@@ -80,7 +95,7 @@ class SQLQueue(QueueBase):
 
 
         with Session(self.engine) as session:
-            statement = (insert(SqlQueue).values(db_items) \
+            statement = (insert(self.SqlQueueTable).values(db_items) \
                          .on_conflict_do_nothing())
             session.exec(statement)
 
@@ -109,9 +124,9 @@ class SQLQueue(QueueBase):
         List[(queue_item_id, queue_item_body)]
         """
         with Session(self.engine) as session:
-            stmt = select(SqlQueue).where(
-                (self.queue_name == SqlQueue.queue_name)
-                & (SqlQueue.queue_item_stage == QueueItemStage.WAITING.value)
+            stmt = select(self.SqlQueueTable).where(
+                (self.queue_name == self.SqlQueueTable.queue_name)
+                & (self.SqlQueueTable.queue_item_stage == QueueItemStage.WAITING.value)
             ).limit(n_items)
             results = session.exec(stmt)
 
@@ -122,7 +137,8 @@ class SQLQueue(QueueBase):
                 update_stage(self.engine,
                              self.queue_name,
                              QueueItemStage.PROCESSING,
-                             queue_item.index_key)
+                             queue_item.index_key,
+                             self.SqlQueueTable)
 
             return outputs
 
@@ -138,7 +154,8 @@ class SQLQueue(QueueBase):
             self.engine,
             self.queue_name,
             QueueItemStage.SUCCESS,
-            queue_item_id
+            queue_item_id,
+            self.SqlQueueTable
         )
 
     def fail(self, queue_item_id):
@@ -153,7 +170,8 @@ class SQLQueue(QueueBase):
             self.engine,
             self.queue_name,
             QueueItemStage.FAIL,
-            queue_item_id
+            queue_item_id,
+            self.SqlQueueTable
         )
 
     # Pylint cannot correctly tell that func has a count method
@@ -173,9 +191,9 @@ class SQLQueue(QueueBase):
         Returns the number of Items in that stage of the Queue as an integer.
         """
         with Session(self.engine) as session:
-            statement = select(func.count(SqlQueue.id)).filter(
-                SqlQueue.queue_name == self.queue_name,
-                SqlQueue.queue_item_stage == queue_item_stage.value
+            statement = select(func.count(self.SqlQueueTable.id)).filter(
+                self.SqlQueueTable.queue_name == self.queue_name,
+                self.SqlQueueTable.queue_item_stage == queue_item_stage.value
             )
 
             return session.exec(statement).first()
@@ -195,9 +213,9 @@ class SQLQueue(QueueBase):
         """
         with Session(self.engine) as session:
             statement = (
-                select(SqlQueue.queue_item_stage)
-                .where((self.queue_name == SqlQueue.queue_name) & \
-                       (str(queue_item_id) == SqlQueue.index_key))
+                select(self.SqlQueueTable.queue_item_stage)
+                .where((self.queue_name == self.SqlQueueTable.queue_name) & \
+                       (str(queue_item_id) == self.SqlQueueTable.index_key))
             )
 
             item = session.exec(statement).first()
@@ -222,9 +240,9 @@ class SQLQueue(QueueBase):
         """
         with Session(self.engine) as session:
             statement = (
-                select(SqlQueue.index_key)
-                .where((self.queue_name == SqlQueue.queue_name) &
-                       (queue_item_stage.value == SqlQueue.queue_item_stage))
+                select(self.SqlQueueTable.index_key)
+                .where((self.queue_name == self.SqlQueueTable.queue_name) &
+                       (queue_item_stage.value == self.SqlQueueTable.queue_item_stage))
             )
 
             result = session.exec(statement).all()
@@ -248,9 +266,9 @@ class SQLQueue(QueueBase):
         # Get item body
         item_body = []
         with Session(self.engine) as session:
-            stmt = select(SqlQueue).where(
-                (self.queue_name == SqlQueue.queue_name)
-                & (SqlQueue.index_key == queue_item_id))
+            stmt = select(self.SqlQueueTable).where(
+                (self.queue_name == self.SqlQueueTable.queue_name)
+                & (self.SqlQueueTable.index_key == queue_item_id))
             results = session.exec(stmt)
 
             for queue_item in results:
@@ -287,10 +305,11 @@ class SQLQueue(QueueBase):
             update_stage(self.engine,
                          self.queue_name,
                          QueueItemStage.WAITING,
-                         item)
+                         item,
+                         self.SqlQueueTable)
 
 
-def update_stage(engine, queue_name, new_stage, item_key):
+def update_stage(engine, queue_name, new_stage, item_key, SqlQueueTable):
     """Updates the stage of an Item.
 
     Parameters:
@@ -304,9 +323,9 @@ def update_stage(engine, queue_name, new_stage, item_key):
         Key of the Item to be staged.
     """
     with Session(engine) as session:
-        statement = select(SqlQueue).where(
-            (SqlQueue.index_key == item_key) & \
-                (SqlQueue.queue_name == queue_name)
+        statement = select(SqlQueueTable).where(
+            (SqlQueueTable.index_key == item_key) & \
+                (SqlQueueTable.queue_name == queue_name)
         )
         results = session.exec(statement)
 
