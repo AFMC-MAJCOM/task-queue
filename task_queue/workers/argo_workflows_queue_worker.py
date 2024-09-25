@@ -1,5 +1,7 @@
 """Wherein is contained the class for the Argo Workflow Queue Worker.
 """
+from pprint import pformat
+
 import requests
 
 import pandas as pd
@@ -124,6 +126,19 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             workflow_name
         )
 
+    def _argo_workflows_logs_url(self, workflow_name, log_container):
+        """Returns the URL to the argo workflows server to capture a log
+        for a specific job.
+        """
+        return self.urlconcat(
+                self._argo_workflows_endpoint,
+                "api",
+                "v1",
+                "workflows",
+                self._namespace,
+                workflow_name,
+                f"log?logOptions.container={log_container}"
+        )
 
     def _construct_submit_body(self, item_id, queue_item_body):
         """Creates body for the submit URL.
@@ -231,6 +246,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         queue_item_id: str
             Item ID of job in workflow
         """
+        logs = self.get_logs(queue_item_id)
+        for container, log in logs.items():
+            logger.info("Item: %s Container: %s: %s"
+                        , queue_item_id, container, pformat(log))
+
         name = self._get_workflow_name(queue_item_id)
         delete_url = self._argo_workflows_delete_url(name)
         response = requests.delete(delete_url, timeout = 10)
@@ -240,6 +260,35 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         except requests.HTTPError as e:
             logger.error("Couldn't delete workflow %s", name)
             raise e
+
+    def get_logs(self, queue_item_id):
+        """Retrieves the logs of a specific argo workflow.
+
+        Parameters:
+        -----------
+        queue_item_id: str
+            Queue Item ID of the job we are looking for
+
+        Returns:
+        ---------
+        Dictionary where the key is the container where the log came
+        from and the value is the logs stored in that container.
+        """
+        workflow_name = self._get_workflow_name(queue_item_id)
+        log_types = ["main","wait","init"]
+        logs = {}
+        for container in log_types:
+            log_url = self._argo_workflows_logs_url(workflow_name,container)
+            response = requests.get(log_url, timeout=10)
+            try:
+                response.raise_for_status()
+                logs[container] = response.text
+            except requests.HTTPError:
+                logger.warning("Couldn't find %s logs for %s",
+                               container, queue_item_id)
+                logs[container] = f"Couldn't find {container}" +\
+                                    f"logs for {queue_item_id}"
+        return logs
 
     def _construct_poll_query(self):
         """Creates a dictionary used to ping Argo for information regarding all
@@ -374,7 +423,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         # item ID if we have retried an item that has already been run. We can
         # handle this case by only taking the most recent one.
 
-        logger.info("Filtering results")
+        logger.debug("Filtering results")
         results = {}
         completed_times = {}
 
@@ -397,7 +446,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Returns Dict[Any, QueueItemStage]
         """
-        logger.info("Getting status from Argo Workflows")
+        logger.debug("Getting status from Argo Workflows")
         request_url = self._argo_workflows_list_url
         request_params = self._construct_poll_query()
 
@@ -407,7 +456,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             timeout=10
         )
 
-        logger.info("Got response from Argo")
+        logger.debug("Got response from Argo")
 
         response.raise_for_status()
 

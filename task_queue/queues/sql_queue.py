@@ -160,6 +160,7 @@ class SQLQueue(QueueBase):
             queue_item_id,
             self.sql_queue
         )
+        logger.info("Job %s successfully completed", queue_item_id)
 
     def fail(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to FAIL.
@@ -176,6 +177,7 @@ class SQLQueue(QueueBase):
             queue_item_id,
             self.sql_queue
         )
+        logger.info("Job %s failed", queue_item_id)
 
     # Pylint cannot correctly tell that func has a count method
     # This raises an error that can be ignored
