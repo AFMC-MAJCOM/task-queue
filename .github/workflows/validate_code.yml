@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   generic-workflow:
-    uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@OPAL-943
+    uses: AFMC-MAJCOM/ci_python/.github/workflows/ci.yaml@main
     with:
       project_root: task_queue
       mark_inputs: not unit and not integration and not end2end
