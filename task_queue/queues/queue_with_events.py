@@ -65,7 +65,6 @@ class QueueWithEvents(QueueBase):
     """
     # Pylint does not like more than 5 parameters
     # pylint: disable=too-many-arguments
-    # pylint: disable=too-many-positional-arguments
     def __init__(
         self,
         queue,
