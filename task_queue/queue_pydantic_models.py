@@ -42,4 +42,4 @@ class ProcessWorkerModel(BaseModel):
     """A Pydantic model representing the requried dictionary for the process
     worker to run properly."""
     file_name : str
-    args : Union[None,list[str],str] = None
+    args : Union[None,list[str]] = None
