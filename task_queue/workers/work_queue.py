@@ -80,14 +80,14 @@ class WorkQueue():
 
         # update all items in processing
         for queue_item_id in processing_items:
-            # default to None if the item id is not in the list of statuses 
-            # returned by the queue worker. This prevents jobs that were 
+            # default to None if the item id is not in the list of statuses
+            # returned by the queue worker. This prevents jobs that were
             # deleted externally from getting stuck in `PROCESSING` eternally.
             status = statuses.get(queue_item_id, None)
 
-            if status == None:
-                # no need to delete here, because this case is only reached 
-                # when the item has already been deleted. 
+            if status is None:
+                # no need to delete here, because this case is only reached
+                # when the item has already been deleted.
                 self._queue.fail(queue_item_id)
             elif status == QueueItemStage.SUCCESS:
                 self._queue.success(queue_item_id)
