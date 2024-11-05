@@ -1,13 +1,13 @@
 """Wherein is contained the WorkQueue class.
 """
-from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues.queue_base import QueueItemStage, QueueBase
 from task_queue import logger
 
 
 class WorkQueue():
     """Class for the WorkQueue initialization and supporting functions.
     """
-    def __init__(self, queue, interface):
+    def __init__(self, queue:QueueBase, interface):
         """Initializes Work Queue.
 
         Parameters:
@@ -75,13 +75,21 @@ class WorkQueue():
         statuses = self._interface.poll_all_status()
 
         logger.info("Processing new statuses from worker interface")
-        for queue_item_id, status in statuses.items():
-            # Not in processing -> don't care
-            if self._queue.lookup_status(queue_item_id) != \
-                QueueItemStage.PROCESSING:
-                continue
 
-            if status == QueueItemStage.SUCCESS:
+        processing_items = self._queue.lookup_state(QueueItemStage.PROCESSING)
+
+        # update all items in processing
+        for queue_item_id in processing_items:
+            # default to None if the item id is not in the list of statuses
+            # returned by the queue worker. This prevents jobs that were
+            # deleted externally from getting stuck in `PROCESSING` eternally.
+            status = statuses.get(queue_item_id, None)
+
+            if status is None:
+                # no need to delete here, because this case is only reached
+                # when the item has already been deleted.
+                self._queue.fail(queue_item_id)
+            elif status == QueueItemStage.SUCCESS:
                 self._queue.success(queue_item_id)
                 self._interface.delete_job(queue_item_id)
             elif status == QueueItemStage.FAIL:

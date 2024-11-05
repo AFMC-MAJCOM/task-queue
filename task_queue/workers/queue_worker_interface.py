@@ -83,7 +83,7 @@ class DummyWorkerInterface(QueueWorkerInterface):
         queue_item_id: str
             Queue Item ID
         """
-        self._job_status[queue_item_id] = None
+        del self._job_status[queue_item_id]
 
     def poll_all_status(self):
         """Poll status of all jobs sent by the worker interface.

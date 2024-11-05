@@ -16,7 +16,7 @@ run_argo_tests = TaskQueueTestSettings().run_argo_tests
 if not run_argo_tests:
     pytest.skip(allow_module_level=True)
 
-def make_queue_item(fail=False):
+def make_queue_item(fail=False, run_time=1):
     """Creates a random queue item for testing.
 
     Paramters:
@@ -37,7 +37,8 @@ def make_queue_item(fail=False):
             "submitOptions": {
                 "parameters": [
                     f"bin_file=fake_bin_file_{random.randint(0, 9999999)}",
-                    f"force-fail={fail}"
+                    f"force-fail={fail}",
+                    f"run-time-sec={run_time}"
                 ]
             }
         }
