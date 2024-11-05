@@ -12,6 +12,8 @@ spec:
       - name: bin_file
       - name: force-fail
         value: False
+      - name: run-time-sec
+        value: 5
     name: run-a-test
     script:
       command:
@@ -28,9 +30,7 @@ spec:
         if {{inputs.parameters.force-fail}}:
           exit(1)
 
-        import random
         import time
         print(f'Parsing {bin_file}')
-        dummy_parse_time = random.randint(1, 10)
-        time.sleep(dummy_parse_time)
+        time.sleep({{run-time-sec}})
         print(f'Parsed {bin_file}')

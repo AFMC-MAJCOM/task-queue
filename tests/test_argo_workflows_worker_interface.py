@@ -16,7 +16,7 @@ run_argo_tests = TaskQueueTestSettings().run_argo_tests
 if not run_argo_tests:
     pytest.skip(allow_module_level=True)
 
-def make_queue_item(fail=False):
+def make_queue_item(fail=False, run_time=1):
     """Creates a random queue item for testing.
 
     Paramters:
@@ -37,7 +37,8 @@ def make_queue_item(fail=False):
             "submitOptions": {
                 "parameters": [
                     f"bin_file=fake_bin_file_{random.randint(0, 9999999)}",
-                    f"force-fail={fail}"
+                    f"force-fail={fail}",
+                    f"run-time-sec={run_time}"
                 ]
             }
         }
@@ -211,3 +212,23 @@ def test_argo_worker_delete_workflows():
     assert queue_item_id in get_workflow_ids(worker)
     wait_for_finish(worker, queue_item_id)
     assert queue_item_id not in get_workflow_ids(worker)
+
+@pytest.mark.integration
+def test_deleted_workflow_result():
+    worker = port_forwarded_worker()
+
+
+    queue_item_id, queue_item_body = make_queue_item(run_time=3600)
+    worker.send_job(
+        queue_item_id,
+        queue_item_body
+    )
+
+    worker.delete_job(queue_item_id)
+
+    statuses = worker.poll_all_status()
+
+    this_status = statuses[queue_item_id]
+
+    assert this_status == QueueItemStage.FAIL
+    
