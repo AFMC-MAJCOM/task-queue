@@ -75,6 +75,12 @@ class WorkQueue():
         statuses = self._interface.poll_all_status()
 
         logger.info("Processing new statuses from worker interface")
+
+        # save queue item IDs to delete until after iterating, because some 
+        # implementations use an internal dictionary to keep track of queue 
+        # item stages, and that dictionary can't be modified while iterating.
+        to_delete = []
+
         for queue_item_id, status in statuses.items():
             # Not in processing -> don't care
             if self._queue.lookup_status(queue_item_id) != \
@@ -83,9 +89,12 @@ class WorkQueue():
 
             if status == QueueItemStage.SUCCESS:
                 self._queue.success(queue_item_id)
-                self._interface.delete_job(queue_item_id)
+                to_delete.append(queue_item_id)
             elif status == QueueItemStage.FAIL:
                 self._queue.fail(queue_item_id)
-                self._interface.delete_job(queue_item_id)
+                to_delete.append(queue_item_id)
+
+        for queue_item_id in to_delete:
+            self._interface.delete_job(queue_item_id)
 
         return statuses

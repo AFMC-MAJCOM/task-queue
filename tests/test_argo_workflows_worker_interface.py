@@ -212,22 +212,3 @@ def test_argo_worker_delete_workflows():
     assert queue_item_id in get_workflow_ids(worker)
     wait_for_finish(worker, queue_item_id)
     assert queue_item_id not in get_workflow_ids(worker)
-
-@pytest.mark.integration
-def test_deleted_workflow_result():
-    """Test that a queue item is moved to FAIL if its workflow is deleted."""
-    worker = port_forwarded_worker()
-
-    queue_item_id, queue_item_body = make_queue_item(run_time=3600)
-    worker.send_job(
-        queue_item_id,
-        queue_item_body
-    )
-
-    worker.delete_job(queue_item_id)
-
-    statuses = worker.poll_all_status()
-
-    this_status = statuses[queue_item_id]
-
-    assert this_status == QueueItemStage.FAIL

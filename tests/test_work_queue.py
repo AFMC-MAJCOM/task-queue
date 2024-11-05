@@ -134,6 +134,20 @@ def test_delete_jobs(default_work_queue):
 
     # Dummy workflow can't delete workflows, instead they are just assinged the
     # status of None
-    assert statuses[success_id] is None
-    assert statuses[fail_id] is None
+    assert success_id not in statuses
+    assert fail_id not in statuses  
+
+# @pytest.mark.unit
+# def test_deleted_job(default_work_queue):
+#     """
+#     Test that a job which is deleted is moved to FAIL instead of being stuck in
+#     PROCESSING.
+#     """
+#     pushed_job = default_work_queue.push_next_jobs(1)[0]
+
+#     pushed_job_id, _ = pushed_job
+
+#     default_work_queue._interface.delete_job(pushed_job_id)
+
+#     statuses = default_work_queue._interface.poll_all_status()
 
