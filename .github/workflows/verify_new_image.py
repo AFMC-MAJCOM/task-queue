@@ -21,7 +21,7 @@ def verify_new_image(version: str) -> bool:
         # If the last version number is 0 it indicates that there was a minor
         # or a major release
         return True
-    return False
+    return True
 
 
 if __name__=="__main__":

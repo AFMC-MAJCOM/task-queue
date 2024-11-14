@@ -158,7 +158,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         payload : dict = queue_item_body[
             ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
-            ]
+        ]
         # Merge new labels into submit options for easier query later.
         # We have to do this get/set because submitOptions and labels
         # may not exist in the queue item body payload
@@ -190,18 +190,35 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         Returns the name of the argo workflow that corresponds to the given
         Queue Item ID.
         """
+
+        item_id_label = f"{self.WORK_QUEUE_ITEM_ID_LABEL}={queue_item_id}"
+
         try:
-            res = requests.get(self._argo_workflows_list_url, timeout=10)
+            res = requests.get(
+                self._argo_workflows_list_url,
+                timeout=10,
+                params=self._construct_poll_query(
+                    additional_label_queries=[item_id_label]
+                )
+            )
             res.raise_for_status()
 
             wf = res.json()
 
+            items = wf.get("items", [])
+
+            # this is here because if the response is empty, then wf["items"]
+            # is None, rather than being not set.
+            if not items:
+                return None
+
             for item in wf.get("items",[]):
                 labels = self.get_labels(item)
-                wf_item_id = labels['work-queue.queue-item-id']
+                wf_item_id = labels[self.WORK_QUEUE_ITEM_ID_LABEL]
                 if wf_item_id == queue_item_id:
                     name = item.get("metadata",{}).get("name","Unknown")
                     return name
+
             return None
 
         except requests.exceptions.RequestException as e:
@@ -261,6 +278,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             logger.error("Couldn't delete workflow %s", name)
             raise e
 
+        logger.debug("Deleted workflow %s", name)
+
     def get_logs(self, queue_item_id):
         """Retrieves the logs of a specific argo workflow.
 
@@ -290,20 +309,41 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                                     f"logs for {queue_item_id}"
         return logs
 
-    def _construct_poll_query(self):
+    def _construct_poll_query(self, additional_label_queries=None):
         """Creates a dictionary used to ping Argo for information regarding all
         jobs relevant to worker_interface_id.
+
+        Parameters:
+        -----------
+        additional_label_queries: [(str, str)]
+            additional queries on labels to filter down results
 
         Returns:
         -----------
         Dictionary of query.
         """
-        # Select labels that match this object
+
+        if not additional_label_queries:
+            additional_label_queries = []
+
+        # always select workflows that were created by this object
+        made_by_this_worker_selector = (
+            f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}"
+            "="
+            f"{self._worker_interface_id}"
+        )
+
+        default_label_selectors = [
+            made_by_this_worker_selector,
+        ]
+
+        labels = additional_label_queries + default_label_selectors
+
+        label_selector_string = ",".join(labels)
+
         return {
-            "listOptions.labelSelector": (
-                f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}"
-                f"={self._worker_interface_id}"),
-            "fields": "items.metadata.labels,metadata.resourceVersion"
+            "listOptions.labelSelector": label_selector_string,
+            "fields": "items.metadata,metadata.resourceVersion"
         }
 
     def _get_workflow_status(self, completed, phase):
@@ -380,8 +420,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         argo_phase_label = "workflows.argoproj.io/phase"
 
         return self._get_workflow_status(
-        self.get_labels(wf).get(argo_completed_label, "false"),
-        self.get_labels(wf).get(argo_phase_label, "Pending")
+            self.get_labels(wf).get(argo_completed_label, "false"),
+            self.get_labels(wf).get(argo_phase_label, "Pending")
         )
 
     def get_workflow_create_time(self, wf):
