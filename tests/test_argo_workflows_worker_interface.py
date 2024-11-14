@@ -254,8 +254,8 @@ def test_argo_worker_delete_workflows():
 @pytest.mark.integration
 def test_argo_worker_get_name_with_other_workflows(execution_number):
     """
-    Test that getting the name of a workflow created by this work queue does not
-    break when other workflows not created by this work queue exist.
+    Test that getting the name of a workflow created by this work queue does 
+    not break when other workflows not created by this work queue exist.
     """
 
     worker = port_forwarded_worker()
