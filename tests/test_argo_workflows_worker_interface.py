@@ -55,8 +55,8 @@ def submit_non_queue_workflow(worker:ArgoWorkflowsQueueWorker):
         "submitOptions": {
             "parameters": [
                 f"bin_file=fake_bin_file_{random.randint(0, 9999999)}",
-                f"force-fail=false",
-                f"run-time-sec=1"
+                "force-fail=false",
+                "run-time-sec=1"
             ]
         }
     }
@@ -163,7 +163,10 @@ def test_argo_worker_end_to_end_concurrent():
         if should_fail:
             n_fail += 1
 
-        queue_item_id, queue_item_body = make_queue_item(fail=should_fail, run_time=5)
+        queue_item_id, queue_item_body = make_queue_item(
+            fail=should_fail, 
+            run_time=5
+        )
         worker.send_job(
             queue_item_id,
             queue_item_body
@@ -240,9 +243,9 @@ def test_argo_worker_delete_workflows():
 # underlying logic is flawed. This happens because the current implementation
 # of the `_get_workflow_name` method loops through the outputs and returns the
 # first output that matches the label, which can come encountered before the 
-# workflow that was submitted without the label, causing the function to return
-# successfully, even though the function will fail when the bad workflow is 
-# before the workflow with the proper label value. 
+# workflow that was submitted without the label, causing the function to 
+# return successfully, even though the function will fail when the external
+# workflow is before the workflow with the proper label value. 
 @pytest.mark.parametrize("execution_number", range(10))
 @pytest.mark.integration
 def test_argo_worker_get_name_with_other_workflows(execution_number):

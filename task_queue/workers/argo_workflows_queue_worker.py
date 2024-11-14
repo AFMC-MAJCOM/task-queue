@@ -195,8 +195,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
 
         try:
             res = requests.get(
-                self._argo_workflows_list_url, 
-                timeout=10, 
+                self._argo_workflows_list_url,
+                timeout=10,
                 params=self._construct_poll_query(
                     additional_label_queries=[item_id_label]
                 )
@@ -204,11 +204,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             res.raise_for_status()
 
             wf = res.json()
-            
+
             items = wf.get("items", [])
 
             # this is here because if the response is empty, then wf["items"]
-            # is None, rather than being not set. 
+            # is None, rather than being not set.
             if not items:
                 return None
 
@@ -218,7 +218,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                 if wf_item_id == queue_item_id:
                     name = item.get("metadata",{}).get("name","Unknown")
                     return name
-                
+
             return None
 
         except requests.exceptions.RequestException as e:
@@ -278,7 +278,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             logger.error("Couldn't delete workflow %s", name)
             raise e
 
-        logger.debug(f"Deleted workflow {name}")
+        logger.debug("Deleted workflow %s", name)
 
     def get_logs(self, queue_item_id):
         """Retrieves the logs of a specific argo workflow.
@@ -309,7 +309,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
                                     f"logs for {queue_item_id}"
         return logs
 
-    def _construct_poll_query(self, additional_label_queries=[]):
+    def _construct_poll_query(self, additional_label_queries=None):
         """Creates a dictionary used to ping Argo for information regarding all
         jobs relevant to worker_interface_id.
 
@@ -322,14 +322,17 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Dictionary of query.
         """
-        
+
+        if not additional_label_queries:
+            additional_label_queries = []
+
         # always select workflows that were created by this object
         made_by_this_worker_selector = (
             f"{ArgoWorkflowsQueueWorker.WORK_QUEUE_ID_LABEL}"
             "="
             f"{self._worker_interface_id}"
         )
-        
+
         default_label_selectors = [
             made_by_this_worker_selector,
         ]
