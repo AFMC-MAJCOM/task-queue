@@ -91,8 +91,6 @@ def wait_for_finish(worker, queue_item_id):
         results = worker.poll_all_status()
         status = results[queue_item_id]
 
-        print(results)
-
         if status != QueueItemStage.PROCESSING:
             break
 
