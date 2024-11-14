@@ -77,7 +77,7 @@ def port_forwarded_worker():
     return ArgoWorkflowsQueueWorker(
         f"test-worker-{random.randint(0, 9999999)}",
         "http://localhost:2746",
-        "rf-data-product"
+        "pivot"
     )
 
 def wait_for_finish(worker, queue_item_id):
