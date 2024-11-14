@@ -47,6 +47,25 @@ def make_queue_item(fail=False, run_time=1):
     return (queue_item_id, queue_item_body)
 
 
+def submit_non_queue_workflow(worker:ArgoWorkflowsQueueWorker):
+    url = worker._argo_workflows_submit_url
+    submit_body = {
+        "resourceKind": "WorkflowTemplate",
+        "resourceName": "queue-test-template",
+        "submitOptions": {
+            "parameters": [
+                f"bin_file=fake_bin_file_{random.randint(0, 9999999)}",
+                f"force-fail=false",
+                f"run-time-sec=1"
+            ]
+        }
+    }
+
+    response = requests.post(url, json=submit_body, timeout=10)
+
+    response.raise_for_status()
+
+
 def port_forwarded_worker():
     """Creates a test worker that connects to an argo workflows instance that
     is port forwarded to this host on port 2746 (the default port).
@@ -58,7 +77,7 @@ def port_forwarded_worker():
     return ArgoWorkflowsQueueWorker(
         f"test-worker-{random.randint(0, 9999999)}",
         "http://localhost:2746",
-        "pivot"
+        "rf-data-product"
     )
 
 def wait_for_finish(worker, queue_item_id):
@@ -72,6 +91,8 @@ def wait_for_finish(worker, queue_item_id):
         results = worker.poll_all_status()
         status = results[queue_item_id]
 
+        print(results)
+
         if status != QueueItemStage.PROCESSING:
             break
 
@@ -80,16 +101,16 @@ def wait_for_finish(worker, queue_item_id):
 
     return status
 
-def get_workflow_ids(worker):
-    """Returns the workflow ids of all jobs in the argo workflows.
+def get_workflow_ids(worker:ArgoWorkflowsQueueWorker):
+    """Returns the queue item ids of all jobs in the argo workflows.
     """
-    url = "http://localhost:2746/api/v1/workflows/pivot"
-    wf = requests.get(url).json()
+    url = worker._argo_workflows_list_url
+    wf = requests.get(url, params=worker._construct_poll_query()).json()
 
     item_ids = []
     for item in wf.get("items",[]):
         labels = worker.get_labels(item)
-        item_ids.append(labels['work-queue.queue-item-id'])
+        item_ids.append(labels[worker.WORK_QUEUE_ITEM_ID_LABEL])
     return item_ids
 
 @pytest.mark.integration
@@ -142,7 +163,7 @@ def test_argo_worker_end_to_end_concurrent():
         if should_fail:
             n_fail += 1
 
-        queue_item_id, queue_item_body = make_queue_item(fail=should_fail)
+        queue_item_id, queue_item_body = make_queue_item(fail=should_fail, run_time=5)
         worker.send_job(
             queue_item_id,
             queue_item_body
@@ -202,6 +223,7 @@ def test_argo_worker_delete_workflows():
     )
     assert queue_item_id in get_workflow_ids(worker)
     wait_for_finish(worker, queue_item_id)
+    time.sleep(1)
     assert queue_item_id not in get_workflow_ids(worker)
 
     queue_item_id, queue_item_body = make_queue_item(fail=True)
@@ -212,3 +234,29 @@ def test_argo_worker_delete_workflows():
     assert queue_item_id in get_workflow_ids(worker)
     wait_for_finish(worker, queue_item_id)
     assert queue_item_id not in get_workflow_ids(worker)
+
+# This test runs 10 times because the endpoint that `_get_workflow_name`
+# relies on is non-deterministic, and has a chance to succeed even if the 
+# underlying logic is flawed. This happens because the current implementation
+# of the `_get_workflow_name` method loops through the outputs and returns the
+# first output that matches the label, which can come encountered before the 
+# workflow that was submitted without the label, causing the function to return
+# successfully, even though the function will fail when the bad workflow is 
+# before the workflow with the proper label value. 
+@pytest.mark.parametrize("execution_number", range(10))
+@pytest.mark.integration
+def test_argo_worker_get_name_with_other_workflows(execution_number):
+    """
+    Test that getting the name of a workflow created by this work queue does not
+    break when other workflows not created by this work queue exist.
+    """
+
+    worker = port_forwarded_worker()
+
+    queue_item_id, queue_item_body = make_queue_item()
+    worker.send_job(queue_item_id, queue_item_body)
+    
+    # add a workflow that does not have the labels added by the work queue
+    submit_non_queue_workflow(worker)
+
+    worker._get_workflow_name(queue_item_id)
