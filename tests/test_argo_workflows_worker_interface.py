@@ -107,8 +107,12 @@ def get_workflow_ids(worker:ArgoWorkflowsQueueWorker):
     url = worker._argo_workflows_list_url
     wf = requests.get(url, params=worker._construct_poll_query()).json()
 
+    items = wf.get("items", [])
+    if not items:
+        items = []
+
     item_ids = []
-    for item in wf.get("items",[]):
+    for item in items:
         labels = worker.get_labels(item)
         item_ids.append(labels[worker.WORK_QUEUE_ITEM_ID_LABEL])
     return item_ids
