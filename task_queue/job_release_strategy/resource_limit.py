@@ -123,10 +123,12 @@ class ResourceLimit(JobReleaseStrategyBase):
             total_jobs_pushed
         )
 
-    def filter_by_available_resources(self, dict):
+    def filter_by_available_resources(self, resource_dict):
         """
         Removes keys in the dictionary that are not in this object's
         resource limits.
         """
-        return { k:v for k,v in dict.items() if k in self.resource_limits}
-
+        return {
+            k:v
+            for k,v in resource_dict.items() if k in self.resource_limits
+        }

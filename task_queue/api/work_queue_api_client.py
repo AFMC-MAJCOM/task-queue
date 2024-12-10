@@ -73,7 +73,7 @@ class ApiClient(QueueBase):
 
     @validate_call
     def peek(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
-        pass # TODO: finish this
+        pass
 
     @validate_call
     def success(self, queue_item_id:str) -> None:

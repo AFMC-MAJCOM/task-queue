@@ -8,7 +8,6 @@ import uuid
 
 import task_queue.queues.queue_base as qb
 
-
 pytestmark = pytest.mark.skip()
 
 def random_item():
@@ -35,6 +34,8 @@ def random_item():
 
 n_items = 20
 default_items = dict([random_item() for _ in range(n_items)])
+
+
 
 def test_put_get(queue):
     """Tests put and get function as expected.
