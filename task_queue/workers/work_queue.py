@@ -19,6 +19,10 @@ class WorkQueue():
         self._interface = interface
         self._cached_statuses = {}
 
+    @property
+    def queue(self):
+        return self._queue
+
     def get_queue_size(self, queue_item_stage):
         """Gets the queue size for the given QueueItemStage stage.
 

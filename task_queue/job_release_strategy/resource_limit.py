@@ -11,8 +11,8 @@ def sum_dictionaries(dictionaries):
     values that don't exist.
     """
     out_dict = {}
-    for dict in dictionaries:
-        for k, v in dict.items():
+    for dict_of_numbers in dictionaries:
+        for k, v in dict_of_numbers.items():
             if k not in out_dict:
                 out_dict[k] = 0
             out_dict[k] += v
@@ -20,9 +20,13 @@ def sum_dictionaries(dictionaries):
     return out_dict
 
 def all_values_negative(dict_of_numbers):
+    """Returns True if all dictionary values are negative
+    """
     return all(r < 0 for r in dict_of_numbers.values())
 
 def any_value_positive(dict_of_numbers):
+    """Returns True if any dictionary value is positive
+    """
     return any(r > 0 for r in dict_of_numbers.values())
 
 class ResourceLimit(JobReleaseStrategyBase):
@@ -49,13 +53,13 @@ class ResourceLimit(JobReleaseStrategyBase):
 
 
     def release_next_jobs(self, work_queue):
-        jobs_processing = work_queue._queue.lookup_state(
+        jobs_processing = work_queue.queue.lookup_state(
             QueueItemStage.PROCESSING
         )
 
         resources_used_by_processing = sum_dictionaries(
             (
-                work_queue._queue
+                work_queue.queue
                 .lookup_item(item_id)["item_body"]
                 .get(self.resource_key, {})
             )
@@ -82,7 +86,7 @@ class ResourceLimit(JobReleaseStrategyBase):
         done = False
         total_jobs_pushed = 0
         while not done:
-            next_possible_items = work_queue._queue.peek(self.peek_batch_size)
+            next_possible_items = work_queue.queue.peek(self.peek_batch_size)
 
             jobs_to_push = 0
             for _, item_body in next_possible_items:
@@ -104,8 +108,8 @@ class ResourceLimit(JobReleaseStrategyBase):
                 if any_value_positive(negative_available_resources):
                     done = True
                     break
-                else:
-                    jobs_to_push += 1
+
+                jobs_to_push += 1
 
             total_jobs_pushed += jobs_to_push
 
@@ -119,25 +123,10 @@ class ResourceLimit(JobReleaseStrategyBase):
             total_jobs_pushed
         )
 
-
-    def can_fit_jobs(self, new_job_resources):
-        current_resources_used = sum_dictionaries(self.processing_job_resources.values())
-
-        # Subtract the resource limits from the resources required by the
-        # current processing jobs plus the new job. If any outputs are
-        # positive, that means we would be starting jobs that require more
-        # resources than the limit allows.
-        new_resources_remaining = sum_dictionaries(
-            [
-                current_resources_used,
-                new_job_resources,
-                self.negative_resource_limits
-            ]
-        )
-
-        return all( r < 0 for r in new_resources_remaining.values() )
-
-
     def filter_by_available_resources(self, dict):
+        """
+        Removes keys in the dictionary that are not in this object's
+        resource limits.
+        """
         return { k:v for k,v in dict.items() if k in self.resource_limits}
 

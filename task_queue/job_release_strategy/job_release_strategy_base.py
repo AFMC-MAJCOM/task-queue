@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 from ..workers.work_queue import WorkQueue
 
+# pylint: disable=too-few-public-methods
 class JobReleaseStrategyBase(ABC):
     """Abstract Base Class for Job Release Strategies.
     """
@@ -13,4 +14,3 @@ class JobReleaseStrategyBase(ABC):
     def release_next_jobs(self, work_queue : WorkQueue):
         """Pushes new jobs to the work queue.
         """
-        pass
