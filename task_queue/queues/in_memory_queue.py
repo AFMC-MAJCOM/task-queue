@@ -122,6 +122,16 @@ class InMemoryQueue(QueueBase):
 
         return queue_items
 
+    def peek(self, n_items=1):
+        next_ids = list(itertools.islice(self.memory_queue.waiting, n_items))
+
+        queue_items = []
+
+        for i in next_ids:
+            queue_items.append((i, self.memory_queue.waiting[i]))
+
+        return queue_items
+
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
 

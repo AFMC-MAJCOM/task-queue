@@ -87,6 +87,17 @@ class QueueBase(ABC):
         """
 
     @abstractmethod
+    def peek(self, n_items=1):
+        """Return the next queue items without moving anything from WAITING to
+        PROCESSING.
+
+        Returns:
+        ------------
+        Returns a list of n_items from the Queue, as
+        List[(queue_item_id, queue_item_body)]
+        """
+
+    @abstractmethod
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
 

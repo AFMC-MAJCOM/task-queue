@@ -135,7 +135,7 @@ def test_delete_jobs(default_work_queue):
     # Dummy workflow can't delete workflows, instead they are just assinged the
     # status of None
     assert success_id not in statuses
-    assert fail_id not in statuses  
+    assert fail_id not in statuses
 
 @pytest.mark.unit
 def test_deleted_job(default_work_queue):

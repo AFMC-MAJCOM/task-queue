@@ -145,6 +145,22 @@ class SQLQueue(QueueBase):
 
             return outputs
 
+    def peek(self, n_items=1):
+        with Session(self.engine) as session:
+            stmt = select(self.sql_queue).where(
+                (self.queue_name == self.sql_queue.queue_name) &
+                (self.sql_queue.queue_item_stage==QueueItemStage.WAITING.value)
+            ).limit(n_items)
+            results = session.exec(stmt)
+
+            outputs = []
+            for queue_item in results:
+                outputs.append((queue_item.index_key,
+                                json.loads(queue_item.json_data)))
+
+            return outputs
+
+
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
 
