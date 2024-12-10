@@ -20,10 +20,16 @@ def random_item():
 
     """
     key = str(uuid.uuid4())
-    val = [
-        random.randint(0, 100)
-        for _ in range(random.randint(0, 10))
-    ]
+    val = {
+        "data": [
+            random.randint(0, 100) for _ in range(random.randint(0, 10))
+        ],
+        "resources": {
+            "resource_a": 1,
+            "resource_b": 10,
+            "resource_c": 2
+        }
+    }
 
     return key,val
 
