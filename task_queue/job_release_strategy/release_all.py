@@ -4,6 +4,7 @@
 from .job_release_strategy_base import JobReleaseStrategyBase
 from ..queues.queue_base import QueueItemStage
 
+# pylint: disable-next=too-few-public-methods
 class ReleaseAll(JobReleaseStrategyBase):
     """
     Simplest possible job release strategy: Releases all jobs as soon as

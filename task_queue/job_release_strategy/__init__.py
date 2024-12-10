@@ -1,3 +1,4 @@
+# pylint: disable=useless-import-alias
 """Different options for how to automatically start jobs in the task queue.
 """
 from .release_all import ReleaseAll as ReleaseAll

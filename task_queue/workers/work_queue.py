@@ -21,6 +21,8 @@ class WorkQueue():
 
     @property
     def queue(self):
+        """The queue object managed by this work queue.
+        """
         return self._queue
 
     def get_queue_size(self, queue_item_stage):

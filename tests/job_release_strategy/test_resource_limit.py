@@ -2,10 +2,10 @@ import pytest
 
 from task_queue.job_release_strategy import ResourceLimit
 from task_queue.queues.queue_base import QueueItemStage
-from tests.test_work_queue import default_work_queue as default_work_queue
+from tests.test_work_queue import default_work_queue as work_queue
 
 @pytest.mark.unit
-def test_resource_limit(default_work_queue):
+def test_resource_limit(work_queue):
     """
     Test that the ProcessingLimit strategy starts jobs as expected
     """
@@ -24,28 +24,28 @@ def test_resource_limit(default_work_queue):
 
     # We should see 2 jobs get started, because the resource B limit is 20, and
     # each job uses 10 of resource B
-    processing_limit_strategy.release_next_jobs(default_work_queue)
-    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    processing_limit_strategy.release_next_jobs(work_queue)
+    processing = work_queue.get_queue_size(QueueItemStage.PROCESSING)
     assert processing == 2
 
     # Second release - make sure no new jobs get started, as we already have
     # enough jobs processing.
-    processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+    processing_limit_strategy.release_next_jobs(work_queue)
+    assert work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
 
     # Finish just one job and make sure it fills back up to the limit again.
     item_to_succeed = (
-        default_work_queue
+        work_queue
         ._queue
         .lookup_state(QueueItemStage.PROCESSING)[0]
     )
-    default_work_queue._interface.mock_success(item_to_succeed)
-    default_work_queue.update_job_status()
-    processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+    work_queue._interface.mock_success(item_to_succeed)
+    work_queue.update_job_status()
+    processing_limit_strategy.release_next_jobs(work_queue)
+    assert work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
 
 @pytest.mark.unit
-def test_resource_limit_missing_resources(default_work_queue):
+def test_resource_limit_missing_resources(work_queue):
     """
     Test that the resource limit still works even with jobs that have resource
     types that are not set in the ResourceLimit and vice versa
@@ -65,13 +65,13 @@ def test_resource_limit_missing_resources(default_work_queue):
 
     # We should see 2 jobs get started, because the resource B limit is 20, and
     # each job uses 10 of resource B
-    processing_limit_strategy.release_next_jobs(default_work_queue)
-    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    processing_limit_strategy.release_next_jobs(work_queue)
+    processing = work_queue.get_queue_size(QueueItemStage.PROCESSING)
     assert processing == 2
 
 
 @pytest.mark.unit
-def test_resource_limit_peek_batch_size(default_work_queue):
+def test_resource_limit_peek_batch_size(work_queue):
     """
     Test that the resource limit will start more than `peek_batch_size` jobs
     at once.
@@ -93,6 +93,6 @@ def test_resource_limit_peek_batch_size(default_work_queue):
     # We should see 2 jobs get started, because the resource B limit is 20, and
     # each job uses 10 of resource B, even though the peek batch size is only
     # 1.
-    processing_limit_strategy.release_next_jobs(default_work_queue)
-    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    processing_limit_strategy.release_next_jobs(work_queue)
+    processing = work_queue.get_queue_size(QueueItemStage.PROCESSING)
     assert processing == 2

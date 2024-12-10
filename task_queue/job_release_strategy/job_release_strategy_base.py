@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 
 from ..workers.work_queue import WorkQueue
 
-# pylint: disable=too-few-public-methods
+# pylint: disable-next=too-few-public-methods
 class JobReleaseStrategyBase(ABC):
     """Abstract Base Class for Job Release Strategies.
     """

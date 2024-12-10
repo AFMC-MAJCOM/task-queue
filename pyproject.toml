@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "task_queue"
 
-version = "1.10.1"
+version = "1.10.0"
 
 dependencies = [
     "pendulum>=2.1.2",

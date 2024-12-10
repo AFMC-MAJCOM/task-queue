@@ -5,8 +5,9 @@ state.
 
 from .job_release_strategy_base import JobReleaseStrategyBase
 from ..queues.queue_base import QueueItemStage
-from task_queue import logger
+from ..logger import logger
 
+# pylint: disable-next=too-few-public-methods
 class ProcessingLimit(JobReleaseStrategyBase):
     """
     Releases jobs to try to keep a certain number of tasks in the `processing`

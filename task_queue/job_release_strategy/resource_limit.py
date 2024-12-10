@@ -1,9 +1,9 @@
-"""Releasess jobs if resources are available.
+"""Releases jobs if resources are available.
 """
 
 from .job_release_strategy_base import JobReleaseStrategyBase
 from ..queues.queue_base import QueueItemStage
-from task_queue import logger
+from ..logger import logger
 
 def sum_dictionaries(dictionaries):
     """
