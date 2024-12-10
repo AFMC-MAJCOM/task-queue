@@ -3,6 +3,7 @@
 
 from .job_release_strategy_base import JobReleaseStrategyBase
 from ..queues.queue_base import QueueItemStage
+from task_queue import logger
 
 def sum_dictionaries(dictionaries):
     """
@@ -12,7 +13,7 @@ def sum_dictionaries(dictionaries):
     out_dict = {}
     for dict in dictionaries:
         for k, v in dict.items():
-            if not k in out_dict:
+            if k not in out_dict:
                 out_dict[k] = 0
             out_dict[k] += v
 
@@ -33,17 +34,25 @@ class ResourceLimit(JobReleaseStrategyBase):
     def __init__(
             self,
             resource_limits:dict[str, int],
-            resource_key:str="resources"
+            resource_key:str="resources",
+            peek_batch_size=10
         ):
         self.resource_key = resource_key
         self.resource_limits = resource_limits.copy()
+        self.peek_batch_size=peek_batch_size
 
         # So we can add a negative number to do a subtraction later.
-        self.negative_resource_limits = { k:-v for k,v in self.resource_limits.items() }
+        self.negative_resource_limits = {
+            k:-v
+            for k,v in self.resource_limits.items()
+        }
 
 
     def release_next_jobs(self, work_queue):
-        jobs_processing = work_queue._queue.lookup_state(QueueItemStage.PROCESSING)
+        jobs_processing = work_queue._queue.lookup_state(
+            QueueItemStage.PROCESSING
+        )
+
         resources_used_by_processing = sum_dictionaries(
             (
                 work_queue._queue
@@ -52,9 +61,12 @@ class ResourceLimit(JobReleaseStrategyBase):
             )
             for item_id in jobs_processing
         )
+
         negative_available_resources = sum_dictionaries(
             [
-                self.filter_by_available_resources(resources_used_by_processing),
+                self.filter_by_available_resources(
+                    resources_used_by_processing
+                ),
                 self.negative_resource_limits
             ]
         )
@@ -62,9 +74,15 @@ class ResourceLimit(JobReleaseStrategyBase):
         # Sanity check - we're not already overcommitted on resources.
         assert not any_value_positive(negative_available_resources)
 
+        logger.info(
+            "ResourceLimit.release_next_jobs: Resources available: %s",
+            { k:-v for k,v in negative_available_resources.items() }
+        )
+
         done = False
+        total_jobs_pushed = 0
         while not done:
-            next_possible_items = work_queue._queue.peek(10)
+            next_possible_items = work_queue._queue.peek(self.peek_batch_size)
 
             jobs_to_push = 0
             for _, item_body in next_possible_items:
@@ -76,7 +94,11 @@ class ResourceLimit(JobReleaseStrategyBase):
                         item_body[self.resource_key]
                     ]
                 )
-                negative_available_resources = self.filter_by_available_resources(negative_available_resources)
+                negative_available_resources = (
+                    self.filter_by_available_resources(
+                        negative_available_resources
+                    )
+                )
 
                 # Check if we have the resources to start this job.
                 if any_value_positive(negative_available_resources):
@@ -85,12 +107,17 @@ class ResourceLimit(JobReleaseStrategyBase):
                 else:
                     jobs_to_push += 1
 
+            total_jobs_pushed += jobs_to_push
+
             # Start the next batch of jobs. When jobs are pushed, they are
             # moved from WAITING to PROCESSING, so they will not be returned
             # by `queue.peek` in the next loop.
             work_queue.push_next_jobs(jobs_to_push)
 
-        print(negative_available_resources)
+        logger.info(
+            "ResourceLimit.release_next_jobs: Started %s jobs",
+            total_jobs_pushed
+        )
 
 
     def can_fit_jobs(self, new_job_resources):

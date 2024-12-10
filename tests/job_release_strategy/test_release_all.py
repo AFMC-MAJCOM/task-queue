@@ -2,7 +2,7 @@ import pytest
 
 from task_queue.job_release_strategy import ReleaseAll
 from task_queue.queues.queue_base import QueueItemStage
-from tests.test_work_queue import default_work_queue
+from tests.test_work_queue import default_work_queue as default_work_queue
 
 @pytest.mark.unit
 def test_release_all(default_work_queue):
@@ -20,6 +20,7 @@ def test_release_all(default_work_queue):
 
     # check the postconditions
     assert default_work_queue.get_queue_size(QueueItemStage.WAITING) == 0
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == num_waiting
+    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert processing == num_waiting
 
 

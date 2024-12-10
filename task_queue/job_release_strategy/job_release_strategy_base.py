@@ -3,7 +3,6 @@
 
 from abc import ABC, abstractmethod
 
-from task_queue import logger
 from ..workers.work_queue import WorkQueue
 
 class JobReleaseStrategyBase(ABC):

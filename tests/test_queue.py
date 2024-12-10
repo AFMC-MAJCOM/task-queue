@@ -241,8 +241,9 @@ def test_peek_items_not_moved(new_empty_queue):
     new_empty_queue.put(qtest.default_items)
 
     NUM_PEEK = 5
-    items = new_empty_queue.peek(NUM_PEEK)
-    assert new_empty_queue.size(QueueItemStage.WAITING) == len(qtest.default_items)
+    _ = new_empty_queue.peek(NUM_PEEK)
+    waiting = new_empty_queue.size(QueueItemStage.WAITING)
+    assert waiting == len(qtest.default_items)
     assert new_empty_queue.size(QueueItemStage.PROCESSING) == 0
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)

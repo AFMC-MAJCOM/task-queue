@@ -5,6 +5,7 @@ state.
 
 from .job_release_strategy_base import JobReleaseStrategyBase
 from ..queues.queue_base import QueueItemStage
+from task_queue import logger
 
 class ProcessingLimit(JobReleaseStrategyBase):
     """
@@ -33,3 +34,8 @@ class ProcessingLimit(JobReleaseStrategyBase):
         to_start = max(0, self.max_num_processing - n_processing)
 
         started_jobs = work_queue.push_next_jobs(to_start)
+
+        logger.info(
+            "ProcessingLimit.release_next_jobs: Started %s jobs",
+            started_jobs
+        )

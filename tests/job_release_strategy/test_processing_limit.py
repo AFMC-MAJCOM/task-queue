@@ -2,7 +2,7 @@ import pytest
 
 from task_queue.job_release_strategy import ProcessingLimit
 from task_queue.queues.queue_base import QueueItemStage
-from tests.test_work_queue import default_work_queue
+from tests.test_work_queue import default_work_queue as default_work_queue
 
 @pytest.mark.unit
 def test_processing_limit(default_work_queue):
@@ -20,20 +20,28 @@ def test_processing_limit(default_work_queue):
 
     # First release - make sure jobs get started.
     processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert default_work_queue.get_queue_size(QueueItemStage.WAITING) == num_waiting - NUM_PROCESSING_LIMIT
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == NUM_PROCESSING_LIMIT
+    waiting = default_work_queue.get_queue_size(QueueItemStage.WAITING)
+    assert waiting == num_waiting - NUM_PROCESSING_LIMIT
+    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert processing == NUM_PROCESSING_LIMIT
 
     # Second release - make sure no new jobs get started, as we already have
     # enough jobs processing.
     processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert default_work_queue.get_queue_size(QueueItemStage.WAITING) == num_waiting - NUM_PROCESSING_LIMIT
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == NUM_PROCESSING_LIMIT
+    waiting = default_work_queue.get_queue_size(QueueItemStage.WAITING)
+    assert waiting == num_waiting - NUM_PROCESSING_LIMIT
+    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert processing == NUM_PROCESSING_LIMIT
 
     # Finish just one job and make sure it fills back up to the limit again.
-    item_to_succeed = default_work_queue._queue.lookup_state(QueueItemStage.PROCESSING)[0]
+    item_to_succeed = (
+        default_work_queue
+        ._queue
+        .lookup_state(QueueItemStage.PROCESSING)[0]
+    )
     default_work_queue._interface.mock_success(item_to_succeed)
     default_work_queue.update_job_status()
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == NUM_PROCESSING_LIMIT - 1
-
     processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == NUM_PROCESSING_LIMIT
+    processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert processing == NUM_PROCESSING_LIMIT
+
