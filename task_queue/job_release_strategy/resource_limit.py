@@ -19,7 +19,10 @@ def sum_dictionaries(dictionaries):
     return out_dict
 
 def all_values_negative(dict_of_numbers):
-    return all(r < 0 for r in dict_of_numbers)
+    return all(r < 0 for r in dict_of_numbers.values())
+
+def any_value_positive(dict_of_numbers):
+    return any(r > 0 for r in dict_of_numbers.values())
 
 class ResourceLimit(JobReleaseStrategyBase):
     """
@@ -51,12 +54,13 @@ class ResourceLimit(JobReleaseStrategyBase):
         )
         negative_available_resources = sum_dictionaries(
             [
-                resources_used_by_processing,
+                self.filter_by_available_resources(resources_used_by_processing),
                 self.negative_resource_limits
             ]
         )
 
-        assert all_values_negative(negative_available_resources)
+        # Sanity check - we're not already overcommitted on resources.
+        assert not any_value_positive(negative_available_resources)
 
         done = False
         while not done:
@@ -64,26 +68,29 @@ class ResourceLimit(JobReleaseStrategyBase):
 
             jobs_to_push = 0
             for _, item_body in next_possible_items:
-                # calculate what the available resources would be if we
-                # started this job
+                # Calculate what the available resources would be if we
+                # started this job.
                 negative_available_resources = sum_dictionaries(
                     [
                         negative_available_resources,
                         item_body[self.resource_key]
                     ]
                 )
+                negative_available_resources = self.filter_by_available_resources(negative_available_resources)
 
-                # check if we have the resources to start this job.
-                if not all_values_negative(negative_available_resources):
+                # Check if we have the resources to start this job.
+                if any_value_positive(negative_available_resources):
                     done = True
                     break
                 else:
                     jobs_to_push += 1
 
-            # start the next batch of jobs. When jobs are pushed, they are
+            # Start the next batch of jobs. When jobs are pushed, they are
             # moved from WAITING to PROCESSING, so they will not be returned
             # by `queue.peek` in the next loop.
             work_queue.push_next_jobs(jobs_to_push)
+
+        print(negative_available_resources)
 
 
     def can_fit_jobs(self, new_job_resources):
@@ -103,4 +110,7 @@ class ResourceLimit(JobReleaseStrategyBase):
 
         return all( r < 0 for r in new_resources_remaining.values() )
 
+
+    def filter_by_available_resources(self, dict):
+        return { k:v for k,v in dict.items() if k in self.resource_limits}
 

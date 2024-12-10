@@ -12,14 +12,67 @@ def test_resource_limit(default_work_queue):
 
     RESOURCE_A_LIMIT = 10
     RESOURCE_B_LIMIT = 20
+    RESOURCE_C_LIMIT = 10
     processing_limit_strategy = ResourceLimit(
         {
             "resource_a": RESOURCE_A_LIMIT,
-            "resource_b": RESOURCE_B_LIMIT
+            "resource_b": RESOURCE_B_LIMIT,
+            "resource_c": RESOURCE_C_LIMIT
         }
     )
 
-    # Make sure some preconditions are good.
-    num_waiting = default_work_queue.get_queue_size(QueueItemStage.WAITING)
-    assert num_waiting > 0
-    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 0
+    # We should see 2 jobs get started, because the resource B limit is 20, and
+    # each job uses 10 of resource B
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    num_processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert num_processing == 2
+
+    # Second release - make sure no new jobs get started, as we already have
+    # enough jobs processing.
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+
+    # Finish just one job and make sure it fills back up to the limit again.
+    item_to_succeed = default_work_queue._queue.lookup_state(QueueItemStage.PROCESSING)[0]
+    default_work_queue._interface.mock_success(item_to_succeed)
+    default_work_queue.update_job_status()
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+
+@pytest.mark.unit
+def test_resource_limit_missing_resources(default_work_queue):
+    """
+    Test that the resource limit still works even with jobs that have resource
+    types that are not set in the ResourceLimit and vice versa
+    """
+
+    RESOURCE_A_LIMIT = 10
+    RESOURCE_B_LIMIT = 20
+    RESOURCE_D_LIMIT = 5
+
+    processing_limit_strategy = ResourceLimit(
+        {
+            "resource_a": RESOURCE_A_LIMIT,
+            "resource_b": RESOURCE_B_LIMIT,
+            "resource_d": RESOURCE_D_LIMIT
+        }
+    )
+
+    # We should see 2 jobs get started, because the resource B limit is 20, and
+    # each job uses 10 of resource B
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    num_processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
+    assert num_processing == 2
+
+    # Second release - make sure no new jobs get started, as we already have
+    # enough jobs processing.
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+
+    # Finish just one job and make sure it fills back up to the limit again.
+    item_to_succeed = default_work_queue._queue.lookup_state(QueueItemStage.PROCESSING)[0]
+    default_work_queue._interface.mock_success(item_to_succeed)
+    default_work_queue.update_job_status()
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    assert default_work_queue.get_queue_size(QueueItemStage.PROCESSING) == 2
+
