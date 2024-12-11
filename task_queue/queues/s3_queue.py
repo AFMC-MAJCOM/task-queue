@@ -141,6 +141,30 @@ class JsonS3Queue(QueueBase):
 
         return output
 
+    def peek(self, n_items=1):
+
+        n_items = max(n_items, 0)
+
+        queue_items = safe_s3fs_ls(
+            fs,
+            self.queue_path,
+            detail=False,
+            refresh=True
+        )
+
+        to_get = queue_items[:n_items]
+
+        output = []
+
+        for item_path in to_get:
+            # get item data and add to list
+            with fs.open(item_path) as f:
+                item_data = json.load(f)
+
+            output.append((fname_to_id(item_path), item_data))
+
+        return output
+
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS.
 

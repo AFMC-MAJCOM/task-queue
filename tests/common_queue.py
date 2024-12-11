@@ -8,7 +8,6 @@ import uuid
 
 import task_queue.queues.queue_base as qb
 
-
 pytestmark = pytest.mark.skip()
 
 def random_item():
@@ -20,15 +19,23 @@ def random_item():
 
     """
     key = str(uuid.uuid4())
-    val = [
-        random.randint(0, 100)
-        for _ in range(random.randint(0, 10))
-    ]
+    val = {
+        "data": [
+            random.randint(0, 100) for _ in range(random.randint(0, 10))
+        ],
+        "resources": {
+            "resource_a": 1,
+            "resource_b": 10,
+            "resource_c": 2
+        }
+    }
 
     return key,val
 
 n_items = 20
 default_items = dict([random_item() for _ in range(n_items)])
+
+
 
 def test_put_get(queue):
     """Tests put and get function as expected.

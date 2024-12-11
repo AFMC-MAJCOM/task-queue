@@ -177,6 +177,9 @@ class QueueWithEvents(QueueBase):
 
         return items
 
+    def peek(self, n_items=1):
+        return self.queue.peek(n_items)
+
     def success(self, queue_item_id):
         """Moves a Queue Item from PROCESSING to SUCCESS and logs the Event.
 

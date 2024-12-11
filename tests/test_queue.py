@@ -15,6 +15,7 @@ from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
 from .test_config import TaskQueueTestSettings
 from .utils import PytestSqlEngine
+from task_queue.queues.queue_base import QueueItemStage
 
 
 UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
@@ -232,3 +233,28 @@ def test_lookup_item_fail(new_empty_queue):
     """Tests that the proper error is thrown when lookup_item fails.
     """
     qtest.test_lookup_item_fail(new_empty_queue)
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_peek_items_not_moved(new_empty_queue):
+    """Tests that peeked items are not moved to PROCESSING
+    """
+    new_empty_queue.put(qtest.default_items)
+
+    NUM_PEEK = 5
+    _ = new_empty_queue.peek(NUM_PEEK)
+    waiting = new_empty_queue.size(QueueItemStage.WAITING)
+    assert waiting == len(qtest.default_items)
+    assert new_empty_queue.size(QueueItemStage.PROCESSING) == 0
+
+@pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
+def test_peek_items_same_as_get(new_empty_queue):
+    """Tests that the items returned by `peek` are the same as returned by a
+    subsequent `get`
+    """
+    new_empty_queue.put(qtest.default_items)
+
+    NUM_PEEK = 5
+    items_peek = new_empty_queue.peek(NUM_PEEK)
+    items_get = new_empty_queue.get(NUM_PEEK)
+
+    assert items_peek == items_get

@@ -72,6 +72,10 @@ class ApiClient(QueueBase):
         return response.json()
 
     @validate_call
+    def peek(self, n_items:PositiveInt=1) -> List[Tuple[str, Any]]:
+        return None
+
+    @validate_call
     def success(self, queue_item_id:str) -> None:
         """Moves a Queue Item from PROCESSING to SUCCESS.
 
