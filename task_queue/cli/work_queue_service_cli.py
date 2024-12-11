@@ -13,6 +13,8 @@ from task_queue.workers.argo_workflows_queue_worker import (
 from task_queue.queues.s3_queue import json_s3_queue
 from task_queue.queues.sql_queue import json_sql_queue
 from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues.in_memory_queue import InMemoryQueue
+
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
 from task_queue.job_release_strategy import (
@@ -158,6 +160,9 @@ def handle_queue_implementation_choice(cli_settings):
             create_engine(cli_settings.connection_string),
             cli_settings.queue_name
         )
+    elif cli_settings.queue_implementation \
+         == config.QueueImplementations.IN_MEMORY:
+        queue = InMemoryQueue()
 
     if cli_settings.with_queue_events:
         store = None

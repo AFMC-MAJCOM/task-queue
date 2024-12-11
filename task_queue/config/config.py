@@ -156,7 +156,7 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
         alias='resource-limits',
         description="Resource limits for starting new jobs"
     )
-    resource__key : Optional[str] = Field(
+    resource_key : Optional[str] = Field(
         default="resources",
         alias='resource-key',
         description=(
