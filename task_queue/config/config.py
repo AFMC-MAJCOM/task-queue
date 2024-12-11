@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
     Field,
     field_validator,
+    model_validator
 )
 from task_queue import logger
 
@@ -63,7 +64,6 @@ class TaskQueueBaseSetting(BaseSettings):
         logger.info("Loaded %s parameters:", class_name)
         for k, v in self.model_dump().items():
             logger.info("%s: %s", str(k), str(v))
-
 
 
 class TaskQueueSqlSettings(TaskQueueBaseSetting):
@@ -150,11 +150,26 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
                     "argument should be set to 'sql-json' "
                     "when including this flag."
     )
-    processing_limit : int = Field(
-        default=10,
+
+    resource_limits : Optional[dict[str, int]] = Field(
+        default=None,
+        alias='resource-limits',
+        description="Resource limits for starting new jobs"
+    )
+    resource__key : Optional[str] = Field(
+        default="resources",
+        alias='resource-key',
+        description=(
+            "The key in the queue item body JSON which holds the list of "
+            "resources that this queue item uses."
+        )
+    )
+    processing_limit : Optional[int] = Field(
+        default=None,
         alias='processing-limit',
         description="Number of jobs to be run concurrently."
     )
+
     periodic_seconds : int = Field(
         default=10,
         alias='periodic-seconds',
@@ -224,6 +239,12 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
                     "event-store-implementation is not set to "
                     f"{EventStoreChoices.NO_EVENTS.value}"
     )
+
+    @model_validator(mode='after')
+    def set_default_processing_limit(self):
+        if not self.processing_limit and not self.resource_limits:
+            self.processing_limit = 10
+        return self
 
 
 def get_task_queue_settings(setting_class, config_path=None, **kwargs):

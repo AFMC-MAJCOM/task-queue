@@ -15,6 +15,10 @@ from task_queue.queues.sql_queue import json_sql_queue
 from task_queue.queues.queue_base import QueueItemStage
 from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.job_release_strategy import (
+    ProcessingLimit,
+    ResourceLimit
+)
 
 # Pylint does not like how many if/elif branches we have in this function
 # pylint: disable=R0912
@@ -176,6 +180,30 @@ def handle_queue_implementation_choice(cli_settings):
     return queue
 
 
+def handle_job_release_strategy_choice(cli_settings):
+    """Handles the job release strategy choice.
+
+    Parameters:
+    -----------
+    cli_settings: TaskQueueCliSettings
+        Configuration object for the CLI
+
+    Returns:
+    -----------
+    Constructs the job release strategy from the arguments.
+    """
+
+    if cli_settings.resource_limits:
+        return ResourceLimit(
+            cli_settings.resource_limits,
+            cli_settings.resource_key
+        )
+    elif cli_settings.processing_limit:
+        return ProcessingLimit(
+            cli_settings.processing_limit
+        )
+
+
 def start_jobs_with_processing_limit(max_processing_limit,
                                      work_queue
                                     ):
@@ -200,7 +228,7 @@ def start_jobs_with_processing_limit(max_processing_limit,
                 len(started_jobs))
 
 
-def main(periodic_functions, work_queue, period_sec=10):
+def main(job_release_strategy, work_queue, period_sec=10):
     """Main function, runs functions periodically with a set time to wait.
 
     Parameters:
@@ -216,9 +244,8 @@ def main(periodic_functions, work_queue, period_sec=10):
         logger.info("Updating job statuses")
         work_queue.update_job_status()
 
-        logger.info("Running periodic functions")
-        for fn in periodic_functions:
-            fn()
+        logger.info("Releasing new jobs")
+        job_release_strategy.release_next_jobs(work_queue)
 
         time.sleep(period_sec)
 
@@ -253,11 +280,9 @@ if __name__ == "__main__":
         unique_worker_interface
     )
 
-    unique_periodic_functions = [
-        lambda: start_jobs_with_processing_limit(settings.processing_limit,
-                                                 unique_work_queue)
-    ]
-
-    main(unique_periodic_functions,
+    unique_job_release_strategy = handle_job_release_strategy_choice(
+        settings
+    )
+    main(unique_job_release_strategy,
          unique_work_queue,
          settings.periodic_seconds)
