@@ -19,7 +19,8 @@ from task_queue.events.sql_event_store import SqlEventStore
 from task_queue.queues.queue_with_events import queue_with_events
 from task_queue.job_release_strategy import (
     ProcessingLimit,
-    ResourceLimit
+    ResourceLimit,
+    ReleaseAll
 )
 
 # Pylint does not like how many if/elif branches we have in this function
@@ -199,14 +200,18 @@ def handle_job_release_strategy_choice(cli_settings):
     """
 
     if cli_settings.resource_limits:
-        return ResourceLimit(
+        job_release_strategy = ResourceLimit(
             cli_settings.resource_limits,
             cli_settings.resource_key
         )
     elif cli_settings.processing_limit:
-        return ProcessingLimit(
+        job_release_strategy = ProcessingLimit(
             cli_settings.processing_limit
         )
+    else:
+        job_release_strategy = ReleaseAll()
+
+    return job_release_strategy
 
 
 def start_jobs_with_processing_limit(max_processing_limit,

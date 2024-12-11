@@ -242,6 +242,10 @@ class TaskQueueCliSettings(TaskQueueBaseSetting,
 
     @model_validator(mode='after')
     def set_default_processing_limit(self):
+        """
+        Sets the default processing limit based on the existence of other
+        command line arugments.
+        """
         if not self.processing_limit and not self.resource_limits:
             self.processing_limit = 10
         return self
