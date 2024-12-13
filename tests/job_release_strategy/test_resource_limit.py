@@ -95,3 +95,22 @@ def test_resource_limit_peek_batch_size(default_work_queue):
     processing_limit_strategy.release_next_jobs(default_work_queue)
     processing = default_work_queue.get_queue_size(QueueItemStage.PROCESSING)
     assert processing == 2
+
+
+@pytest.mark.unit
+def test_resource_limit_terminates_when_complete(default_work_queue):
+    """
+    Test that the resource limit will terminate when the remaining jobs to do
+    do not use all available resources.
+    """
+
+    RESOURCE_D_LIMIT = 5
+
+    processing_limit_strategy = ResourceLimit(
+        {
+            "resource_d": RESOURCE_D_LIMIT
+        }
+    )
+
+    processing_limit_strategy.release_next_jobs(default_work_queue)
+    assert True
