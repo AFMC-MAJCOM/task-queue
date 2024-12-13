@@ -88,6 +88,10 @@ class ResourceLimit(JobReleaseStrategyBase):
         while not done:
             next_possible_items = work_queue.queue.peek(self.peek_batch_size)
 
+            if next_possible_items == []:
+                # No more items to process, time to be done.
+                done = True
+
             jobs_to_push = 0
             for _, item_body in next_possible_items:
                 # Calculate what the available resources would be if we
