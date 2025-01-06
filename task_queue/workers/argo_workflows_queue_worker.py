@@ -1,10 +1,9 @@
 """Wherein is contained the class for the Argo Workflow Queue Worker.
 """
 from pprint import pformat
+import datetime
 
 import requests
-
-import pandas as pd
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
@@ -436,8 +435,10 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         A timestamp
         """
-        return pd.Timestamp(
-            wf['metadata']['creationTimestamp'])
+        return datetime.datetime.strptime(
+            wf['metadata']['creationTimestamp'],
+            "%Y-%m-%dT%H:%M:%S%z"
+        )
 
     def _get_response_ids_and_status(self, response_body):
         """"Converts the response body of the argo workflows server list
