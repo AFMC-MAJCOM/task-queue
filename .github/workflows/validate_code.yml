@@ -11,6 +11,7 @@ jobs:
     with:
       project_root: task_queue
       mark_inputs: not unit and not integration and not end2end
+      optional_dependencies: "[s3,sql]"
 
   unit-test:
     strategy:
