@@ -4,7 +4,7 @@ from pprint import pformat
 
 import requests
 
-import pandas as pd
+import datetime
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
 from task_queue.queues.queue_base import QueueItemStage
@@ -436,7 +436,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         A timestamp
         """
-        return pd.Timestamp(
+        return datetime.datetime.fromisoformat(
             wf['metadata']['creationTimestamp'])
 
     def _get_response_ids_and_status(self, response_body):

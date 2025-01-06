@@ -13,13 +13,16 @@ jobs:
       mark_inputs: not unit and not integration and not end2end
 
   unit-test:
+    strategy:
+      matrix:
+        optional_dependency: [ "[s3,sql]", "[s3]", "[sql]", "" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Run pytest setup
       uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
       with:
-        optional_dependencies: "[s3,sql]"
+        optional_dependencies: ${{matrix.optional_dependency}}
     - name: Run unit tests
       uses: ./.github/actions/unit-test
 
