@@ -437,7 +437,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         A timestamp
         """
         return datetime.datetime.fromisoformat(
-            wf['metadata']['creationTimestamp'])
+            wf['metadata']['creationTimestamp'].strip("\"\'"))
 
     def _get_response_ids_and_status(self, response_body):
         """"Converts the response body of the argo workflows server list
