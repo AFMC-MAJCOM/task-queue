@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "task_queue"
 
-version = "1.12.0"
+version = "1.12.1"
 
 dependencies = [
     "requests",
