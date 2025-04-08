@@ -4,7 +4,8 @@ from typing import Optional
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert, JSONB, Any
+from sqlalchemy.dialects.postgresql import insert, JSONB
+from typing import Any
 from sqlalchemy import Engine, Column
 
 from task_queue import logger
