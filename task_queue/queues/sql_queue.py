@@ -1,10 +1,10 @@
 """Wherein is contained the functions for implementing the SQL Queue.
 """
-from typing import Optional
+from typing import Optional, Any
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert, JSONB, Any
+from sqlalchemy.dialects.postgresql import insert, JSONB
 from sqlalchemy import Engine, Column
 
 from task_queue import logger
@@ -35,7 +35,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
 
         id: Optional[int] = Field(default=None, primary_key=True)
         queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-        json_data: Any = Field(sa_column=Column(JSONB))
+        json_data: dict[Any, Any] = Field(sa_column=Column(JSONB))
         index_key: str
         queue_name: str
     return SqlQueueTable
