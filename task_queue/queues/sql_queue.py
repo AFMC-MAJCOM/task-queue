@@ -35,7 +35,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
 
         id: Optional[int] = Field(default=None, primary_key=True)
         queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-        json_data: Any = Field(sa_column=Column(JSONB))
+        json_data: JSONB = Field(sa_column=Column(JSONB))
         index_key: str
         queue_name: str
     return SqlQueueTable
