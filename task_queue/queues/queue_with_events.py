@@ -47,7 +47,7 @@ class QueueMoveEventData(pydantic.BaseModel):
         return QueueItemStage(v)
 
     @pydantic.field_serializer('stage_from', 'stage_to')
-    def _internal_serializer(cls, v):
+    def _internal_serializer(self, v, info):
         """Serializes QueueItemStage by returning the int representation.
 
         Parameters:

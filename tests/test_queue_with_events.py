@@ -60,10 +60,12 @@ def test_event_queue_lifecycle(queue_with_events_fixture):
 
     eq.put(default_items)
 
+    # Move half of the items from `waiting` to `processing`.
     get_amount = len(default_items) // 2
 
     items = eq.get(get_amount)
 
+    # Move half of the items in `processing` to `success` and half to `fail`.
     success_fail_amount = get_amount // 2
     success_items = items[:success_fail_amount]
     fail_items = items[success_fail_amount:]

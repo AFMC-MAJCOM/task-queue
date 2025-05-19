@@ -124,8 +124,10 @@ def test_process_invalid_body(process_worker):
     queue_item_id, _ = make_queue_item()
     queue_item_body = {"bad_key" : "bad_value"}
 
-    with pytest.raises(ValidationError,
-                       match="1 validation error for send_job\n2.file_name"):
+    with pytest.raises(
+        ValidationError,
+        match="1 validation error for ProcessQueueWorker.send_job\n2.file_name"
+    ):
         process_worker.send_job(
             queue_item_id,
             queue_item_body

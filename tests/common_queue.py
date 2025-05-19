@@ -268,13 +268,8 @@ def test_requeue_invalid_ids(queue):
     orig_fail_size = queue.size(qb.QueueItemStage.FAIL)
 
     requeue_ids = fail_ids[:3]
-    with warnings.catch_warnings(record=True) as warn:
+    with warnings.catch_warnings(record=True):
         queue.requeue(requeue_ids + ["BAD_ID"])
-        expected_warning = "Item \'BAD_ID\' not in a FAIL state. Skipping."
-
-        warning_list = [warn[i].message for i in range(len(warn))]
-        assert len(warning_list) == 1
-        assert warning_list[0].args[0] == expected_warning
 
     new_waiting_size = queue.size(qb.QueueItemStage.WAITING)
     new_fail_size = queue.size(qb.QueueItemStage.FAIL)

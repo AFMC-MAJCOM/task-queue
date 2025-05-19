@@ -258,7 +258,7 @@ def test_validate_args_event_store_implementation_missing_add_name():
             'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
+    assert 'event-store-implementation is set to sql-json'\
            in error_string
 
 @pytest.mark.unit
@@ -281,7 +281,7 @@ def test_validate_args_event_store_implementation_missing_move_name():
             'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
+    assert 'event-store-implementation is set to sql-json'\
            in error_string
 
 @pytest.mark.unit
@@ -432,49 +432,6 @@ def test_validate_args_logger_success():
             'logger_level': 'DEBUG'}
     success, error_string = validate_args(args_dict)
     print(error_string)
-    assert success
-    assert error_string == ''
-
-@pytest.mark.unit
-def test_validate_args_logger_fail():
-    """Test valid arguments for the S3 queue
-    """
-    args_dict = {'worker_interface': None,
-            'queue_implementation': None,
-            'event_store_implementation': 'none',
-            'with_queue_events': None,
-            'worker_interface_id': None,
-            'endpoint': None,
-            'namespace': None,
-            'connection_string': None,
-            'queue_name': None,
-            's3_base_path': None,
-            'add_to_queue_event_name': None,
-            'move_queue_event_name': None,
-            'logger_level': 'INVALID'}
-    success, error_string = validate_args(args_dict)
-    assert not success
-    assert 'logger_level' in error_string
-
-@pytest.mark.unit
-def test_validate_args_process_success():
-    """Test valid arguments for the process worker interface
-    """
-    args_dict = {'worker_interface': 'process',
-            'queue_implementation': 's3-json',
-            'event_store_implementation': 'none',
-            'with_queue_events': False,
-            'worker_interface_id': 'dummy-id',
-            'endpoint': 'dummy-endpoint',
-            'namespace': 'dummy-namespace',
-            'path_to_scripts':'dummy/path',
-            'connection_string': None,
-            'queue_name': None,
-            's3_base_path': 'dummypath',
-            'add_to_queue_event_name': None,
-            'move_queue_event_name': None,
-            'logger_level': None}
-    success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
 

@@ -21,7 +21,7 @@ class JsonS3Queue(QueueBase):
     def __init__(self, queue_base_s3_path):
         self.queue_base_path = queue_base_s3_path
         fs.mkdir(self.queue_base_path)
-        self.queue_path = os.path.join(
+        self.waiting_path = os.path.join(
             queue_base_s3_path,
             queue_base.QueueItemStage.WAITING.name
         )
@@ -68,7 +68,7 @@ class JsonS3Queue(QueueBase):
 
         # Path of each item is its ID
         item_paths = {
-            k: os.path.join(self.queue_path, id_to_fname(k))
+            k: os.path.join(self.waiting_path, id_to_fname(k))
             for k in items_to_add.keys()
         }
 
@@ -121,7 +121,7 @@ class JsonS3Queue(QueueBase):
 
         queue_items = safe_s3fs_ls(
             fs,
-            self.queue_path,
+            self.waiting_path,
             detail=False,
             refresh=True
         )
@@ -147,7 +147,7 @@ class JsonS3Queue(QueueBase):
 
         queue_items = safe_s3fs_ls(
             fs,
-            self.queue_path,
+            self.waiting_path,
             detail=False,
             refresh=True
         )
@@ -227,7 +227,7 @@ class JsonS3Queue(QueueBase):
         raise an error if Item is not in Queue.
         """
         paths_with_status = [
-            (self.queue_path, queue_base.QueueItemStage.WAITING),
+            (self.waiting_path, queue_base.QueueItemStage.WAITING),
             (self.success_path, queue_base.QueueItemStage.SUCCESS),
             (self.fail_path, queue_base.QueueItemStage.FAIL),
             (self.processing_path, queue_base.QueueItemStage.PROCESSING)
@@ -307,7 +307,7 @@ class JsonS3Queue(QueueBase):
         for item in item_ids:
             s3_move(
                 os.path.join(self.fail_path, id_to_fname(item)),
-                self.queue_path
+                self.waiting_path
             )
 
     def description(self):

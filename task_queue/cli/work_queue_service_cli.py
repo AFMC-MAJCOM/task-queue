@@ -60,11 +60,11 @@ def validate_args(cli_args):
     if worker_interface_choice \
         == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         required_args = ['worker_interface_id', 'endpoint', 'namespace']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'worker_interface',
-            config.WorkerInterfaceChoices.ARGO_WORKFLOWS
+            'worker-interface',
+            config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -72,11 +72,11 @@ def validate_args(cli_args):
     elif worker_interface_choice \
         == config.WorkerInterfaceChoices.PROCESS:
         required_args = ['path_to_scripts']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'worker_interface',
-            config.WorkerInterfaceChoices.PROCESS
+            'worker-interface',
+            config.WorkerInterfaceChoices.PROCESS.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -86,11 +86,11 @@ def validate_args(cli_args):
     if queue_implementation_choice \
         == config.QueueImplementations.SQL_JSON:
         required_args = ['connection_string', 'queue_name']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'queue_implementation',
-            config.QueueImplementations.SQL_JSON
+            'queue-implementation',
+            config.QueueImplementations.SQL_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -98,11 +98,11 @@ def validate_args(cli_args):
     elif queue_implementation_choice \
         == config.QueueImplementations.S3_JSON:
         required_args = ['s3_base_path']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'queue_implementation',
-            config.QueueImplementations.S3_JSON
+            'queue-implementation',
+            config.QueueImplementations.S3_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -110,11 +110,11 @@ def validate_args(cli_args):
     if cli_args['event_store_implementation'] \
         != config.EventStoreChoices.NO_EVENTS:
         required_args = ['add_to_queue_event_name', 'move_queue_event_name']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'event_sore_implementation',
-            config.EventStoreChoices.SQL_JSON
+            'event-store-implementation',
+            config.EventStoreChoices.SQL_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
