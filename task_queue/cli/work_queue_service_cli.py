@@ -24,11 +24,14 @@ from task_queue.job_release_strategy import (
 )
 
 def validate_required_args_groups(cli_args, required_args, field, value):
-    if not all(cli_args[i] is not None for i in required_args):
-        errors_found += f"{required_args} arguments required when " \
+    """
+    Checks that all the args in `required_args` are present in `cli_args`.
+    """
+    if not all(cli_args[arg] is not None for arg in required_args):
+        error_found = f"{required_args} arguments required when " \
                         f"{field} is set to " \
                         f"{value}\n"
-        return False, errors_found
+        return False, error_found
     return True, ""
 
 # Pylint does not like how many if/elif branches we have in this function
@@ -120,15 +123,16 @@ def validate_args(cli_args):
         if cli_args['event_store_implementation'] \
                                 != config.EventStoreChoices.SQL_JSON:
 
-            errors_found += f"If with_queue_events is specificied, " \
+            errors.append(f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
                             f"{config.EventStoreChoices.SQL_JSON.value}"
-            validation_success = False
+            )
+            validation_success.append(False)
 
     all_valid = all(validation_success)
-    error_string = "\n".join([ e for e in errors_found if e ])
+    error = "\n".join([ e for e in errors if e ])
 
-    return all_valid, error_string
+    return all_valid, error
 
 def handle_worker_interface_choice(cli_settings):
     """Handles the worker interface choice.

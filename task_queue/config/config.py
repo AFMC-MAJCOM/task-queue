@@ -80,9 +80,9 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
     @classmethod
     def validate_sql_connection_string(
         cls,
-        v: str,
+        v: Optional[str],
         values: ValidationInfo
-    ) -> str:
+    ) -> Optional[str]:
         """
         Verify either the connection string is present, or all the connection
         variables are presenet.
@@ -99,7 +99,7 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
                     "SQL_QUEUE_CONNECTION_STRING is None."
                 )
 
-        return ""
+        return None
 
 
 class TaskQueueS3Settings(TaskQueueBaseSetting):
