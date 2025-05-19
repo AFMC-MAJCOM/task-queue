@@ -55,7 +55,13 @@ class TaskQueueBaseSetting(BaseSettings):
         env_file_encoding='utf-8',
         extra='ignore'
     )
-    logger_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'] = 'DEBUG'
+    logger_level: Literal[
+        'DEBUG',
+        'INFO',
+        'WARNING',
+        'ERROR',
+        'CRITICAL'
+    ] = 'DEBUG'
 
 
     def log_settings(self):
