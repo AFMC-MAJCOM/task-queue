@@ -23,6 +23,17 @@ from task_queue.job_release_strategy import (
     ReleaseAll
 )
 
+def validate_required_args_groups(cli_args, required_args, field, value):
+    """
+    Checks that all the args in `required_args` are present in `cli_args`.
+    """
+    if not all(cli_args[arg] is not None for arg in required_args):
+        error_found = f"{required_args} arguments required when " \
+                        f"{field} is set to " \
+                        f"{value}\n"
+        return False, error_found
+    return True, ""
+
 # Pylint does not like how many if/elif branches we have in this function
 # pylint: disable=R0912
 def validate_args(cli_args):
@@ -41,71 +52,87 @@ def validate_args(cli_args):
     errors_found: str
         Error/s found if any. Empty string if validation_success = True.
     """
-    errors_found = ""
-    validation_success = True
-    if cli_args['worker_interface'] \
+    errors = []
+    validation_success = []
+
+    worker_interface_choice = cli_args['worker_interface']
+
+    if worker_interface_choice \
         == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         required_args = ['worker_interface_id', 'endpoint', 'namespace']
-        if not all(cli_args[i] is not None for i in required_args):
-            value = config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
-            errors_found += f"{required_args} arguments required when " \
-                             "worker-interface is set to " \
-                            f"{value}\n"
-            validation_success = False
+        error, valid = validate_required_args_groups(
+            cli_args,
+            required_args,
+            'worker_interface',
+            config.WorkerInterfaceChoices.ARGO_WORKFLOWS
+        )
+        errors.append(error)
+        validation_success.append(valid)
 
-    elif cli_args['worker_interface'] \
+    elif worker_interface_choice \
         == config.WorkerInterfaceChoices.PROCESS:
         required_args = ['path_to_scripts']
-        if not all(cli_args[i] is not None for i in required_args):
-            value = config.WorkerInterfaceChoices.PROCESS.value
-            errors_found += f"{required_args} arguments required when " \
-                             "worker-interface is set to " \
-                            f"{value}\n"
-            validation_success = False
+        error, valid = validate_required_args_groups(
+            cli_args,
+            required_args,
+            'worker_interface',
+            config.WorkerInterfaceChoices.PROCESS
+        )
+        errors.append(error)
+        validation_success.append(valid)
 
-    if cli_args['queue_implementation'] \
+    queue_implementation_choice = cli_args['queue_implementation']
+
+    if queue_implementation_choice \
         == config.QueueImplementations.SQL_JSON:
         required_args = ['connection_string', 'queue_name']
-        if not all(cli_args[i] is not None for i in required_args):
-            errors_found += f"{required_args} arguments required when " \
-                             "queue-implementation is set to " \
-                            f"{config.QueueImplementations.SQL_JSON.value}\n"
-            validation_success = False
+        error, valid = validate_required_args_groups(
+            cli_args,
+            required_args,
+            'queue_implementation',
+            config.QueueImplementations.SQL_JSON
+        )
+        errors.append(error)
+        validation_success.append(valid)
 
-    elif cli_args['queue_implementation'] \
+    elif queue_implementation_choice \
         == config.QueueImplementations.S3_JSON:
         required_args = ['s3_base_path']
-        if not all(cli_args[i] is not None for i in required_args):
-            errors_found += f"{required_args} arguments required when " \
-                             "queue-implementation is set to " \
-                            f"{config.QueueImplementations.S3_JSON.value}\n"
-            validation_success = False
+        error, valid = validate_required_args_groups(
+            cli_args,
+            required_args,
+            'queue_implementation',
+            config.QueueImplementations.S3_JSON
+        )
+        errors.append(error)
+        validation_success.append(valid)
 
     if cli_args['event_store_implementation'] \
         != config.EventStoreChoices.NO_EVENTS:
         required_args = ['add_to_queue_event_name', 'move_queue_event_name']
-        if not all(cli_args[i] is not None for i in required_args):
-            errors_found += f"{required_args} arguments required when " \
-                             "event-store-implementation is not " \
-                            f"{config.EventStoreChoices.NO_EVENTS.value}\n"
-            validation_success = False
+        error, valid = validate_required_args_groups(
+            cli_args,
+            required_args,
+            'event_sore_implementation',
+            config.EventStoreChoices.SQL_JSON
+        )
+        errors.append(error)
+        validation_success.append(valid)
 
     if cli_args['with_queue_events']:
         if cli_args['event_store_implementation'] \
                                 != config.EventStoreChoices.SQL_JSON:
 
-            errors_found += f"If with_queue_events is specificied, " \
+            errors.append(f"If with_queue_events is specificied, " \
                              "event_store_implementation must be set to " \
                             f"{config.EventStoreChoices.SQL_JSON.value}"
-            validation_success = False
+            )
+            validation_success.append(False)
 
-    if cli_args['logger_level']:
-        log_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
-        if cli_args['logger_level'] not in log_levels:
-            errors_found = f"logger_level must be {log_levels}"
-            validation_success = False
+    all_valid = all(validation_success)
+    error = "\n".join([ e for e in errors if e ])
 
-    return validation_success, errors_found
+    return all_valid, error
 
 def handle_worker_interface_choice(cli_settings):
     """Handles the worker interface choice.

@@ -97,7 +97,7 @@ class JsonS3Queue(QueueBase):
             ]
             logger.error("Error writing at least one queue object to S3: %s",\
                          fail_items)
-            raise BaseException(
+            raise ConnectionError(
                 "Error writing at least one queue object to S3:",
                 fail_items
             )

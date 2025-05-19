@@ -22,7 +22,6 @@ class QueueWorkerInterface(ABC):
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
         """
-        raise NotImplementedError("Please Implement this method")
 
     @abstractmethod
     def delete_job(self, queue_item_id):
@@ -34,7 +33,6 @@ class QueueWorkerInterface(ABC):
         queue_item_id: str
             Queue Item ID
         """
-        raise NotImplementedError("Please Implement this method")
 
 
     @abstractmethod
@@ -45,7 +43,6 @@ class QueueWorkerInterface(ABC):
         -----------
         Returns Dict[Any, QueueItemStage]
         """
-        raise NotImplementedError("Please Implement this method")
 
 
 class DummyWorkerInterface(QueueWorkerInterface):
