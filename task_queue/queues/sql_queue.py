@@ -1,10 +1,10 @@
 """Wherein is contained the functions for implementing the SQL Queue.
 """
-from typing import Optional
+from typing import Optional, Any
 import json
 
 from sqlmodel import Field, Session, SQLModel, select, func, UniqueConstraint
-from sqlalchemy.dialects.postgresql import insert, JSONB, Any
+from sqlalchemy.dialects.postgresql import insert, JSONB
 from sqlalchemy import Engine, Column
 
 from task_queue import logger
@@ -35,7 +35,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
 
         id: Optional[int] = Field(default=None, primary_key=True)
         queue_item_stage: Optional[int] = QueueItemStage.WAITING.value
-        json_data: Any = Field(sa_column=Column(JSONB))
+        json_data: dict[Any, Any] = Field(sa_column=Column(JSONB))
         index_key: str
         queue_name: str
     return SqlQueueTable
@@ -73,13 +73,13 @@ class SQLQueue(QueueBase):
 
         Returns:
         -----------
-        Returns 0 if it was successful or else raises exception.
+        Returns the number of items successfully added to the sql queue.
         """
-        success = 0
         items = self._put(items)
 
         if len(items) == 0:
-            return success
+            # Nothing to add.
+            return 0
 
         fail_items = []
 
@@ -93,7 +93,7 @@ class SQLQueue(QueueBase):
                         queue_name=self.queue_name
                     ).model_dump(exclude_unset=True)
                 )
-            except BaseException as e:
+            except Exception as e:
                 logger.warning(e)
 
 
@@ -107,11 +107,11 @@ class SQLQueue(QueueBase):
         if len(db_items) != len(items):
             logger.error("Error writing at least one queue object to SQL: %s",\
                         fail_items)
-            raise BaseException(
+            raise ValueError(
                 "Error writing at least one queue object to SQL:",
                 fail_items)
 
-        return success
+        return len(db_items)
 
     def get(self, n_items=1):
         """Gets the next n items from the queue, moving them to PROCESSING.

@@ -1,7 +1,7 @@
 """This file contains pydantic models used for pydantic type checking of the
 inputs and outputs of the API and Client, when applicable."""
 import json
-from typing import Any, Annotated, Union
+from typing import Any, Annotated, Optional
 
 from pydantic import BaseModel
 from pydantic.functional_validators import AfterValidator
@@ -42,4 +42,4 @@ class ProcessWorkerModel(BaseModel):
     """A Pydantic model representing the requried dictionary for the process
     worker to run properly."""
     file_name : str
-    args : Union[None,list[str]] = None
+    args : Optional[list[str]] = None

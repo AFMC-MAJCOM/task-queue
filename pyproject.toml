@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "task_queue"
 
-version = "1.12.1"
+version = "1.14.1"
 
 dependencies = [
     "requests",
@@ -15,6 +15,9 @@ dependencies = [
 [project.optional-dependencies]
 s3 = [
     "s3fs>=2023.6.0",
+    # botocore >= 1.36.0 changes how hashes work, which breaks minio
+    # compatibility. It is still compatible with AWS S3 so far.
+    "botocore<1.36.0"
 ]
 
 sql = [

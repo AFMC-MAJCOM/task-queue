@@ -2,16 +2,16 @@
 """
 import os
 from enum import Enum
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
     Field,
     field_validator,
-    model_validator
+    model_validator,
+    ValidationInfo
 )
 from task_queue import logger
-
 
 
 def get_config_file_path() -> str:
@@ -55,7 +55,13 @@ class TaskQueueBaseSetting(BaseSettings):
         env_file_encoding='utf-8',
         extra='ignore'
     )
-    logger_level: str = 'DEBUG'
+    logger_level: Literal[
+        'DEBUG',
+        'INFO',
+        'WARNING',
+        'ERROR',
+        'CRITICAL'
+    ] = 'DEBUG'
 
 
     def log_settings(self):
@@ -78,10 +84,18 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
 
     @field_validator('SQL_QUEUE_CONNECTION_STRING')
     @classmethod
-    def validate_s3_path(cls, v: str, values) -> str:
-        """Verify either the connection string is present"""
+    def validate_sql_connection_string(
+        cls,
+        v: Optional[str],
+        values: ValidationInfo
+    ) -> Optional[str]:
+        """
+        Verify either the connection string is present, or all the connection
+        variables are presenet.
+        """
         if v is not None:
             return v
+
         for key, value in values.data.items():
             if value is None:
                 logger.error("SQL Queue parameter %s must be supplied"\
@@ -90,7 +104,8 @@ class TaskQueueSqlSettings(TaskQueueBaseSetting):
                     f"SQL Queue parameter {key} must be supplied when "
                     "SQL_QUEUE_CONNECTION_STRING is None."
                 )
-        return v
+
+        return None
 
 
 class TaskQueueS3Settings(TaskQueueBaseSetting):
