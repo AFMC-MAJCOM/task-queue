@@ -286,7 +286,7 @@ async def get(n_items:PositiveInt=1) ->  List[Tuple[str, Any]]:
     return queue.get(n_items)
 
 @app.post("/api/v1/queue/requeue")
-def requeue(item_ids:Union[str,list[str]]) -> None:
+def requeue(item_ids: str | list[str]) -> None:
     """API endpoint to move input queue items from FAILED to WAITING.
 
     If an input queue item is not in the FAIL stage, it will be skipped. If an

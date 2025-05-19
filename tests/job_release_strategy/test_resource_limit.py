@@ -100,8 +100,8 @@ def test_resource_limit_peek_batch_size(default_work_queue):
 @pytest.mark.unit
 def test_resource_limit_terminates_when_complete(default_work_queue):
     """
-    Test that the resource limit will terminate when the remaining jobs to do
-    do not use all available resources.
+    Test that the resource limit release jobs method will terminate when the
+    remaining jobs do not use all available resources.
     """
 
     RESOURCE_D_LIMIT = 5
@@ -113,4 +113,3 @@ def test_resource_limit_terminates_when_complete(default_work_queue):
     )
 
     processing_limit_strategy.release_next_jobs(default_work_queue)
-    assert True

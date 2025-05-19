@@ -191,7 +191,7 @@ class ApiClient(QueueBase):
         return response
 
     @validate_call
-    def requeue(self, item_ids:Union[str, List[str]]) -> None:
+    def requeue(self, item_ids:str | List[str]) -> None:
         """Move input queue items from FAILED to WAITING.
 
         Parameters:
