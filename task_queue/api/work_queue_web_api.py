@@ -25,7 +25,6 @@ from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
 
 api_settings = config.get_task_queue_settings(config.TaskQueueApiSettings)
-print(api_settings)
 set_logger_level(api_settings.logger_level)
 api_settings.log_settings()
 app = FastAPI()
