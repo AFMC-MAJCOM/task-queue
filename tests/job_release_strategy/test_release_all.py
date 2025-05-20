@@ -1,7 +1,7 @@
 import pytest
 
 from task_queue.job_release_strategy import ReleaseAll
-from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues import QueueItemStage
 
 @pytest.mark.unit
 def test_release_all(default_work_queue):

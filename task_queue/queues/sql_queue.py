@@ -44,7 +44,7 @@ class SQLQueue(QueueBase):
     """Creates the SQL Queue.
     """
     def __init__(self,
-                 engine:Engine,
+                 engine,
                  queue_name,
                  tablename="sqlqueue",
                  constraint_name="_queue_name_index_key_uc"):
@@ -359,7 +359,7 @@ def update_stage(engine, queue_name, new_stage, item_key, sql_queue):
         session.add(item)
         session.commit()
 
-def json_sql_queue(engine:Engine, queue_name):
+def json_sql_queue(engine:Engine, queue_name, table_name="sqlqueue"):
     """Creates and returns the SQL Queue.
     """
-    return SQLQueue(engine, queue_name)
+    return SQLQueue(engine, queue_name, tablename=table_name)

@@ -1,7 +1,7 @@
 import pytest
 
 from task_queue.job_release_strategy import ResourceLimit
-from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues import QueueItemStage
 
 @pytest.mark.unit
 def test_resource_limit(default_work_queue):

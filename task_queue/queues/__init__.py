@@ -1,0 +1,24 @@
+import warnings
+
+try:
+    from .sql_queue import json_sql_queue
+except ModuleNotFoundError:
+    warnings.warn(
+        "Task queue must be installed with optional dependencies "
+        "`task_queue[sql]` to use `json_sql_queue`."
+    )
+    json_sql_queue = None
+
+try:
+    from .s3_queue import json_s3_queue
+except ModuleNotFoundError:
+    warnings.warn(
+        "Task queue must be installed with optional dependencies "
+        "`task_queue[sqls3]` to use `json_s3_queue`."
+    )
+    json_s3_queue = None
+
+
+from .in_memory_queue import in_memory_queue as memory_queue
+from .queue_with_events import queue_with_events
+from .queue_base import QueueBase, QueueItemStage

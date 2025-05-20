@@ -4,12 +4,12 @@ import random
 
 import pytest
 
-from task_queue.events.in_memory_event_store import InMemoryEventStore
-from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.events import InMemoryEventStore
+from task_queue.queues import memory_queue
+from task_queue.queues import queue_with_events
 from task_queue.queues.queue_with_events import QueueAddEventData
 from task_queue.queues.queue_with_events import QueueMoveEventData
-from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues import QueueItemStage
 from .common_queue import default_items
 
 
@@ -22,7 +22,7 @@ MOVE_EVENT_NAME = f"TEST_QUEUE_MOVE_EVENT_{random_number}"
 def queue_with_events_fixture():
     """Fixture to create queue with events for testing.
     """
-    q = in_memory_queue()
+    q = memory_queue()
     s = InMemoryEventStore()
 
     return q, s, queue_with_events(

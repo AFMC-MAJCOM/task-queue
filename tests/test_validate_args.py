@@ -3,14 +3,12 @@
 import sys
 import pytest
 
-from sqlalchemy import create_engine
-
 from task_queue.cli.work_queue_service_cli import (validate_args,
                                             handle_queue_implementation_choice)
 from task_queue.config import config
-from task_queue.queues.sql_queue import json_sql_queue
-from task_queue.events.sql_event_store import SqlEventStore
-from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.queues import json_sql_queue
+from task_queue.events import SqlEventStore
+from task_queue.queues import queue_with_events
 
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
 JSON_SQL_QUEUE_CLI_CHOICE=config.QueueImplementations.SQL_JSON.value
@@ -315,6 +313,7 @@ def test_handle_queue_implementation_choice_pass():
     """Checks that the handle_queue_implementation_choice will return the
        correct queue given the right cli settings
     """
+    from sqlalchemy import create_engine
     sql_settings = config.get_task_queue_settings(
                 setting_class=config.TaskQueueSqlSettings
             )

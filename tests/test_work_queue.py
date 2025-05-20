@@ -2,7 +2,7 @@
 """
 import pytest
 
-from task_queue.queues.queue_base import QueueItemStage
+from task_queue.queues import QueueItemStage
 
 @pytest.mark.unit
 def test_push_job(default_work_queue):
