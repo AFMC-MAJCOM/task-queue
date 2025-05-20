@@ -30,7 +30,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
         __table_args__ = (
             UniqueConstraint("queue_name", "index_key",
                              name=constraint_name),
-            {'keep_existing':True},
+            {'extend_existing':True},
         )
 
         id: Optional[int] = Field(default=None, primary_key=True)
@@ -359,7 +359,17 @@ def update_stage(engine, queue_name, new_stage, item_key, sql_queue):
         session.add(item)
         session.commit()
 
-def json_sql_queue(engine:Engine, queue_name, table_name="sqlqueue"):
+def json_sql_queue(
+    engine:Engine,
+    queue_name,
+    table_name="sqlqueue",
+    constraint_name="_queue_name_index_key_uc"
+):
     """Creates and returns the SQL Queue.
     """
-    return SQLQueue(engine, queue_name, tablename=table_name)
+    return SQLQueue(
+        engine,
+        queue_name,
+        tablename=table_name,
+        constraint_name=constraint_name
+    )

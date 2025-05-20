@@ -97,7 +97,8 @@ def new_sql_queue():
     return json_sql_queue(
         test_sql_engine.test_sql_engine,
         queue_name,
-        "test_sql_queue"
+        table_name="test_sql_queue",
+        constraint_name="_test_queue_name_index_key_uc"
     )
 
 @pytest.fixture(scope="session")
