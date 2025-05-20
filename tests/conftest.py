@@ -3,7 +3,7 @@
 import pytest
 
 from task_queue.workers import work_queue
-import task_queue.queues.in_memory_queue as mq
+from task_queue.queues import memory_queue
 from task_queue.workers.queue_worker_interface import DummyWorkerInterface
 from tests.common_queue import default_items
 
@@ -31,7 +31,7 @@ def default_work_queue() -> work_queue.WorkQueue:
     A default work_queue to be used for pytests.
 
     """
-    queue = mq.in_memory_queue()
+    queue = memory_queue()
     queue.put(default_items)
     interface = DummyWorkerInterface()
     return work_queue.WorkQueue(queue, interface)

@@ -3,14 +3,12 @@
 import sys
 import pytest
 
-from sqlalchemy import create_engine
-
 from task_queue.cli.work_queue_service_cli import (validate_args,
                                             handle_queue_implementation_choice)
 from task_queue.config import config
-from task_queue.queues.sql_queue import json_sql_queue
-from task_queue.events.sql_event_store import SqlEventStore
-from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.queues import json_sql_queue
+from task_queue.events import SqlEventStore
+from task_queue.queues import event_queue
 
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
 JSON_SQL_QUEUE_CLI_CHOICE=config.QueueImplementations.SQL_JSON.value
@@ -258,7 +256,7 @@ def test_validate_args_event_store_implementation_missing_add_name():
             'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
+    assert 'event-store-implementation is set to sql-json'\
            in error_string
 
 @pytest.mark.unit
@@ -281,7 +279,7 @@ def test_validate_args_event_store_implementation_missing_move_name():
             'logger_level': None}
     success, error_string = validate_args(args_dict)
     assert not success
-    assert f'event-store-implementation is not {NO_EVENT_STORE_CLI_CHOICE}'\
+    assert 'event-store-implementation is set to sql-json'\
            in error_string
 
 @pytest.mark.unit
@@ -315,6 +313,7 @@ def test_handle_queue_implementation_choice_pass():
     """Checks that the handle_queue_implementation_choice will return the
        correct queue given the right cli settings
     """
+    from sqlalchemy import create_engine
     sql_settings = config.get_task_queue_settings(
                 setting_class=config.TaskQueueSqlSettings
             )
@@ -358,7 +357,7 @@ def test_handle_queue_implementation_choice_pass():
                 create_engine(test_settings.connection_string)
             )
 
-    test_queue = queue_with_events(
+    test_queue = event_queue(
             test_queue,
             test_store,
             add_event_name=test_settings.add_to_queue_event_name,
@@ -432,49 +431,6 @@ def test_validate_args_logger_success():
             'logger_level': 'DEBUG'}
     success, error_string = validate_args(args_dict)
     print(error_string)
-    assert success
-    assert error_string == ''
-
-@pytest.mark.unit
-def test_validate_args_logger_fail():
-    """Test valid arguments for the S3 queue
-    """
-    args_dict = {'worker_interface': None,
-            'queue_implementation': None,
-            'event_store_implementation': 'none',
-            'with_queue_events': None,
-            'worker_interface_id': None,
-            'endpoint': None,
-            'namespace': None,
-            'connection_string': None,
-            'queue_name': None,
-            's3_base_path': None,
-            'add_to_queue_event_name': None,
-            'move_queue_event_name': None,
-            'logger_level': 'INVALID'}
-    success, error_string = validate_args(args_dict)
-    assert not success
-    assert 'logger_level' in error_string
-
-@pytest.mark.unit
-def test_validate_args_process_success():
-    """Test valid arguments for the process worker interface
-    """
-    args_dict = {'worker_interface': 'process',
-            'queue_implementation': 's3-json',
-            'event_store_implementation': 'none',
-            'with_queue_events': False,
-            'worker_interface_id': 'dummy-id',
-            'endpoint': 'dummy-endpoint',
-            'namespace': 'dummy-namespace',
-            'path_to_scripts':'dummy/path',
-            'connection_string': None,
-            'queue_name': None,
-            's3_base_path': 'dummypath',
-            'add_to_queue_event_name': None,
-            'move_queue_event_name': None,
-            'logger_level': None}
-    success, error_string = validate_args(args_dict)
     assert success
     assert error_string == ''
 

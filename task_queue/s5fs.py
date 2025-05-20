@@ -31,6 +31,9 @@ def base_command(subcmd, *main_args, concurrency=None, other_arguments=None):
     else:
         concurrency_args = []
 
+    if other_arguments is None:
+        other_arguments = []
+
     args = concurrency_args + other_arguments
 
     cmd = ["s5cmd", subcmd] + list(main_args) + args

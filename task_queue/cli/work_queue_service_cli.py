@@ -2,21 +2,25 @@
 """
 import time
 
-from sqlalchemy import create_engine
-
 from task_queue.logger import logger, set_logger_level
 from task_queue.config import config
 from task_queue.workers.work_queue import WorkQueue
 from task_queue.workers.process_queue_worker import ProcessQueueWorker
 from task_queue.workers.argo_workflows_queue_worker import (
                                                     ArgoWorkflowsQueueWorker)
-from task_queue.queues.s3_queue import json_s3_queue
-from task_queue.queues.sql_queue import json_sql_queue
-from task_queue.queues.queue_base import QueueItemStage
-from task_queue.queues.in_memory_queue import InMemoryQueue
 
-from task_queue.events.sql_event_store import SqlEventStore
-from task_queue.queues.queue_with_events import queue_with_events
+# The imports for the different queue types try-catch blocks
+# because we only want to try to include the modules necessary
+# for the queue type that we're creating. For example, if we're using the
+# SQL queue, then we don't want to import any of the S3 modules in case we
+# don't have those installed.
+from task_queue.queues import json_s3_queue
+from task_queue.queues import json_sql_queue
+from task_queue.events import SqlEventStore
+
+from task_queue.queues import QueueItemStage
+from task_queue.queues import memory_queue
+from task_queue.queues import event_queue
 from task_queue.job_release_strategy import (
     ProcessingLimit,
     ResourceLimit,
@@ -60,11 +64,11 @@ def validate_args(cli_args):
     if worker_interface_choice \
         == config.WorkerInterfaceChoices.ARGO_WORKFLOWS:
         required_args = ['worker_interface_id', 'endpoint', 'namespace']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'worker_interface',
-            config.WorkerInterfaceChoices.ARGO_WORKFLOWS
+            'worker-interface',
+            config.WorkerInterfaceChoices.ARGO_WORKFLOWS.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -72,11 +76,11 @@ def validate_args(cli_args):
     elif worker_interface_choice \
         == config.WorkerInterfaceChoices.PROCESS:
         required_args = ['path_to_scripts']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'worker_interface',
-            config.WorkerInterfaceChoices.PROCESS
+            'worker-interface',
+            config.WorkerInterfaceChoices.PROCESS.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -86,11 +90,11 @@ def validate_args(cli_args):
     if queue_implementation_choice \
         == config.QueueImplementations.SQL_JSON:
         required_args = ['connection_string', 'queue_name']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'queue_implementation',
-            config.QueueImplementations.SQL_JSON
+            'queue-implementation',
+            config.QueueImplementations.SQL_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -98,11 +102,11 @@ def validate_args(cli_args):
     elif queue_implementation_choice \
         == config.QueueImplementations.S3_JSON:
         required_args = ['s3_base_path']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'queue_implementation',
-            config.QueueImplementations.S3_JSON
+            'queue-implementation',
+            config.QueueImplementations.S3_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -110,11 +114,11 @@ def validate_args(cli_args):
     if cli_args['event_store_implementation'] \
         != config.EventStoreChoices.NO_EVENTS:
         required_args = ['add_to_queue_event_name', 'move_queue_event_name']
-        error, valid = validate_required_args_groups(
+        valid, error = validate_required_args_groups(
             cli_args,
             required_args,
-            'event_sore_implementation',
-            config.EventStoreChoices.SQL_JSON
+            'event-store-implementation',
+            config.EventStoreChoices.SQL_JSON.value
         )
         errors.append(error)
         validation_success.append(valid)
@@ -180,6 +184,8 @@ def handle_queue_implementation_choice(cli_settings):
         queue = json_s3_queue(cli_settings.s3_base_path)
     elif cli_settings.queue_implementation \
         == config.QueueImplementations.SQL_JSON:
+        # pylint: disable=import-outside-toplevel
+        from sqlalchemy import create_engine
         sql_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueSqlSettings
         )
@@ -190,12 +196,14 @@ def handle_queue_implementation_choice(cli_settings):
         )
     elif cli_settings.queue_implementation \
          == config.QueueImplementations.IN_MEMORY:
-        queue = InMemoryQueue()
+        queue = memory_queue()
 
     if cli_settings.with_queue_events:
         store = None
         if cli_settings.event_store_implementation \
             == config.EventStoreChoices.SQL_JSON:
+            # pylint: disable=import-outside-toplevel
+            from sqlalchemy import create_engine
             store = SqlEventStore(
                 create_engine(cli_settings.connection_string)
             )
@@ -203,7 +211,7 @@ def handle_queue_implementation_choice(cli_settings):
             raise AttributeError("SQL_JSON is the only implemented event store"
                                   " that works with with_queue_events")
 
-        queue = queue_with_events(
+        queue = event_queue(
             queue,
             store,
             add_event_name=cli_settings.add_to_queue_event_name,

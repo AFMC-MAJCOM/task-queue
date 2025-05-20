@@ -5,10 +5,8 @@ import datetime
 import pytest
 from pydantic import BaseModel
 
-from task_queue.events.in_memory_event_store import InMemoryEventStore
-from task_queue.events.sql_event_store import SqlEventStore
+from task_queue.events import SqlEventStore, InMemoryEventStore
 from task_queue.events.event import Event
-from ..utils import PytestSqlEngine
 
 test_event_names = [
     "test-event-store-1",
@@ -90,6 +88,7 @@ def new_empty_store(request):
     if request.param == "memory":
         yield InMemoryEventStore()
     if request.param == "sql":
+        from ..utils import PytestSqlEngine
         test_sql_engine = PytestSqlEngine()
         yield SqlEventStore(test_sql_engine.test_sql_engine)
 
@@ -106,7 +105,7 @@ def test_add_events(new_empty_store, events):
                          ALL_EVENT_STORE_TYPES,
                          indirect=True)
 def test_add_events_no_duplicates(new_empty_store, events):
-    """Tests that trying to add duplicate events to a store 
+    """Tests that trying to add duplicate events to a store
         does not add events.
     """
     #In case this tests gets run first

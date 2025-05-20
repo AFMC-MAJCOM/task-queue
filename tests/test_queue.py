@@ -2,26 +2,48 @@
 """
 import random
 import os
-import sqlalchemy as sqla
 
 import pytest
-import s3fs
 
-import task_queue.queues.s3_queue as s3q
-from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue.queues.sql_queue import SQLQueue
-import task_queue.queues.queue_with_events as eq
-from task_queue.events.in_memory_event_store import InMemoryEventStore
+from task_queue.queues import memory_queue
+from task_queue.queues import event_queue
+from task_queue.queues import json_sql_queue
+from task_queue.queues import json_s3_queue
+from task_queue.events import InMemoryEventStore
 import tests.common_queue as qtest
 from .test_config import TaskQueueTestSettings
-from .utils import PytestSqlEngine
 from task_queue.queues.queue_base import QueueItemStage
 
 
 UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
 
+ALL_QUEUE_TYPES = [
+    pytest.param("memory", marks=pytest.mark.unit),
+    pytest.param("with_events", marks=pytest.mark.unit)
+]
+try:
+    import sqlalchemy as sqla
+    from .utils import PytestSqlEngine
+    param = pytest.param(
+        "sql",
+        marks=[pytest.mark.integration, pytest.mark.uses_sql]
+    )
+    ALL_QUEUE_TYPES.append(param)
+except ModuleNotFoundError:
+    pass
 
-@pytest.fixture(scope="session", autouse=True)
+try:
+    import s3fs
+    param = pytest.param(
+        "s3",
+        marks=[pytest.mark.integration, pytest.mark.uses_s3]
+    )
+    ALL_QUEUE_TYPES.append(param)
+except ModuleNotFoundError:
+    pass
+
+
+@pytest.fixture(scope="session")
 def setup_s3_bucket():
     """Create a 'integration-tests' S3 bucket for testing purposes.
     """
@@ -46,53 +68,68 @@ def new_s3_queue(request):
     """
     queue_base = os.path.join(UNIT_TEST_QUEUE_BASE,
                               str(random.randint(0, 9999999)))
-    yield s3q.json_s3_queue(queue_base)
+    yield json_s3_queue(queue_base)
+    fs = s3fs.S3FileSystem()
 
     # If the test passes
     if request.node.rep_call.passed:
         print("Cleaning up results")
         # Clean up the queue to reduce clutter
-        if s3q.fs.exists(queue_base):
-            s3q.fs.rm(queue_base, recursive=True)
+        if fs.exists(queue_base):
+            fs.rm(queue_base, recursive=True)
     elif request.node.rep_call.failed:
         print(f"Failed results at {queue_base}")
 
 def new_in_memory_queue():
     """Returns an in-memory queue.
     """
-    return in_memory_queue()
+    return memory_queue()
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def cleanup_sql_queue():
-    """Deletes the SQL table made during the pytests."""
-    yield
-
-    tablename = 'test_sql_queue'
-    test_sql_engine = PytestSqlEngine()
-    with test_sql_engine.test_sql_engine.connect() as connection:
-        connection.execute(sqla.text(f"DROP TABLE IF EXISTS {tablename};"))
-        connection.commit()
+    """"""
 
 def new_sql_queue():
     """Returns a SQL queue.
     """
     queue_name = "TEST_QUEUE_" + str(random.randint(0, 9999999999))
     test_sql_engine = PytestSqlEngine()
-    return SQLQueue(
+    return json_sql_queue(
         test_sql_engine.test_sql_engine,
         queue_name,
-        "test_sql_queue",
-        "_test_queue_name_index_key_uc"
+        table_name="test_sql_queue",
+        constraint_name="_test_queue_name_index_key_uc"
     )
 
-ALL_QUEUE_TYPES = [
-    pytest.param("memory", marks=pytest.mark.unit),
-    pytest.param("sql", marks=pytest.mark.integration),
-    pytest.param("s3", marks=pytest.mark.integration),
-    pytest.param("with_events", marks=pytest.mark.unit)
-]
+@pytest.fixture(scope="session")
+def setup_fixture(request):
+    uses_s3_marker = request.node.get_closest_marker("uses_s3")
+    uses_sql_marker = request.node.get_closest_marker("uses_sql")
+
+    if uses_sql_marker is not None:
+        # Deletes the SQL table made during the pytests.
+        yield
+
+        tablename = 'test_sql_queue'
+        test_sql_engine = PytestSqlEngine()
+        with test_sql_engine.test_sql_engine.connect() as connection:
+            connection.execute(sqla.text(f"DROP TABLE IF EXISTS {tablename};"))
+            connection.commit()
+    elif uses_s3_marker is not None:
+        fs = s3fs.S3FileSystem()
+
+        test_bucket_name = 'integration-tests'
+        if fs.exists(test_bucket_name):
+            fs.rm(test_bucket_name, recursive=True)
+        fs.mkdir(test_bucket_name)
+
+        yield
+        # cleanup_bucket(test_bucket_name, fs)
+    else:
+        yield
+
 @pytest.fixture
-def new_empty_queue(request):
+def new_empty_queue(request, setup_fixture):
     """Fixture to create an empty queue of one given type.
 
     This is then broadcasted across ALL_QUEUE_TYPES for each test by way of the
@@ -107,8 +144,8 @@ def new_empty_queue(request):
         yield new_in_memory_queue()
     elif request.param == "with_events":
         store = InMemoryEventStore()
-        queue = in_memory_queue()
-        yield eq.queue_with_events(queue, store, "TEST_EVENT_QUEUE")
+        queue = new_in_memory_queue()
+        yield event_queue(queue, store, "TEST_EVENT_QUEUE")
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):

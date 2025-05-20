@@ -20,10 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
       with:
-        optional_dependencies: ${{matrix.optional_dependency}}
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install .${{matrix.optional_dependency}}
     - name: Run unit tests
       uses: ./.github/actions/unit-test
 
@@ -44,10 +49,15 @@ jobs:
           - 5432:5432
     steps:
     - uses: actions/checkout@v3
-    - name: Run pytest setup
-      uses: AFMC-MAJCOM/ci_python/.github/actions/pytest-setup@main
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
       with:
-        optional_dependencies: "[s3,sql]"
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install .[s3,sql]
     - name: Run integration tests
       uses: ./.github/actions/integration-test
 

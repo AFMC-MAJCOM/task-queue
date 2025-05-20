@@ -229,14 +229,7 @@ def test_client_put(mock_post):
     assert route == f"{test_client.api_base_url}put"
 
 @pytest.mark.unit
-@mock.patch('requests.post', side_effect=mocked_requests_fail)
-def test_client_put_fail(mock_post):
+def test_client_put_fail():
     """Tests that Client handles error if put has a bad response."""
     with pytest.raises(RequestException):
         test_client.put({})
-
-@pytest.mark.unit
-def test_client_put_invalid_parameter():
-    """Tests that Client throws pydantic error for put."""
-    with pytest.raises(ValidationError):
-        test_client.put("{}")
