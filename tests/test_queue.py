@@ -2,23 +2,39 @@
 """
 import random
 import os
-import sqlalchemy as sqla
 
 import pytest
-import s3fs
 
-import task_queue.queues.s3_queue as s3q
 from task_queue.queues.in_memory_queue import in_memory_queue
-from task_queue.queues.sql_queue import SQLQueue
 import task_queue.queues.queue_with_events as eq
 from task_queue.events.in_memory_event_store import InMemoryEventStore
 import tests.common_queue as qtest
 from .test_config import TaskQueueTestSettings
-from .utils import PytestSqlEngine
 from task_queue.queues.queue_base import QueueItemStage
 
 
 UNIT_TEST_QUEUE_BASE = TaskQueueTestSettings().UNIT_TEST_QUEUE_BASE
+
+ALL_QUEUE_TYPES = [
+    pytest.param("memory", marks=pytest.mark.unit),
+    pytest.param("with_events", marks=pytest.mark.unit)
+]
+try:
+    from task_queue.queues.sql_queue import SQLQueue
+    import sqlalchemy as sqla
+    from .utils import PytestSqlEngine
+    param = pytest.param("sql", marks=[pytest.mark.integration, pytest.mark.uses_sql])
+    ALL_QUEUE_TYPES.append(param)
+except ModuleNotFoundError:
+    pass
+
+try:
+    import task_queue.queues.s3_queue as s3q
+    import s3fs
+    param = pytest.param("s3", marks=[pytest.mark.integration, pytest.mark.uses_s3]),
+    ALL_QUEUE_TYPES.append(param)
+except ModuleNotFoundError:
+    pass
 
 
 @pytest.fixture(scope="session")
@@ -105,12 +121,6 @@ def setup_fixture(request):
     else:
         yield
 
-ALL_QUEUE_TYPES = [
-    pytest.param("memory", marks=pytest.mark.unit),
-    pytest.param("sql", marks=[pytest.mark.integration, pytest.mark.uses_sql]),
-    pytest.param("s3", marks=[pytest.mark.integration, pytest.mark.uses_s3]),
-    pytest.param("with_events", marks=pytest.mark.unit)
-]
 @pytest.fixture
 def new_empty_queue(request, setup_fixture):
     """Fixture to create an empty queue of one given type.
