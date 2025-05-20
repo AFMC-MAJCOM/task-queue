@@ -11,7 +11,11 @@ except ModuleNotFoundError:
         "Task queue must be installed with optional dependencies "
         "`task_queue[sql]` to use `json_sql_queue`."
     )
-    json_sql_queue = None
+
+    def json_sql_queue():
+        """
+        Empty placeholder function to satisfy type hints and the like.
+        """
 
 try:
     from .s3_queue import json_s3_queue
@@ -20,7 +24,11 @@ except ModuleNotFoundError:
         "Task queue must be installed with optional dependencies "
         "`task_queue[sqls3]` to use `json_s3_queue`."
     )
-    json_s3_queue = None
+
+    def json_s3_queue():
+        """
+        Empty placeholder function to satisfy type hints and the like.
+        """
 
 
 from .in_memory_queue import in_memory_queue as memory_queue

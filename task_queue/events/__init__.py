@@ -11,7 +11,11 @@ except ModuleNotFoundError:
         "Task queue must be installed with optional dependencies "
         "`task_queue[sql]` to use `SqlEventStore`."
     )
-    SqlEventStore = None
+
+    class SqlEventStore:
+        """
+        Empty placeholder class to satisfy type hints and the like.
+        """
 
 from .in_memory_event_store import InMemoryEventStore
 
