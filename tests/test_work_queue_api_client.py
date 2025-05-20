@@ -2,7 +2,6 @@
 """
 import pytest
 import re
-import os
 from unittest import mock
 from requests.exceptions import RequestException
 from pydantic import ValidationError

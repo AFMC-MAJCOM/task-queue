@@ -8,13 +8,15 @@ from annotated_types import Ge, Le
 
 from pydantic import PositiveInt
 from fastapi import FastAPI, HTTPException
-from sqlalchemy import create_engine
+
+# The imports for the different queue types are in their own `make_queue`
+# methods because we only want to try to include the modules necessary
+# for the queue type that we're creating. For example, if we're using the
+# SQL queue, then we don't want to import any of the S3 modules in case we
+# don't have those installed.
 
 from task_queue.logger import set_logger_level
 from task_queue.queues.queue_base import QueueItemStage
-from task_queue.queues.s3_queue import json_s3_queue
-from task_queue.queues.sql_queue import json_sql_queue
-from task_queue.queues.in_memory_queue import in_memory_queue
 from task_queue import config, logger
 from task_queue.queue_pydantic_models import QueueGetSizesModel, \
     LookupQueueItemModel, QueueItemBodyType
@@ -70,6 +72,7 @@ class S3QueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JsonS3Queue.
         """
+        from task_queue.queues.s3_queue import json_s3_queue
         return json_s3_queue(self.s3_base_path)
 
 
@@ -111,6 +114,8 @@ class SqlQueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JSONSQLQueue.
         """
+        from sqlalchemy import create_engine
+        from task_queue.queues.sql_queue import json_sql_queue
         return json_sql_queue(
             create_engine(self.connection_string),
             self.queue_name
@@ -135,6 +140,7 @@ class InMemoryQueueSettings(QueueSettings):
     def make_queue(self):
         """Returns QueueBase object.
         """
+        from task_queue.queues.in_memory_queue import in_memory_queue
         return in_memory_queue()
 
 
