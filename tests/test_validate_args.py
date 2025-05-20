@@ -8,7 +8,7 @@ from task_queue.cli.work_queue_service_cli import (validate_args,
 from task_queue.config import config
 from task_queue.queues import json_sql_queue
 from task_queue.events import SqlEventStore
-from task_queue.queues import queue_with_events
+from task_queue.queues import event_queue
 
 JSON_S3_QUEUE_CLI_CHOICE=config.QueueImplementations.S3_JSON.value
 JSON_SQL_QUEUE_CLI_CHOICE=config.QueueImplementations.SQL_JSON.value
@@ -357,7 +357,7 @@ def test_handle_queue_implementation_choice_pass():
                 create_engine(test_settings.connection_string)
             )
 
-    test_queue = queue_with_events(
+    test_queue = event_queue(
             test_queue,
             test_store,
             add_event_name=test_settings.add_to_queue_event_name,

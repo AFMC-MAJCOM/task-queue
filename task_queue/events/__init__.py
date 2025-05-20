@@ -12,6 +12,7 @@ except ModuleNotFoundError:
         "`task_queue[sql]` to use `SqlEventStore`."
     )
 
+    # pylint: disable-next=too-few-public-methods
     class SqlEventStore:
         """
         Empty placeholder class to satisfy type hints and the like.
