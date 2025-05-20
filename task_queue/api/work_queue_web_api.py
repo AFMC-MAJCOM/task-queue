@@ -14,16 +14,8 @@ from fastapi import FastAPI, HTTPException
 # for the queue type that we're creating. For example, if we're using the
 # SQL queue, then we don't want to import any of the S3 modules in case we
 # don't have those installed.
-# pylint: disable=ungrouped-imports
-try:
-    from task_queue.queues.s3_queue import json_s3_queue
-except ModuleNotFoundError:
-    pass
-try:
-    from sqlalchemy import create_engine
-    from task_queue.queues.sql_queue import json_sql_queue
-except ModuleNotFoundError:
-    pass
+from task_queue.queues import json_s3_queue
+from task_queue.queues import json_sql_queue
 
 from task_queue.queues.in_memory_queue import in_memory_queue
 from task_queue.logger import set_logger_level
@@ -124,6 +116,8 @@ class SqlQueueSettings(QueueSettings):
     def make_queue(self):
         """Creates and returns a JSONSQLQueue.
         """
+        # pylint: disable=import-outside-toplevel
+        from sqlalchemy import create_engine
         return json_sql_queue(
             create_engine(self.connection_string),
             self.queue_name

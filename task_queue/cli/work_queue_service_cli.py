@@ -14,21 +14,13 @@ from task_queue.workers.argo_workflows_queue_worker import (
 # for the queue type that we're creating. For example, if we're using the
 # SQL queue, then we don't want to import any of the S3 modules in case we
 # don't have those installed.
-# pylint: disable=ungrouped-imports
-try:
-    from task_queue.queues.s3_queue import json_s3_queue
-except ModuleNotFoundError:
-    pass
-try:
-    from sqlalchemy import create_engine
-    from task_queue.queues.sql_queue import json_sql_queue
-    from task_queue.events.sql_event_store import SqlEventStore
-except ModuleNotFoundError:
-    pass
+from task_queue.queues import json_s3_queue
+from task_queue.queues import json_sql_queue
+from task_queue.events import SqlEventStore
 
-from task_queue.queues.queue_base import QueueItemStage
-from task_queue.queues.in_memory_queue import InMemoryQueue
-from task_queue.queues.queue_with_events import queue_with_events
+from task_queue.queues import QueueItemStage
+from task_queue.queues import memory_queue
+from task_queue.queues import event_queue
 from task_queue.job_release_strategy import (
     ProcessingLimit,
     ResourceLimit,
@@ -192,6 +184,8 @@ def handle_queue_implementation_choice(cli_settings):
         queue = json_s3_queue(cli_settings.s3_base_path)
     elif cli_settings.queue_implementation \
         == config.QueueImplementations.SQL_JSON:
+        # pylint: disable=import-outside-toplevel
+        from sqlalchemy import create_engine
         sql_settings = config.get_task_queue_settings(
             setting_class = config.TaskQueueSqlSettings
         )
@@ -202,12 +196,14 @@ def handle_queue_implementation_choice(cli_settings):
         )
     elif cli_settings.queue_implementation \
          == config.QueueImplementations.IN_MEMORY:
-        queue = InMemoryQueue()
+        queue = memory_queue()
 
     if cli_settings.with_queue_events:
         store = None
         if cli_settings.event_store_implementation \
             == config.EventStoreChoices.SQL_JSON:
+            # pylint: disable=import-outside-toplevel
+            from sqlalchemy import create_engine
             store = SqlEventStore(
                 create_engine(cli_settings.connection_string)
             )
@@ -215,7 +211,7 @@ def handle_queue_implementation_choice(cli_settings):
             raise AttributeError("SQL_JSON is the only implemented event store"
                                   " that works with with_queue_events")
 
-        queue = queue_with_events(
+        queue = event_queue(
             queue,
             store,
             add_event_name=cli_settings.add_to_queue_event_name,

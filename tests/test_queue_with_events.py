@@ -6,7 +6,7 @@ import pytest
 
 from task_queue.events import InMemoryEventStore
 from task_queue.queues import memory_queue
-from task_queue.queues import queue_with_events
+from task_queue.queues import event_queue
 from task_queue.queues.queue_with_events import QueueAddEventData
 from task_queue.queues.queue_with_events import QueueMoveEventData
 from task_queue.queues import QueueItemStage
@@ -25,7 +25,7 @@ def queue_with_events_fixture():
     q = memory_queue()
     s = InMemoryEventStore()
 
-    return q, s, queue_with_events(
+    return q, s, event_queue(
         q,
         s,
         add_event_name=ADD_EVENT_NAME,

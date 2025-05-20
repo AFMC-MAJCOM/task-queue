@@ -1,7 +1,11 @@
+"""
+Event store implementations to hold task queue event types.
+"""
+
 import warnings
 
 try:
-    from .sql_event_store import SqlEventStore
+    from .sql_event_store import SqlEventStore as SqlEventStore
 except ModuleNotFoundError:
     warnings.warn(
         "Task queue must be installed with optional dependencies "
@@ -9,4 +13,4 @@ except ModuleNotFoundError:
     )
     SqlEventStore = None
 
-from .in_memory_event_store import InMemoryEventStore
+from .in_memory_event_store import InMemoryEventStore as InMemoryEventStore

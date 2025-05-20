@@ -6,7 +6,7 @@ import os
 import pytest
 
 from task_queue.queues import memory_queue
-from task_queue.queues import queue_with_events
+from task_queue.queues import event_queue
 from task_queue.queues import json_sql_queue
 from task_queue.queues import json_s3_queue
 from task_queue.events import InMemoryEventStore
@@ -24,14 +24,20 @@ ALL_QUEUE_TYPES = [
 try:
     import sqlalchemy as sqla
     from .utils import PytestSqlEngine
-    param = pytest.param("sql", marks=[pytest.mark.integration, pytest.mark.uses_sql])
+    param = pytest.param(
+        "sql",
+        marks=[pytest.mark.integration, pytest.mark.uses_sql]
+    )
     ALL_QUEUE_TYPES.append(param)
 except ModuleNotFoundError:
     pass
 
 try:
     import s3fs
-    param = pytest.param("s3", marks=[pytest.mark.integration, pytest.mark.uses_s3]),
+    param = pytest.param(
+        "s3",
+        marks=[pytest.mark.integration, pytest.mark.uses_s3]
+    )
     ALL_QUEUE_TYPES.append(param)
 except ModuleNotFoundError:
     pass
@@ -138,7 +144,7 @@ def new_empty_queue(request, setup_fixture):
     elif request.param == "with_events":
         store = InMemoryEventStore()
         queue = new_in_memory_queue()
-        yield queue_with_events(queue, store, "TEST_EVENT_QUEUE")
+        yield event_queue(queue, store, "TEST_EVENT_QUEUE")
 
 @pytest.mark.parametrize("new_empty_queue", ALL_QUEUE_TYPES, indirect=True)
 def test_put_get(new_empty_queue):

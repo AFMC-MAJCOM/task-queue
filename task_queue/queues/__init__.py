@@ -1,7 +1,11 @@
+"""
+Types of queues that store task statuses in the task queue.
+"""
+
 import warnings
 
 try:
-    from .sql_queue import json_sql_queue
+    from .sql_queue import json_sql_queue as json_sql_queue
 except ModuleNotFoundError:
     warnings.warn(
         "Task queue must be installed with optional dependencies "
@@ -10,7 +14,7 @@ except ModuleNotFoundError:
     json_sql_queue = None
 
 try:
-    from .s3_queue import json_s3_queue
+    from .s3_queue import json_s3_queue as json_s3_queue
 except ModuleNotFoundError:
     warnings.warn(
         "Task queue must be installed with optional dependencies "
@@ -20,5 +24,8 @@ except ModuleNotFoundError:
 
 
 from .in_memory_queue import in_memory_queue as memory_queue
-from .queue_with_events import queue_with_events
-from .queue_base import QueueBase, QueueItemStage
+from .queue_with_events import queue_with_events as event_queue
+from .queue_base import (
+    QueueBase as QueueBase,
+    QueueItemStage as QueueItemStage
+)
