@@ -30,7 +30,7 @@ def new_sql_queue_table(tablename:str, constraint_name:str):
         __table_args__ = (
             UniqueConstraint("queue_name", "index_key",
                              name=constraint_name),
-            {'extend_existing':True},
+            {'keep_existing':True},
         )
 
         id: Optional[int] = Field(default=None, primary_key=True)
