@@ -8,7 +8,6 @@ from requests.exceptions import RequestException
 from pydantic import ValidationError
 
 from task_queue.api.work_queue_api_client import ApiClient
-os.environ["QUEUE_IMPLEMENTATION"] = "in-memory"
 from task_queue.api.work_queue_web_api import app
 from task_queue.queues.queue_base import QueueItemStage
 
