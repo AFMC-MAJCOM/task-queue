@@ -66,17 +66,20 @@ class SqlEventStore(EventStoreInterface):
         """
         SQLModel.metadata.create_all(engine)
         self.engine = engine
-    
+
     def _remove_duplicates(self, db_events: list):
         """Queries sql event store for all events
         returns list of events not already in database
         """
-        with Session(self.engine) as session:
-            statement = (
-                select(SqlEventStoreModel.name, SqlEventStoreModel.json_data)
-                .where(tuple_(SqlEventStoreModel.name, SqlEventStoreModel.json_data)
-                       .in_([(event['name'], event['json_data']) for event in db_events]))
+        statement = (
+            select(SqlEventStoreModel.name,
+                   SqlEventStoreModel.json_data)
+            .where(tuple_(SqlEventStoreModel.name,
+                          SqlEventStoreModel.json_data)
+                   .in_([(event['name'], event['json_data'])
+                         for event in db_events]))
             )
+        with Session(self.engine) as session:
             existing_records = session.exec(statement).all()
 
         existing_records_set = set(existing_records)
@@ -84,7 +87,7 @@ class SqlEventStore(EventStoreInterface):
         for event in db_events:
             if (event['name'], event['json_data']) not in existing_records_set:
                 missing_items.append(event)
-        
+
         return missing_items
 
     def _add_raw(self, events):
