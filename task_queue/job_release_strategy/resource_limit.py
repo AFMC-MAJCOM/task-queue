@@ -56,15 +56,14 @@ class ResourceLimit(JobReleaseStrategyBase):
         jobs_processing = work_queue.queue.lookup_state(
             QueueItemStage.PROCESSING
         )
-
-        resources_used_by_processing = sum_dictionaries(
-            (
-                work_queue.queue
-                .lookup_item(item_id)["item_body"]
-                .get(self.resource_key, {})
-            )
-            for item_id in jobs_processing
-        )
+        resources_dict_list = []
+        for item_id in jobs_processing:
+            item_body  = work_queue.queue.lookup_item(item_id)['item_body']
+            if isinstance(item_body, str):
+                item_body = json.loads(item_body)
+            resources = item_body.get(self.resource_key, {})
+            resources_dict_list.append(resources)
+        resources_used_by_processing = sum_dictionaries(resources_dict_list)
 
         negative_available_resources = sum_dictionaries(
             [
