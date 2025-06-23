@@ -3,6 +3,7 @@
 from pprint import pformat
 import datetime
 
+import json
 import requests
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
@@ -155,6 +156,8 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Returns a jsonnable dict to send to the submit URL
         """
+        if isinstance(queue_item_body, str):
+            queue_item_body = json.loads(queue_item_body)
         payload : dict = queue_item_body[
             ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
         ]
@@ -238,7 +241,9 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
-
+        logger.info(f"request url: {request_url}")
+        logger.info(f"request body: {request_body}")
+        logger.info(f"type of request: {type(request_body)}")
         response = requests.post(
             request_url,
             json=request_body,
