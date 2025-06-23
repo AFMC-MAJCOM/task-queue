@@ -60,6 +60,7 @@ class WorkQueue():
         next_items = self._queue.get(n_jobs)
 
         for queue_item_id, queue_item_body in next_items:
+            logger.info(f"queue item body: {queue_item_body}")
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
             except Exception:
