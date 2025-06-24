@@ -239,6 +239,7 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
         """
+        logger.info("Send argo job")
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
         logger.info(f"request url: {request_url}")

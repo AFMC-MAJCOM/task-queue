@@ -65,7 +65,6 @@ class WorkQueue():
                 queue_item_body = json.loads(queue_item_body)
             if 'submit_body' in queue_item_body:
                 queue_item_body = queue_item_body['submit_body']
-            logger.info(f"queue item body: {queue_item_body}")
             try:
                 self._interface.send_job(queue_item_id, queue_item_body)
             except Exception:

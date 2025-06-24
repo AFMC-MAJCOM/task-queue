@@ -78,6 +78,7 @@ class ProcessQueueWorker(QueueWorkerInterface):
                 "args": ['list','of','args'] or None
             }
         """
+        logger.info("send process job")
         p = Process(target=self.start_job, args=(item_id,queue_item_body,))
         self._active_processes[item_id] = p
         p.start()
