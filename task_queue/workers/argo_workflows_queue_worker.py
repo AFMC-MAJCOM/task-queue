@@ -158,9 +158,11 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         """
         if isinstance(queue_item_body, str):
             queue_item_body = json.loads(queue_item_body)
+        logger.info(f"queue item body: {queue_item_body}")
         payload : dict = queue_item_body[
             ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
         ]
+        logger.info(f"payload: {payload}")
         # Merge new labels into submit options for easier query later.
         # We have to do this get/set because submitOptions and labels
         # may not exist in the queue item body payload
