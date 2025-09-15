@@ -3,6 +3,7 @@
 from pprint import pformat
 import datetime
 
+import json
 import requests
 
 from task_queue.workers.queue_worker_interface import QueueWorkerInterface
@@ -155,9 +156,13 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
         -----------
         Returns a jsonnable dict to send to the submit URL
         """
+        if isinstance(queue_item_body, str):
+            queue_item_body = json.loads(queue_item_body)
+        logger.info(f"queue item body: {queue_item_body}")
         payload : dict = queue_item_body[
             ArgoWorkflowsQueueWorker.PAYLOAD_FIELD
         ]
+        logger.info(f"payload: {payload}")
         # Merge new labels into submit options for easier query later.
         # We have to do this get/set because submitOptions and labels
         # may not exist in the queue item body payload
@@ -236,9 +241,12 @@ class ArgoWorkflowsQueueWorker(QueueWorkerInterface):
             'submit_body' and the value is a dictionary with the format
             matching the submit_body schema.
         """
+        logger.info("Send argo job")
         request_body = self._construct_submit_body(item_id, queue_item_body)
         request_url = self._argo_workflows_submit_url
-
+        logger.info(f"request url: {request_url}")
+        logger.info(f"request body: {request_body}")
+        logger.info(f"type of request: {type(request_body)}")
         response = requests.post(
             request_url,
             json=request_body,

@@ -5,6 +5,7 @@ import json
 
 from sqlmodel import Field, Session, SQLModel, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.sql import tuple_
 
 from .event_store_interface import EventStoreInterface
 from .event import Event
@@ -66,25 +67,28 @@ class SqlEventStore(EventStoreInterface):
         SQLModel.metadata.create_all(engine)
         self.engine = engine
 
-    def _check_for_duplicates(self, event: Event):
-        """Queries sql event store for event
-        returns True if duplicate exists
+    def _remove_duplicates(self, db_events: list):
+        """Queries sql event store for all events
+        returns list of events not already in database
         """
-        sql_query = str(event['name']) == SqlEventStoreModel.name
-
-        sql_query = sql_query & \
-                    (str(event['json_data']) == SqlEventStoreModel.json_data)
-
-        with Session(self.engine) as session:
-            statement = (
-                select(SqlEventStoreModel)
-                .where(sql_query)
+        statement = (
+            select(SqlEventStoreModel.name,
+                   SqlEventStoreModel.json_data)
+            .where(tuple_(SqlEventStoreModel.name,
+                          SqlEventStoreModel.json_data)
+                   .in_([(event['name'], event['json_data'])
+                         for event in db_events]))
             )
+        with Session(self.engine) as session:
+            existing_records = session.exec(statement).all()
 
-            items = session.exec(statement).all()
-            if items:
-                return True
-            return False
+        existing_records_set = set(existing_records)
+        missing_items = []
+        for event in db_events:
+            if (event['name'], event['json_data']) not in existing_records_set:
+                missing_items.append(event)
+
+        return missing_items
 
     def _add_raw(self, events):
         """Add events to Event Store.
@@ -103,9 +107,7 @@ class SqlEventStore(EventStoreInterface):
             for evt in events
         ]
 
-        for db_evt in db_events[:]:
-            if self._check_for_duplicates(db_evt):
-                db_events.remove(db_evt)
+        db_events = self._remove_duplicates(db_events)
 
         if not db_events:
             return
